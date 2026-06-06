@@ -30,6 +30,8 @@ public final class SchemaMigrator {
         runScript("database/004_role_permissions.sql");
         try (Connection connection = dataSource.getConnection()) {
             ensureColumn(connection, "clans", "join_requests_open", "INTEGER NOT NULL DEFAULT 1");
+            ensureColumn(connection, "clans", "banner_data", "TEXT");
+            ensureColumn(connection, "clans", "standard_issued", "INTEGER NOT NULL DEFAULT 0");
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate("INSERT INTO schema_version(version) SELECT 1 WHERE NOT EXISTS (SELECT 1 FROM schema_version)");
             }

@@ -9,6 +9,7 @@ public final class GuiMembersConfig {
     private final int previousSlot;
     private final int backSlot;
     private final int nextSlot;
+    private final int bannerSlot;
     private final int contentStart;
     private final int contentSize;
     private final Material pageArrowMaterial;
@@ -21,6 +22,7 @@ public final class GuiMembersConfig {
         this.previousSlot = settings.slots.previous;
         this.backSlot = settings.slots.back;
         this.nextSlot = settings.slots.next;
+        this.bannerSlot = settings.slots.banner;
         this.contentStart = 9;
         this.contentSize = Math.max(0, (rows - 2) * 9);
         this.pageArrowMaterial = parseMaterial(settings.materials.pageArrow, Material.ARROW);
@@ -47,6 +49,10 @@ public final class GuiMembersConfig {
 
     public int nextSlot() {
         return nextSlot;
+    }
+
+    public int bannerSlot() {
+        return bannerSlot;
     }
 
     public Material pageArrowMaterial() {

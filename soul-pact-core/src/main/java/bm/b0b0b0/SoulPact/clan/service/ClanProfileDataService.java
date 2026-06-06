@@ -11,15 +11,18 @@ public final class ClanProfileDataService {
     private final ClanRepository clanRepository;
     private final ClanMembershipRepository membershipRepository;
     private final ClanRolePermissionService rolePermissionService;
+    private final ClanBannerService clanBannerService;
 
     public ClanProfileDataService(
             ClanRepository clanRepository,
             ClanMembershipRepository membershipRepository,
-            ClanRolePermissionService rolePermissionService
+            ClanRolePermissionService rolePermissionService,
+            ClanBannerService clanBannerService
     ) {
         this.clanRepository = clanRepository;
         this.membershipRepository = membershipRepository;
         this.rolePermissionService = rolePermissionService;
+        this.clanBannerService = clanBannerService;
     }
 
     public CompletableFuture<Optional<ClanProfileSnapshot>> load(Player player) {
@@ -39,8 +42,16 @@ public final class ClanProfileDataService {
                         CompletableFuture<Integer> pendingFuture = requestsView
                                 ? membershipRepository.countJoinRequestsByClanId(clan.id())
                                 : CompletableFuture.completedFuture(0);
-                        return pendingFuture.thenApply(pendingCount ->
-                                Optional.of(new ClanProfileSnapshot(clan, members, pendingCount, requestsView))
+                        return clanBannerService.loadBanner(clan.id()).thenCombine(
+                                pendingFuture,
+                                (banner, pendingCount) -> Optional.of(new ClanProfileSnapshot(
+                                        clan,
+                                        members,
+                                        pendingCount,
+                                        requestsView,
+                                        banner,
+                                        clan.leaderId().equals(player.getUniqueId())
+                                ))
                         );
                     })
             );

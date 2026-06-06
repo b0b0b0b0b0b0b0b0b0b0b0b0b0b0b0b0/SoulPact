@@ -20,6 +20,7 @@ public final class PluginConfig {
     private final GuiMemberKickConfirmConfig guiMemberKickConfirmConfig;
     private final GuiClanSettingsConfig guiClanSettingsConfig;
     private final GuiClanRoleSettingsConfig guiClanRoleSettingsConfig;
+    private final GuiClanBannerConfig guiClanBannerConfig;
     private final PermissionsConfig permissionsConfig;
     private final EconomyConfig economyConfig;
 
@@ -39,6 +40,7 @@ public final class PluginConfig {
         this.guiMemberKickConfirmConfig = new GuiMemberKickConfirmConfig(guiSettings.memberKickConfirm);
         this.guiClanSettingsConfig = new GuiClanSettingsConfig(guiSettings.settings);
         this.guiClanRoleSettingsConfig = new GuiClanRoleSettingsConfig(guiSettings.roleSettings);
+        this.guiClanBannerConfig = new GuiClanBannerConfig(guiSettings.banner);
         this.permissionsConfig = new PermissionsConfig(mainSettings.permissions);
         this.economyConfig = new EconomyConfig(mainSettings.economy);
     }
@@ -101,6 +103,10 @@ public final class PluginConfig {
 
     public GuiClanRoleSettingsConfig guiClanRoleSettings() {
         return guiClanRoleSettingsConfig;
+    }
+
+    public GuiClanBannerConfig guiClanBanner() {
+        return guiClanBannerConfig;
     }
 
     public PermissionsConfig permissions() {

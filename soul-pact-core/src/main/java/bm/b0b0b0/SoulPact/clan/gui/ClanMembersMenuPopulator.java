@@ -36,8 +36,14 @@ public final class ClanMembersMenuPopulator {
         return slotLayout.assignPage(guiMembersConfig, snapshot.members(), page);
     }
 
-    public void populate(Inventory inventory, Player player, ClanMembersPage membersPage) {
+    public void populate(Inventory inventory, Player player, ClanMembersPage membersPage, ClanMembersSnapshot snapshot) {
         fillBackground(inventory, player);
+        inventory.setItem(guiMembersConfig.bannerSlot(), guiItemBuilder.buildFromStack(
+                player,
+                snapshot.bannerItem(),
+                "clan.gui.members.item.banner.name",
+                "clan.gui.members.item.banner.lore"
+        ));
         for (Map.Entry<Integer, ClanMember> entry : membersPage.slotMembers().entrySet()) {
             ClanMember member = entry.getValue();
             String playerName = resolveDisplayName(member);

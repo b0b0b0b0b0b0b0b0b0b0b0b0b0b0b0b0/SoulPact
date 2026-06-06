@@ -8,11 +8,11 @@ roles:
     title: "<#FCD34D>Генерал"
     list-names: true
   deputy:
-    title: "<#D8B4FE>Полковник"
+    title: "<#C084FC>Полковник"
     list-names: true
   officer:
-    title: "<#93C5FD>Капитан"
+    title: "<white>Капитан"
     list-names: true
   member:
-    title: "<#9CA3AF>Солдаты"
+    title: "<white>Солдаты"
     list-names: false

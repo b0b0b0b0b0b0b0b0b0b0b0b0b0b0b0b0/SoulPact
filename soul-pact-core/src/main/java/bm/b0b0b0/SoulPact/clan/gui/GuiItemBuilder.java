@@ -86,4 +86,31 @@ public final class GuiItemBuilder {
         itemStack.setItemMeta(skullMeta);
         return itemStack;
     }
+
+    public ItemStack buildFromStack(
+            Player player,
+            ItemStack source,
+            String nameKey,
+            String loreKey
+    ) {
+        return buildFromStack(player, source, nameKey, loreKey, Map.of());
+    }
+
+    public ItemStack buildFromStack(
+            Player player,
+            ItemStack source,
+            String nameKey,
+            String loreKey,
+            Map<String, String> placeholders
+    ) {
+        ItemStack itemStack = source.clone();
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.displayName(messageService.component(player, nameKey, placeholders));
+        List<String> loreLines = messageService.resolveList(player, loreKey, placeholders);
+        if (loreLines != null && !loreLines.isEmpty()) {
+            itemMeta.lore(loreLines.stream().map(AdventureTextParser::parse).toList());
+        }
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
 }

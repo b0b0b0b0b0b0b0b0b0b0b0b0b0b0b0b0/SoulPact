@@ -7,48 +7,56 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public final class ClanHubDataService {
 
     private final ClanRepository clanRepository;
+    private final ClanBannerService clanBannerService;
     private final ClanEconomyMessages clanEconomyMessages;
     private final MessageService messageService;
     private final ExtensionRegistryImpl extensionRegistry;
 
     public ClanHubDataService(
             ClanRepository clanRepository,
+            ClanBannerService clanBannerService,
             ClanEconomyMessages clanEconomyMessages,
             MessageService messageService,
             ExtensionRegistryImpl extensionRegistry
     ) {
         this.clanRepository = clanRepository;
+        this.clanBannerService = clanBannerService;
         this.clanEconomyMessages = clanEconomyMessages;
         this.messageService = messageService;
         this.extensionRegistry = extensionRegistry;
     }
 
     public CompletableFuture<ClanHubSnapshot> loadSnapshot(Player player) {
-        CompletableFuture<Integer> totalFuture = clanRepository.countClans();
-        CompletableFuture<java.util.Optional<bm.b0b0b0.SoulPact.clan.model.Clan>> playerClanFuture =
-                clanRepository.findByPlayerId(player.getUniqueId());
-        return totalFuture.thenCombine(playerClanFuture, (total, playerClan) ->
-                buildSnapshot(
-                        player,
-                        total,
-                        playerClan.map(clan -> clan.tag()).orElse(null),
-                        playerClan.isPresent(),
-                        playerClan.map(clan -> clan.leaderId().equals(player.getUniqueId())).orElse(false)
-                )
-        );
+        return clanRepository.findByPlayerId(player.getUniqueId()).thenCompose(playerClanOptional -> {
+            CompletableFuture<Integer> totalFuture = clanRepository.countClans();
+            CompletableFuture<ItemStack> bannerFuture = playerClanOptional
+                    .map(clan -> clanBannerService.loadBanner(clan.id()))
+                    .orElseGet(() -> CompletableFuture.completedFuture(null));
+            return totalFuture.thenCombine(bannerFuture, (total, banner) -> buildSnapshot(
+                    player,
+                    total,
+                    playerClanOptional,
+                    banner
+            ));
+        });
     }
 
     private ClanHubSnapshot buildSnapshot(
             Player player,
             int totalClans,
-            String playerClanTag,
-            boolean inClan,
-            boolean clanLeader
+            java.util.Optional<bm.b0b0b0.SoulPact.clan.model.Clan> playerClanOptional,
+            ItemStack bannerItem
     ) {
+        String playerClanTag = playerClanOptional.map(clan -> clan.tag()).orElse(null);
+        boolean inClan = playerClanOptional.isPresent();
+        boolean clanLeader = playerClanOptional
+                .map(clan -> clan.leaderId().equals(player.getUniqueId()))
+                .orElse(false);
         Map<String, String> placeholders = new HashMap<>();
         placeholders.put("total_clans", String.valueOf(totalClans));
         placeholders.put("your_clan", playerClanTag == null
@@ -56,6 +64,6 @@ public final class ClanHubDataService {
                 : playerClanTag);
         placeholders.put("create_cost", clanEconomyMessages.createCostLine(player));
         placeholders.put("extension_count", String.valueOf(extensionRegistry.all().size()));
-        return new ClanHubSnapshot(Map.copyOf(placeholders), inClan, clanLeader);
+        return new ClanHubSnapshot(Map.copyOf(placeholders), inClan, clanLeader, bannerItem);
     }
 }

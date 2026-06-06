@@ -11,8 +11,8 @@ roles:
     title: "<#C084FC>Vice Captain"
     list-names: true
   officer:
-    title: "<#93C5FD>Commander"
+    title: "<white>Commander"
     list-names: true
   member:
-    title: "<#9CA3AF>Nakama"
+    title: "<white>Nakama"
     list-names: false

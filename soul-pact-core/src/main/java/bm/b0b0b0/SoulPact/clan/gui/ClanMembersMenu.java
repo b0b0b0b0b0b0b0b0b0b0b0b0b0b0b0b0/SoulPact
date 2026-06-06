@@ -42,7 +42,7 @@ public final class ClanMembersMenu implements InventoryHolder {
                         "pages", String.valueOf(Math.max(membersPage.totalPages(), 1))
                 ))
         );
-        populator.populate(inventory, player, membersPage);
+        populator.populate(inventory, player, membersPage, snapshot);
     }
 
     @Override
@@ -76,5 +76,13 @@ public final class ClanMembersMenu implements InventoryHolder {
 
     public UUID memberIdAtSlot(int slot) {
         return membersPage.memberIdAtSlot(slot);
+    }
+
+    public int slotBanner() {
+        return guiMembersConfig.bannerSlot();
+    }
+
+    public boolean viewerIsLeader() {
+        return snapshot.viewerIsLeader();
     }
 }

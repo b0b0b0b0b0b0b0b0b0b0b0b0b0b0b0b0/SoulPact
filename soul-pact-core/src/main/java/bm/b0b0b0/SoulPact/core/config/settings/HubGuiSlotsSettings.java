@@ -14,8 +14,8 @@ public final class HubGuiSlotsSettings {
     @Comment(@CommentValue("Настройки клана"))
     public int settings = 24;
 
-    @Comment(@CommentValue("Баннер клана"))
-    public int banner = 29;
+    @Comment(@CommentValue("Баннер клана (ряд с профилем)"))
+    public int banner = 20;
 
     @Comment(@CommentValue("Создать клан (под головой игрока)"))
     public int create = 31;

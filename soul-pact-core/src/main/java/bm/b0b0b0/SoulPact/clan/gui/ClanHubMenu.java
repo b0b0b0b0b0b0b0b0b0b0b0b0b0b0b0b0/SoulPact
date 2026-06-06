@@ -13,6 +13,9 @@ public final class ClanHubMenu implements InventoryHolder {
     private final GuiHubConfig guiHubConfig;
     private final Inventory inventory;
 
+    private final boolean clanLeader;
+    private final boolean inClan;
+
     public ClanHubMenu(
             GuiHubConfig guiHubConfig,
             ClanHubMenuPopulator populator,
@@ -21,6 +24,8 @@ public final class ClanHubMenu implements InventoryHolder {
             ClanHubSnapshot snapshot
     ) {
         this.guiHubConfig = guiHubConfig;
+        this.inClan = snapshot.inClan();
+        this.clanLeader = snapshot.clanLeader();
         this.inventory = Bukkit.createInventory(
                 this,
                 guiHubConfig.size(),
@@ -60,5 +65,13 @@ public final class ClanHubMenu implements InventoryHolder {
 
     public int slotHelp() {
         return guiHubConfig.helpSlot();
+    }
+
+    public boolean clanLeader() {
+        return clanLeader;
+    }
+
+    public boolean inClan() {
+        return inClan;
     }
 }

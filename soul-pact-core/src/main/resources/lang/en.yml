@@ -107,6 +107,36 @@ clan:
       kick: "Kick"
       accept: "Accept"
       recruit_lower: "Recruit lower"
+  banner:
+    not-in-clan: "<#F87171>You are not in a clan."
+    not-leader: "<#F87171>Only the leader can change the clan banner."
+    saved: "<#86EFAC>Clan banner saved."
+    save-failed: "<#F87171>Failed to save the banner."
+    max-layers: "<#F87171>The banner already has 6 patterns — maximum."
+    from-hand-empty: "<#F87171>Hold a banner in your main hand."
+    from-hand-invalid: "<#F87171>You must hold a banner."
+    from-hand-applied: "<#86EFAC>Banner copied from hand."
+    view-only: "<#9CA3AF>Only the leader can edit the clan standard."
+    edit-locked: "<#F87171>While the standard is out of storage, the banner cannot be edited."
+    deposit-first: "<#FCD34D>Deposit the standard in storage first."
+    standard-away: "<#F87171>The standard is somewhere in the world — find it and pick it up."
+  standard:
+    take:
+      success: "<#F87171><bold>Standard [{tag}] issued.</bold> <#9CA3AF>If it burns, falls into the void, or is destroyed — <#F87171>the clan disbands in shame<#9CA3AF>. Guard it with your life."
+      already-exists: "<#F87171>The standard is already in the world. Deposit it or find it first."
+      failed: "<#F87171>Failed to issue the standard."
+    deposit:
+      success: "<#86EFAC>Standard [{tag}] stored. You can edit the banner again."
+      not-in-inventory: "<#F87171>The standard must be in your inventory."
+      failed: "<#F87171>Failed to store the standard."
+    disband:
+      broadcast: "<#F87171><bold>Shame!</bold> Clan <white>[{tag}] {name}</white> <#6B7280>(#{id}) <#F87171>— the standard was lost, the clan is no more."
+    item:
+      name: "<#FCD34D><bold>Standard [{tag}]</bold>"
+      lore:
+        - "<#9CA3AF>Clan ID: <white>#{id}"
+        - "<#F87171>Unique clan standard"
+        - "<#F87171>Loss = disband with shame"
   pending:
     invalid-id: "<#F87171>Invalid request number."
     button-separator: " <#6B7280>| "
@@ -226,7 +256,8 @@ clan:
         banner:
           name: "<#F3F4F6>Clan banner"
           lore:
-            - "<#9CA3AF>Upload and view banner"
+            - "<#9CA3AF>Your clan flag"
+            - "<#D8B4FE>Click — editor"
         create:
           name: "<#86EFAC><bold>Create clan</bold>"
           lore:
@@ -254,7 +285,7 @@ clan:
           lore:
             - "<#9CA3AF>To main menu"
       role:
-        title: "<#581C87><bold>{role}</bold>"
+        title: "{role}"
         item:
           back:
             name: "<#F87171>Back"
@@ -294,6 +325,132 @@ clan:
               lore:
                 - "<#9CA3AF>Status: <#F87171>disabled"
                 - "<#D8B4FE>Click — enable"
+    banner:
+      title: "<#581C87><bold>Banner</bold> <#374151>[{tag}]"
+      color:
+        white: "White"
+        black: "Black"
+        red: "Red"
+        yellow: "Yellow"
+        purple: "Purple"
+        cyan: "Cyan"
+        lime: "Lime"
+        orange: "Orange"
+      item:
+        preview:
+          name: "<#F3F4F6>Clan banner"
+          lore:
+            - "<#9CA3AF>Current preview"
+            - "<#9CA3AF>Pattern layers: <white>{layers}<#9CA3AF>/6"
+        clear:
+          name: "<#F87171>Clear patterns"
+          lore:
+            - "<#9CA3AF>Keep base color only"
+            - "<#D8B4FE>Click — clear"
+        pattern-color:
+          name: "<#C084FC>Pattern color"
+          lore:
+            - "<#9CA3AF>Selected: <white>{color}"
+            - "<#D8B4FE>Click — cycle"
+        from-hand:
+          name: "<#D8B4FE>Copy from hand"
+          lore:
+            - "<#9CA3AF>Banner in main hand"
+            - "<#D8B4FE>Click — apply"
+        undo:
+          name: "<#9CA3AF>Remove layer"
+          lore:
+            - "<#9CA3AF>Remove last pattern"
+            - "<#D8B4FE>Click — undo"
+        save:
+          name: "<#86EFAC><bold>Save</bold>"
+          lore:
+            - "<#9CA3AF>Save clan banner"
+            - "<#D8B4FE>Click — save"
+        take-standard:
+          name: "<#FCD34D><bold>Take standard</bold>"
+          lore:
+            - "<#9CA3AF>Your clan's ceremonial flag"
+            - ""
+            - "<#F87171><bold>ONE STANDARD PER CLAN</bold>"
+            - "<#F87171>If it burns, falls into the void, despawns"
+            - "<#F87171>or is destroyed — <bold>the clan disbands</bold>"
+            - "<#F87171><bold>The whole server</bold> will know"
+            - ""
+            - "<#9CA3AF>While you carry it, the banner is locked"
+            - "<#9CA3AF>Return it here to edit the banner again"
+            - ""
+            - "<#FCD34D><bold>Are you sure?</bold>"
+            - "<#D8B4FE>Click — receive"
+        deposit-standard:
+          name: "<#86EFAC><bold>Store standard</bold>"
+          lore:
+            - "<#9CA3AF>Return the standard to clan storage"
+            - "<#9CA3AF>Removed from your inventory"
+            - "<#86EFAC>You can edit the banner again"
+            - "<#D8B4FE>Click — store"
+        edit-locked:
+          name: "<#F87171><bold>Editor locked</bold>"
+          lore:
+            - "<#9CA3AF>The standard is out of storage"
+            - "<#9CA3AF>While it exists in the world, no edits"
+            - "<#FCD34D>Store the standard to unlock"
+        standard-away:
+          name: "<#F87171><bold>Standard not with you</bold>"
+          lore:
+            - "<#9CA3AF>The standard is somewhere in the world"
+            - "<#9CA3AF>Find it and pick it up"
+            - "<#FCD34D>Then store it here"
+        back:
+          name: "<#F87171>Back"
+          lore:
+            - "<#9CA3AF>Main menu"
+        pattern:
+          stripe_bottom:
+            name: "<white>Bottom stripe"
+            lore:
+              - "<#9CA3AF>Add pattern"
+              - "<#D8B4FE>Click — apply"
+          stripe_top:
+            name: "<white>Top stripe"
+            lore:
+              - "<#9CA3AF>Add pattern"
+              - "<#D8B4FE>Click — apply"
+          stripe_left:
+            name: "<white>Left stripe"
+            lore:
+              - "<#9CA3AF>Add pattern"
+              - "<#D8B4FE>Click — apply"
+          cross:
+            name: "<white>Cross"
+            lore:
+              - "<#9CA3AF>Add pattern"
+              - "<#D8B4FE>Click — apply"
+          triangle_top:
+            name: "<white>Triangle"
+            lore:
+              - "<#9CA3AF>Add pattern"
+              - "<#D8B4FE>Click — apply"
+          border:
+            name: "<white>Border"
+            lore:
+              - "<#9CA3AF>Add pattern"
+              - "<#D8B4FE>Click — apply"
+          gradient:
+            name: "<white>Gradient"
+            lore:
+              - "<#9CA3AF>Add pattern"
+              - "<#D8B4FE>Click — apply"
+          rhombus:
+            name: "<white>Rhombus"
+            lore:
+              - "<#9CA3AF>Add pattern"
+              - "<#D8B4FE>Click — apply"
+          skull:
+            name: "<white>Skull"
+            lore:
+              - "<#9CA3AF>Add pattern"
+              - "<#D8B4FE>Click — apply"
     profile:
       title: "<#581C87><bold>Clan profile</bold>"
       value-yes: "<#86EFAC>yes"
@@ -317,6 +474,11 @@ clan:
             - "<#9CA3AF>Create a clan or join"
             - "<#9CA3AF>via invitation"
       item:
+        banner:
+          name: "<#F3F4F6>Clan standard"
+          lore:
+            - "<#9CA3AF>Your clan flag"
+            - "<#D8B4FE>Leader — editor"
         clan:
           name: "<#C084FC><bold>[{tag}] {name}</bold>"
           lore:
@@ -353,6 +515,11 @@ clan:
     members:
       title: "<#581C87><bold>Roster</bold> <#374151>[{tag}] <#6B7280>({count}) <#374151>{page}/{pages}"
       item:
+        banner:
+          name: "<#F3F4F6>Clan standard"
+          lore:
+            - "<#9CA3AF>Clan flag"
+            - "<#D8B4FE>Leader — editor"
         entry:
           name: "<white>{player}</white>"
           lore:
@@ -385,6 +552,7 @@ clan:
           leave: "left"
           kick: "kicked"
           disband: "disbanded"
+          standard-lost: "standard lost"
           other: "—"
         player:
           name: "<white>{player}</white>"
@@ -505,6 +673,7 @@ clan:
           leave: "left"
           kick: "kicked"
           disband: "disbanded"
+          standard-lost: "standard lost"
           other: "—"
         accept:
           name: "<#86EFAC><bold>Accept</bold>"

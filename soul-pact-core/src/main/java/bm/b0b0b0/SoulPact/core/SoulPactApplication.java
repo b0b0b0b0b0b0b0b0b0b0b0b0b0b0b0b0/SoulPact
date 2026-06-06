@@ -30,6 +30,17 @@ import bm.b0b0b0.SoulPact.clan.gui.ClanRequestDetailMenuPopulator;
 import bm.b0b0b0.SoulPact.clan.gui.ClanRequestsClickHandler;
 import bm.b0b0b0.SoulPact.clan.gui.ClanRequestsMenuPopulator;
 import bm.b0b0b0.SoulPact.clan.gui.ClanRoleSettingsClickHandler;
+import bm.b0b0b0.SoulPact.clan.gui.ClanBannerClickHandler;
+import bm.b0b0b0.SoulPact.clan.gui.ClanBannerMenuPopulator;
+import bm.b0b0b0.SoulPact.clan.repository.ClanBannerRepository;
+import bm.b0b0b0.SoulPact.clan.repository.SqlClanBannerRepository;
+import bm.b0b0b0.SoulPact.clan.listener.ClanStandardListener;
+import bm.b0b0b0.SoulPact.clan.standard.ClanStandardItem;
+import bm.b0b0b0.SoulPact.clan.standard.ClanStandardKeys;
+import bm.b0b0b0.SoulPact.clan.standard.ClanStandardPresence;
+import bm.b0b0b0.SoulPact.clan.standard.ClanStandardService;
+import bm.b0b0b0.SoulPact.clan.service.ClanBannerDataService;
+import bm.b0b0b0.SoulPact.clan.service.ClanBannerService;
 import bm.b0b0b0.SoulPact.clan.gui.ClanRoleSettingsMenuPopulator;
 import bm.b0b0b0.SoulPact.clan.gui.ClanSettingsClickHandler;
 import bm.b0b0b0.SoulPact.clan.gui.ClanSettingsMenuPopulator;
@@ -197,16 +208,29 @@ public final class SoulPactApplication {
                 new ClanPendingJoinListener(clanRuntimeHolder, dataSourceProvider),
                 plugin
         );
+        plugin.getServer().getPluginManager().registerEvents(
+                new ClanStandardListener(clanStandardItem, standardPresence, clanStandardService),
+                plugin
+        );
     }
+
+    private ClanStandardItem clanStandardItem;
+    private ClanStandardPresence standardPresence;
+    private ClanStandardService clanStandardService;
 
     private void wireServices() {
         ClanRepository clanRepository = new SqlClanRepository(dataSourceProvider, asyncDatabaseExecutor);
+        ClanBannerRepository clanBannerRepository = new SqlClanBannerRepository(dataSourceProvider, asyncDatabaseExecutor);
+        ClanBannerService clanBannerService = new ClanBannerService(clanBannerRepository);
         ClanQueryService clanQueryService = new ClanQueryService(clanRepository);
         RoleThemeService roleThemeService = new RoleThemeService(plugin, pluginConfig.locale(), pluginConfig.clan());
         PlayerHeadSkinApplier playerHeadSkinApplier = new PlayerHeadSkinApplier(
                 integrationBootstrap.skinRestorerIntegration()
         );
         GuiItemBuilder guiItemBuilder = new GuiItemBuilder(messageService, playerHeadSkinApplier);
+        ClanStandardKeys standardKeys = new ClanStandardKeys(plugin);
+        this.clanStandardItem = new ClanStandardItem(standardKeys, messageService);
+        this.standardPresence = new ClanStandardPresence();
         ClanHubMenuPopulator hubMenuPopulator = new ClanHubMenuPopulator(pluginConfig.guiHub(), guiItemBuilder);
         ClanProfileMembersLoreBuilder profileMembersLoreBuilder = new ClanProfileMembersLoreBuilder(
                 messageService,
@@ -246,7 +270,8 @@ public final class SoulPactApplication {
         ClanProfileDataService profileDataService = new ClanProfileDataService(
                 clanRepository,
                 membershipRepository,
-                rolePermissionService
+                rolePermissionService,
+                clanBannerService
         );
         ClanMembershipNotificationRepository notificationRepository = new SqlClanMembershipNotificationRepository(
                 dataSourceProvider,
@@ -260,7 +285,7 @@ public final class SoulPactApplication {
                 memberHistoryLoreBuilder
         );
         ClanMembersSlotLayout membersSlotLayout = new ClanMembersSlotLayout(roleThemeService);
-        ClanMembersDataService membersDataService = new ClanMembersDataService(clanRepository);
+        ClanMembersDataService membersDataService = new ClanMembersDataService(clanRepository, clanBannerService);
         ClanMemberManagementPlanner memberManagementPlanner = new ClanMemberManagementPlanner(roleThemeService);
         ClanMemberDetailDataService memberDetailDataService = new ClanMemberDetailDataService(
                 clanRepository,
@@ -316,6 +341,7 @@ public final class SoulPactApplication {
         );
         ClanHubDataService hubDataService = new ClanHubDataService(
                 clanRepository,
+                clanBannerService,
                 clanEconomyMessages,
                 messageService,
                 extensionRegistry
@@ -355,11 +381,39 @@ public final class SoulPactApplication {
                 pluginConfig.guiClanRoleSettings(),
                 guiItemBuilder
         );
+        ClanBannerMenuPopulator bannerMenuPopulator = new ClanBannerMenuPopulator(
+                pluginConfig.guiClanBanner(),
+                guiItemBuilder,
+                messageService
+        );
         ClanSettingsDataService settingsDataService = new ClanSettingsDataService(clanRepository, roleThemeService);
         ClanRoleSettingsDataService roleSettingsDataService = new ClanRoleSettingsDataService(
                 clanRepository,
                 roleThemeService,
                 rolePermissionService
+        );
+        ClanDisbandService disbandService = new ClanDisbandService(
+                clanRepository,
+                membershipHistoryService,
+                standardPresence,
+                messageService,
+                asyncDatabaseExecutor
+        );
+        ClanStandardService clanStandardService = new ClanStandardService(
+                clanRepository,
+                clanBannerService,
+                clanBannerRepository,
+                clanStandardItem,
+                standardPresence,
+                disbandService,
+                messageService,
+                asyncDatabaseExecutor
+        );
+        this.clanStandardService = clanStandardService;
+        ClanBannerDataService bannerDataService = new ClanBannerDataService(
+                clanRepository,
+                clanBannerService,
+                clanStandardService
         );
         ClanGuiOpenService guiOpenService = new ClanGuiOpenService(
                 pluginConfig.guiHub(),
@@ -371,6 +425,7 @@ public final class SoulPactApplication {
                 pluginConfig.guiMemberKickConfirm(),
                 pluginConfig.guiClanSettings(),
                 pluginConfig.guiClanRoleSettings(),
+                pluginConfig.guiClanBanner(),
                 pluginConfig.guiList(),
                 pluginConfig.guiExtensions(),
                 pluginConfig.guiInfo(),
@@ -383,6 +438,7 @@ public final class SoulPactApplication {
                 memberKickConfirmMenuPopulator,
                 settingsMenuPopulator,
                 roleSettingsMenuPopulator,
+                bannerMenuPopulator,
                 listMenuPopulator,
                 infoMenuPopulator,
                 extensionsMenuPopulator,
@@ -398,6 +454,7 @@ public final class SoulPactApplication {
                 extensionsDataService,
                 settingsDataService,
                 roleSettingsDataService,
+                bannerDataService,
                 asyncDatabaseExecutor
         );
         ClanCreateChatPrompt createChatPrompt = new ClanCreateChatPrompt(messageService, asyncDatabaseExecutor);
@@ -432,12 +489,6 @@ public final class SoulPactApplication {
                 messageService,
                 asyncDatabaseExecutor
         );
-        ClanDisbandService disbandService = new ClanDisbandService(
-                clanRepository,
-                membershipHistoryService,
-                messageService,
-                asyncDatabaseExecutor
-        );
         ClanCreateEconomy createEconomy = new ClanCreateEconomy(
                 pluginConfig.economy(),
                 integrationBootstrap.vaultIntegration()
@@ -458,7 +509,8 @@ public final class SoulPactApplication {
         ClanProfileClickHandler profileClickHandler = new ClanProfileClickHandler(
                 createChatPrompt,
                 guiOpenService,
-                leaveService
+                leaveService,
+                messageService
         );
         ClanListClickHandler listClickHandler = new ClanListClickHandler(guiOpenService);
         ClanInfoClickHandler infoClickHandler = new ClanInfoClickHandler(
@@ -475,7 +527,7 @@ public final class SoulPactApplication {
                 guiOpenService,
                 membershipService
         );
-        ClanMembersClickHandler membersClickHandler = new ClanMembersClickHandler(guiOpenService);
+        ClanMembersClickHandler membersClickHandler = new ClanMembersClickHandler(guiOpenService, messageService);
         ClanMemberDetailClickHandler memberDetailClickHandler = new ClanMemberDetailClickHandler(
                 guiOpenService,
                 memberManagementService
@@ -489,6 +541,14 @@ public final class SoulPactApplication {
                 guiOpenService,
                 rolePermissionService
         );
+        ClanBannerClickHandler bannerClickHandler = new ClanBannerClickHandler(
+                messageService,
+                clanBannerService,
+                clanStandardService,
+                bannerMenuPopulator,
+                guiOpenService,
+                asyncDatabaseExecutor
+        );
         ClanGuiClickDispatcher guiClickDispatcher = new ClanGuiClickDispatcher(
                 hubClickHandler,
                 profileClickHandler,
@@ -501,7 +561,8 @@ public final class SoulPactApplication {
                 memberDetailClickHandler,
                 memberKickConfirmClickHandler,
                 settingsClickHandler,
-                roleSettingsClickHandler
+                roleSettingsClickHandler,
+                bannerClickHandler
         );
         ClanCreateService createService = new ClanCreateService(
                 clanRepository,

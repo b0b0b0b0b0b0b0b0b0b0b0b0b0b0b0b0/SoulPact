@@ -1,18 +1,29 @@
 package bm.b0b0b0.SoulPact.clan.gui;
 
+import bm.b0b0b0.SoulPact.core.message.MessageService;
 import org.bukkit.entity.Player;
 
 public final class ClanMembersClickHandler {
 
     private final ClanGuiOpenService guiOpenService;
+    private final MessageService messageService;
 
-    public ClanMembersClickHandler(ClanGuiOpenService guiOpenService) {
+    public ClanMembersClickHandler(ClanGuiOpenService guiOpenService, MessageService messageService) {
         this.guiOpenService = guiOpenService;
+        this.messageService = messageService;
     }
 
     public void handle(ClanMembersMenu menu, Player player, int slot) {
         if (slot == menu.config().backSlot()) {
             navigateBack(menu.navigation(), player);
+            return;
+        }
+        if (slot == menu.slotBanner()) {
+            if (!menu.viewerIsLeader()) {
+                messageService.send(player, "clan.banner.view-only");
+                return;
+            }
+            guiOpenService.openBanner(player);
             return;
         }
         if (slot == menu.slotPrevious() && menu.membersPage().hasPrevious()) {

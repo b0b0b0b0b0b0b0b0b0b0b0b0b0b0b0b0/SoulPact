@@ -28,4 +28,7 @@ public final class ProfileGuiSlotsSettings {
 
     @Comment(@CommentValue("Назад в главное меню"))
     public int back = 22;
+
+    @Comment(@CommentValue("Знамя клана (верх, центр)"))
+    public int banner = 4;
 }

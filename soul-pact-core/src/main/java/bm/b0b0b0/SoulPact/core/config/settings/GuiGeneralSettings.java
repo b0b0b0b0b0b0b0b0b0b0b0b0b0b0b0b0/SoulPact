@@ -46,4 +46,7 @@ public final class GuiGeneralSettings extends YamlSerializable {
 
     @Comment(@CommentValue("Права роли в настройках клана"))
     public RoleSettingsGuiSettings roleSettings = new RoleSettingsGuiSettings();
+
+    @Comment(@CommentValue("Редактор баннера клана"))
+    public BannerGuiSettings banner = new BannerGuiSettings();
 }

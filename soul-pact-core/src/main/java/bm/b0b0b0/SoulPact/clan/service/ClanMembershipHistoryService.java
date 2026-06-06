@@ -56,4 +56,21 @@ public final class ClanMembershipHistoryService {
         }
         return chain;
     }
+
+    public CompletableFuture<Void> recordStandardLoss(Clan clan, List<ClanMember> members, long leftAt) {
+        CompletableFuture<Void> chain = CompletableFuture.completedFuture(null);
+        for (ClanMember member : members) {
+            chain = chain.thenCompose(ignored -> historyRepository.record(
+                    member.playerId(),
+                    clan.id(),
+                    clan.tag(),
+                    clan.name(),
+                    member.role(),
+                    member.joinedAt(),
+                    leftAt,
+                    "standard_lost"
+            ));
+        }
+        return chain;
+    }
 }

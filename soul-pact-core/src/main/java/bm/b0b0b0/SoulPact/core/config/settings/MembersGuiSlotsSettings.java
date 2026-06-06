@@ -13,4 +13,7 @@ public final class MembersGuiSlotsSettings {
 
     @Comment(@CommentValue("Следующая страница"))
     public int next = 53;
+
+    @Comment(@CommentValue("Знамя клана (верх, центр)"))
+    public int banner = 4;
 }

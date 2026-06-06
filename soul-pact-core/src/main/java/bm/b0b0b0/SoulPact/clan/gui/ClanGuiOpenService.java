@@ -10,7 +10,10 @@ import bm.b0b0b0.SoulPact.clan.service.ClanMembersDataService;
 import bm.b0b0b0.SoulPact.clan.service.ClanRequestDetailDataService;
 import bm.b0b0b0.SoulPact.clan.service.ClanRequestsDataService;
 import bm.b0b0b0.SoulPact.clan.service.ClanRoleSettingsDataService;
+import bm.b0b0b0.SoulPact.clan.service.ClanBannerDataService;
+import bm.b0b0b0.SoulPact.clan.service.ClanBannerSnapshot;
 import bm.b0b0b0.SoulPact.clan.service.ClanSettingsDataService;
+import bm.b0b0b0.SoulPact.core.config.GuiClanBannerConfig;
 import bm.b0b0b0.SoulPact.core.config.GuiClanRoleSettingsConfig;
 import bm.b0b0b0.SoulPact.core.config.GuiClanSettingsConfig;
 import bm.b0b0b0.SoulPact.core.config.GuiExtensionsConfig;
@@ -39,6 +42,7 @@ public final class ClanGuiOpenService {
     private final GuiMemberKickConfirmConfig guiMemberKickConfirmConfig;
     private final GuiClanSettingsConfig guiClanSettingsConfig;
     private final GuiClanRoleSettingsConfig guiClanRoleSettingsConfig;
+    private final GuiClanBannerConfig guiClanBannerConfig;
     private final GuiListConfig guiListConfig;
     private final GuiExtensionsConfig guiExtensionsConfig;
     private final GuiInfoConfig guiInfoConfig;
@@ -51,6 +55,7 @@ public final class ClanGuiOpenService {
     private final ClanMemberKickConfirmMenuPopulator memberKickConfirmMenuPopulator;
     private final ClanSettingsMenuPopulator settingsMenuPopulator;
     private final ClanRoleSettingsMenuPopulator roleSettingsMenuPopulator;
+    private final ClanBannerMenuPopulator bannerMenuPopulator;
     private final ClanListMenuPopulator listMenuPopulator;
     private final ClanInfoMenuPopulator infoMenuPopulator;
     private final ClanExtensionsMenuPopulator extensionsMenuPopulator;
@@ -66,6 +71,7 @@ public final class ClanGuiOpenService {
     private final ClanExtensionsDataService extensionsDataService;
     private final ClanSettingsDataService settingsDataService;
     private final ClanRoleSettingsDataService roleSettingsDataService;
+    private final ClanBannerDataService bannerDataService;
     private final AsyncDatabaseExecutor asyncDatabaseExecutor;
 
     public ClanGuiOpenService(
@@ -78,6 +84,7 @@ public final class ClanGuiOpenService {
             GuiMemberKickConfirmConfig guiMemberKickConfirmConfig,
             GuiClanSettingsConfig guiClanSettingsConfig,
             GuiClanRoleSettingsConfig guiClanRoleSettingsConfig,
+            GuiClanBannerConfig guiClanBannerConfig,
             GuiListConfig guiListConfig,
             GuiExtensionsConfig guiExtensionsConfig,
             GuiInfoConfig guiInfoConfig,
@@ -90,6 +97,7 @@ public final class ClanGuiOpenService {
             ClanMemberKickConfirmMenuPopulator memberKickConfirmMenuPopulator,
             ClanSettingsMenuPopulator settingsMenuPopulator,
             ClanRoleSettingsMenuPopulator roleSettingsMenuPopulator,
+            ClanBannerMenuPopulator bannerMenuPopulator,
             ClanListMenuPopulator listMenuPopulator,
             ClanInfoMenuPopulator infoMenuPopulator,
             ClanExtensionsMenuPopulator extensionsMenuPopulator,
@@ -105,6 +113,7 @@ public final class ClanGuiOpenService {
             ClanExtensionsDataService extensionsDataService,
             ClanSettingsDataService settingsDataService,
             ClanRoleSettingsDataService roleSettingsDataService,
+            ClanBannerDataService bannerDataService,
             AsyncDatabaseExecutor asyncDatabaseExecutor
     ) {
         this.guiHubConfig = guiHubConfig;
@@ -116,6 +125,7 @@ public final class ClanGuiOpenService {
         this.guiMemberKickConfirmConfig = guiMemberKickConfirmConfig;
         this.guiClanSettingsConfig = guiClanSettingsConfig;
         this.guiClanRoleSettingsConfig = guiClanRoleSettingsConfig;
+        this.guiClanBannerConfig = guiClanBannerConfig;
         this.guiListConfig = guiListConfig;
         this.guiExtensionsConfig = guiExtensionsConfig;
         this.guiInfoConfig = guiInfoConfig;
@@ -128,6 +138,7 @@ public final class ClanGuiOpenService {
         this.memberKickConfirmMenuPopulator = memberKickConfirmMenuPopulator;
         this.settingsMenuPopulator = settingsMenuPopulator;
         this.roleSettingsMenuPopulator = roleSettingsMenuPopulator;
+        this.bannerMenuPopulator = bannerMenuPopulator;
         this.listMenuPopulator = listMenuPopulator;
         this.infoMenuPopulator = infoMenuPopulator;
         this.extensionsMenuPopulator = extensionsMenuPopulator;
@@ -143,6 +154,7 @@ public final class ClanGuiOpenService {
         this.extensionsDataService = extensionsDataService;
         this.settingsDataService = settingsDataService;
         this.roleSettingsDataService = roleSettingsDataService;
+        this.bannerDataService = bannerDataService;
         this.asyncDatabaseExecutor = asyncDatabaseExecutor;
     }
 
@@ -261,7 +273,7 @@ public final class ClanGuiOpenService {
     }
 
     public void openMembers(Player player, ClanMembersNav navigation) {
-        membersDataService.load(navigation.clanId()).thenAccept(snapshotOptional -> asyncDatabaseExecutor.runSync(() -> {
+        membersDataService.load(player, navigation.clanId()).thenAccept(snapshotOptional -> asyncDatabaseExecutor.runSync(() -> {
             if (!player.isOnline()) {
                 return;
             }
@@ -378,5 +390,32 @@ public final class ClanGuiOpenService {
                 extensionsPage
         );
         player.openInventory(menu.getInventory());
+    }
+
+    public void openBanner(Player player) {
+        bannerDataService.load(player).thenAccept(snapshotOptional -> asyncDatabaseExecutor.runSync(() -> {
+            if (!player.isOnline()) {
+                return;
+            }
+            if (snapshotOptional.isEmpty()) {
+                messageService.send(player, "clan.banner.not-in-clan");
+                return;
+            }
+            ClanBannerSnapshot snapshot = snapshotOptional.get();
+            ClanBannerMenu menu = new ClanBannerMenu(
+                    guiClanBannerConfig,
+                    bannerMenuPopulator,
+                    messageService,
+                    player,
+                    snapshot.clanId(),
+                    snapshot.clanTag(),
+                    snapshot.workingBanner(),
+                    snapshot.patternColor(),
+                    snapshot.clanLeader(),
+                    snapshot.standardOut(),
+                    snapshot.canDepositStandard()
+            );
+            player.openInventory(menu.getInventory());
+        }));
     }
 }

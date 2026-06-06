@@ -14,6 +14,7 @@ public final class GuiProfileConfig {
     private final int emptyCreateSlot;
     private final int emptyListSlot;
     private final int backSlot;
+    private final int bannerSlot;
     private final Material clanInfoMaterial;
     private final Material membersMaterial;
     private final Material requestsMaterial;
@@ -34,6 +35,7 @@ public final class GuiProfileConfig {
         this.emptyCreateSlot = settings.slots.emptyCreate;
         this.emptyListSlot = settings.slots.emptyList;
         this.backSlot = settings.slots.back;
+        this.bannerSlot = settings.slots.banner;
         this.clanInfoMaterial = parseMaterial(settings.materials.clanInfo, Material.LEATHER);
         this.membersMaterial = parseMaterial(settings.materials.members, Material.PLAYER_HEAD);
         this.requestsMaterial = parseMaterial(settings.materials.requests, Material.WRITABLE_BOOK);
@@ -83,6 +85,10 @@ public final class GuiProfileConfig {
 
     public int backSlot() {
         return backSlot;
+    }
+
+    public int bannerSlot() {
+        return bannerSlot;
     }
 
     public Material clanInfoMaterial() {

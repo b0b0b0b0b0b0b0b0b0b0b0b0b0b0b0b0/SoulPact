@@ -18,6 +18,7 @@ public final class ClanGuiClickDispatcher {
     private final ClanMemberKickConfirmClickHandler memberKickConfirmClickHandler;
     private final ClanSettingsClickHandler settingsClickHandler;
     private final ClanRoleSettingsClickHandler roleSettingsClickHandler;
+    private final ClanBannerClickHandler bannerClickHandler;
 
     public ClanGuiClickDispatcher(
             ClanHubClickHandler hubClickHandler,
@@ -31,7 +32,8 @@ public final class ClanGuiClickDispatcher {
             ClanMemberDetailClickHandler memberDetailClickHandler,
             ClanMemberKickConfirmClickHandler memberKickConfirmClickHandler,
             ClanSettingsClickHandler settingsClickHandler,
-            ClanRoleSettingsClickHandler roleSettingsClickHandler
+            ClanRoleSettingsClickHandler roleSettingsClickHandler,
+            ClanBannerClickHandler bannerClickHandler
     ) {
         this.hubClickHandler = hubClickHandler;
         this.profileClickHandler = profileClickHandler;
@@ -45,6 +47,7 @@ public final class ClanGuiClickDispatcher {
         this.memberKickConfirmClickHandler = memberKickConfirmClickHandler;
         this.settingsClickHandler = settingsClickHandler;
         this.roleSettingsClickHandler = roleSettingsClickHandler;
+        this.bannerClickHandler = bannerClickHandler;
     }
 
     public void handle(InventoryClickEvent event) {
@@ -98,6 +101,11 @@ public final class ClanGuiClickDispatcher {
         if (clickedInventory.getHolder(false) instanceof ClanRoleSettingsMenu roleSettingsMenu) {
             event.setCancelled(true);
             roleSettingsClickHandler.handle(roleSettingsMenu, player, event.getSlot());
+            return;
+        }
+        if (clickedInventory.getHolder(false) instanceof ClanBannerMenu bannerMenu) {
+            event.setCancelled(true);
+            bannerClickHandler.handle(bannerMenu, player, event.getSlot());
             return;
         }
         if (clickedInventory.getHolder(false) instanceof ClanListMenu listMenu) {

@@ -46,13 +46,15 @@ public final class ClanHubMenuPopulator {
                     placeholders
             ));
         }
-        inventory.setItem(guiHubConfig.bannerSlot(), guiItemBuilder.build(
-                player,
-                guiHubConfig.bannerMaterial(),
-                "clan.gui.hub.item.banner.name",
-                "clan.gui.hub.item.banner.lore",
-                placeholders
-        ));
+        if (snapshot.inClan() && snapshot.bannerItem() != null) {
+            inventory.setItem(guiHubConfig.bannerSlot(), guiItemBuilder.buildFromStack(
+                    player,
+                    snapshot.bannerItem(),
+                    "clan.gui.hub.item.banner.name",
+                    "clan.gui.hub.item.banner.lore",
+                    placeholders
+            ));
+        }
         if (!snapshot.inClan()) {
             inventory.setItem(guiHubConfig.createSlot(), guiItemBuilder.build(
                     player,

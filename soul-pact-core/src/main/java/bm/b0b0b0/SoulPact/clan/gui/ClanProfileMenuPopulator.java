@@ -37,6 +37,12 @@ public final class ClanProfileMenuPopulator {
 
     public void populate(Inventory inventory, Player player, ClanProfileSnapshot snapshot) {
         fillBackground(inventory, player);
+        inventory.setItem(guiProfileConfig.bannerSlot(), guiItemBuilder.buildFromStack(
+                player,
+                snapshot.bannerItem(),
+                "clan.gui.profile.item.banner.name",
+                "clan.gui.profile.item.banner.lore"
+        ));
         var placeholders = ClanProfilePlaceholders.forClan(
                 player,
                 snapshot.clan(),

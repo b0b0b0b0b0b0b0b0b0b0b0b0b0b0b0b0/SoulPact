@@ -11,8 +11,8 @@ roles:
     title: "<#C084FC>Вице-капитан"
     list-names: true
   officer:
-    title: "<#93C5FD>Командир"
+    title: "<white>Командир"
     list-names: true
   member:
-    title: "<#9CA3AF>Накама"
+    title: "<white>Накама"
     list-names: false

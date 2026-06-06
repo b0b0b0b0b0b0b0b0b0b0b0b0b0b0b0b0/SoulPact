@@ -37,6 +37,7 @@ public final class ClanMemberHistoryLoreBuilder {
             case "leave" -> "clan.gui.members.detail.reason.leave";
             case "kick" -> "clan.gui.members.detail.reason.kick";
             case "disband" -> "clan.gui.members.detail.reason.disband";
+            case "standard_lost" -> "clan.gui.members.detail.reason.standard-lost";
             default -> "clan.gui.members.detail.reason.other";
         };
         return messageService.resolve(player, key);
