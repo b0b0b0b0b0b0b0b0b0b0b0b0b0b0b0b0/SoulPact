@@ -1,0 +1,18 @@
+order:
+  - leader
+  - deputy
+  - officer
+  - member
+roles:
+  leader:
+    title: "<#F472B6>Captain"
+    list-names: true
+  deputy:
+    title: "<#C084FC>Vice Captain"
+    list-names: true
+  officer:
+    title: "<#93C5FD>Commander"
+    list-names: true
+  member:
+    title: "<#9CA3AF>Nakama"
+    list-names: false

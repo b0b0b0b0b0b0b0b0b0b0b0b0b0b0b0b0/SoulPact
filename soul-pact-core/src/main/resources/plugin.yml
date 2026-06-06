@@ -1,0 +1,27 @@
+name: SoulPact
+version: '${version}'
+main: bm.b0b0b0.SoulPact.soulPact.SoulPact
+api-version: '1.21'
+authors: [ b0b0b0 ]
+softdepend:
+  - Vault
+  - Essentials
+  - PlaceholderAPI
+  - SkinsRestorer
+libraries:
+  - com.zaxxer:HikariCP:5.1.0
+  - org.xerial:sqlite-jdbc:3.45.3.0
+  - com.mysql:mysql-connector-j:8.3.0
+  - net.elytrium:serializer:1.1.1
+commands:
+  clan:
+    description: Open clan menu
+    usage: /clan
+  sclan:
+    description: SoulPact admin commands
+    usage: /sclan help
+permissions:
+  soulpact.clan.use:
+    default: true
+  soulpact.admin:
+    default: op

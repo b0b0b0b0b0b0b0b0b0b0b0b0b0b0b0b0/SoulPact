@@ -1,0 +1,18 @@
+order:
+  - leader
+  - deputy
+  - officer
+  - member
+roles:
+  leader:
+    title: "<#FCD34D>General"
+    list-names: true
+  deputy:
+    title: "<#D8B4FE>Colonel"
+    list-names: true
+  officer:
+    title: "<#93C5FD>Captain"
+    list-names: true
+  member:
+    title: "<#9CA3AF>Soldiers"
+    list-names: false

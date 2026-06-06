@@ -1,0 +1,18 @@
+order:
+  - leader
+  - deputy
+  - officer
+  - member
+roles:
+  leader:
+    title: "<#F472B6>Капитан"
+    list-names: true
+  deputy:
+    title: "<#C084FC>Вице-капитан"
+    list-names: true
+  officer:
+    title: "<#93C5FD>Командир"
+    list-names: true
+  member:
+    title: "<#9CA3AF>Накама"
+    list-names: false

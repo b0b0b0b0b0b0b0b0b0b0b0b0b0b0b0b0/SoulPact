@@ -1,0 +1,619 @@
+startup:
+  loading: "&7SoulPact is still loading, try again."
+  banner:
+    separator: "=============================="
+    intro: "SoulPact clan system is starting on your server"
+    version: "Version: {version} | Author: b0b0b0"
+    init: "Initialization:"
+  economy:
+    vault-missing: "Vault not found. Economy will not be enabled."
+    vault-connected: "Economy connected via Vault."
+    disabled: "Economy disabled in config."
+  database:
+    connected: "Database ready."
+    failed: "Database connection failed."
+  integration:
+    line: "{name}: {status}"
+    status-connected: "connected"
+    status-missing: "not installed"
+  extensions:
+    line: "Modules registered: {count}"
+  loaded: "SoulPact successfully loaded"
+  reload-complete: "Configuration reloaded."
+
+general:
+  no-permission: "&cYou do not have permission."
+  players-only: "&cPlayers only."
+  not-implemented: "&7Coming soon."
+
+clan:
+  create:
+    success: "<#86EFAC>Clan <white>[{tag}] {name}</white> created."
+    usage: "<#9CA3AF>Format: <#D8B4FE>/clan create <tag> <name>"
+    missing-name: "<#F87171>Clan name is missing. <#9CA3AF>Example: <#D8B4FE>/clan create {tag} My Clan"
+    already-in-clan: "<#F87171>You are already in a clan."
+    tag-taken: "<#F87171>Tag <white>{tag}</white> is already taken."
+    invalid-tag: "<#F87171>Invalid tag. Russian and Latin letters, digits."
+    invalid-tag-length: "<#F87171>Tag length must be between 2 and 6 characters."
+    invalid-name: "<#F87171>Specify a clan name."
+    invalid-name-length: "<#F87171>Clan name is too long."
+    not-enough-money: "<#F87171>Not enough money. Required: <#E9D5FF>{amount}"
+    payment-failed: "<#F87171>Failed to charge clan creation cost."
+    failed: "<#F87171>Failed to create clan. Try again later."
+  list:
+    header: "<#C084FC><bold>Clans</bold> <#9CA3AF>({count})"
+    empty: "<#9CA3AF>No clans on this server yet."
+    entry: "<#D8B4FE>[{tag}] <white>{name}"
+    entry-suggest: "/clan info {tag}"
+    back:
+      label: "<#F87171><bold>[Back to menu]</bold>"
+  info:
+    not-found: "<#F87171>Clan <white>{tag}</white> not found."
+    no-clan: "<#9CA3AF>You are not in a clan."
+    header: "<#C084FC><bold>[{tag}] {name}</bold>"
+    line-leader: "<#9CA3AF>Leader: <white>{leader}"
+    line-members: "<#9CA3AF>Members: <white>{count}/{max}"
+    line-points: "<#9CA3AF>Points: <white>{points}"
+    line-verified: "<#9CA3AF>Verified: {verified}"
+    line-ff: "<#9CA3AF>Friendly fire: {ff}"
+    line-created: "<#9CA3AF>Created: <white>{created}"
+    line-description: "<#9CA3AF>Description: <white>{description}"
+    value-yes: "<#86EFAC>yes"
+    value-no: "<#F87171>no"
+    value-empty-description: "<#6B7280>—"
+    back:
+      label: "<#F87171><bold>[Back to menu]</bold>"
+  leave:
+    success: "<#86EFAC>You left clan <white>[{tag}]</white>."
+    not-in-clan: "<#F87171>You are not in a clan."
+    leader: "<#F87171>Leader cannot leave. Disband the clan or transfer leadership."
+    failed: "<#F87171>Failed to leave the clan."
+  kick:
+    success: "<#86EFAC>Player <white>{player}</white> was kicked from clan <white>[{tag}]</white>."
+    target-notified: "<#F87171>You were kicked from clan <white>[{tag}]</white>."
+    not-leader: "<#F87171>Only the leader can kick members."
+    not-allowed: "<#F87171>Only the leader or deputy can kick members."
+    self: "<#F87171>You cannot kick yourself."
+    target-leader: "<#F87171>Cannot kick the leader."
+    target-protected: "<#F87171>Cannot kick the leader or a deputy."
+    target-not-found: "<#F87171>Member not found."
+    failed: "<#F87171>Failed to kick the member."
+  role:
+    assigned: "<#86EFAC>Assigned {role} to <white>{player}</white>"
+    invalid: "<#F87171>Invalid role."
+    not-leader: "<#F87171>Only the leader can change roles."
+    self: "<#F87171>You cannot change your role here."
+    target-not-found: "<#F87171>Member not found."
+    failed: "<#F87171>Failed to change role."
+  leadership:
+    transferred: "<#86EFAC>Clan <white>[{tag}]</white> transferred to <white>{player}</white>"
+    not-leader: "<#F87171>Only the leader can transfer the clan."
+    self: "<#F87171>You cannot transfer the clan to yourself."
+    target-not-found: "<#F87171>Member not found."
+    not-enough-money: "<#F87171>Not enough money. Required: <white>{amount}</white>"
+    payment-failed: "<#F87171>Failed to charge transfer fee."
+    failed: "<#F87171>Failed to transfer the clan."
+  disband:
+    success: "<#86EFAC>Clan <white>[{tag}] {name}</white> disbanded."
+    not-in-clan: "<#F87171>You are not in a clan."
+    not-leader: "<#F87171>Only the leader can disband the clan."
+    failed: "<#F87171>Failed to disband the clan."
+  settings:
+    not-leader: "<#F87171>Only the leader can change clan settings."
+    permission:
+      enabled: "<#86EFAC>Permission <white>{permission}</white> enabled for this role."
+      disabled: "<#F87171>Permission <white>{permission}</white> disabled for this role."
+    permission-label:
+      kick: "Kick"
+      accept: "Accept"
+      recruit_lower: "Recruit lower"
+  pending:
+    invalid-id: "<#F87171>Invalid request number."
+    button-separator: " <#6B7280>| "
+  invite:
+    received: "<#D8B4FE><white>{inviter}</white> invites you to clan <white>[{tag}] {name}</white> <#6B7280>(#{id})"
+    sent: "<#86EFAC>Invite sent to <white>{player}</white> for clan <white>[{tag}]</white>."
+    accepted: "<#86EFAC>You joined clan <white>[{tag}] {name}</white>."
+    denied: "<#9CA3AF>Invite declined."
+    not-found: "<#F87171>Invite not found."
+    not-in-clan: "<#F87171>You are not in a clan."
+    not-leader: "<#F87171>Only the leader can invite."
+    player-not-found: "<#F87171>Player not found."
+    target-in-clan: "<#F87171>Player is already in a clan."
+    self: "<#F87171>You cannot invite yourself."
+    clan-full: "<#F87171>Clan is full."
+    already-sent: "<#F87171>Invite already sent."
+    button:
+      accept: "<#86EFAC><bold>[Accept]</bold>"
+      deny: "<#F87171><bold>[Decline]</bold>"
+  request:
+    usage: "<#9CA3AF>Usage: <#D8B4FE>/clan join <leader|#ID>"
+    sent: "<#86EFAC>Request sent to clan <white>[{tag}] {name}</white> <#6B7280>(#{id})"
+    received: "<#D8B4FE><white>{player}</white> wants to join your clan <white>[{tag}] {name}</white>"
+    accepted-leader: "<#86EFAC>Player <white>{player}</white> joined clan <white>[{tag}]</white>."
+    accepted-player: "<#86EFAC>You were accepted into clan <white>[{tag}] {name}</white>."
+    denied-leader: "<#9CA3AF>Request declined."
+    denied-player: "<#9CA3AF>Your request to clan <white>[{tag}] {name}</white> was declined."
+    blocked-leader: "<#F87171>Player <white>{player}</white> blocked from requests."
+    blocked-player: "<#F87171>You are blocked from requesting clan <white>[{tag}] {name}</white>."
+    not-found: "<#F87171>Request not found."
+    not-leader: "<#F87171>Only the leader can manage requests."
+    not-staff: "<#F87171>Only the leader or deputy can manage requests."
+    closed: "<#F87171>This clan is not accepting requests."
+    target-not-found: "<#F87171>Clan not found. Use leader name or <white>#ID</white>."
+    already-in-clan: "<#F87171>You are already in a clan."
+    blocked: "<#F87171>You are blocked from requesting this clan."
+    clan-full: "<#F87171>Clan is full."
+    already-sent: "<#F87171>Request already sent."
+    player-offline: "<#F87171>Player must be online to accept."
+    bulk:
+      accepted: "<#86EFAC>All requests accepted."
+      denied: "<#9CA3AF>All requests declined."
+      blocked: "<#F87171>All applicants blocked."
+    toggle:
+      opened: "<#86EFAC>Clan requests are open."
+      closed: "<#F87171>Clan requests are closed."
+      failed: "<#F87171>Failed to update request mode."
+    button:
+      accept: "<#86EFAC><bold>[Accept]</bold>"
+      deny: "<#F87171><bold>[Decline]</bold>"
+      block: "<#C084FC><bold>[Block]</bold>"
+      open-clan: "<#86EFAC><bold>[Open clan]</bold>"
+  join:
+    already-in-clan: "<#F87171>Player is already in a clan."
+    clan-not-found: "<#F87171>Clan not found."
+    clan-full: "<#F87171>Clan is full."
+    failed: "<#F87171>Failed to join the clan."
+  command:
+    create-free-hint: "&7Clan creation is &afree&7. &e/clan create <tag> <name>"
+    create-cost-hint: "&7Clan creation: &e{amount}&7. &e/clan create <tag> <name>"
+
+  gui:
+    value-recruitment-open: "<#86EFAC>Yes"
+    value-recruitment-closed: "<#F87171>No"
+    hub:
+      title: "<#C084FC><bold>Clans</bold>"
+      create:
+        prompt-suggest: "<#86EFAC><bold>▸ Create</bold></> <#9CA3AF>— click and add <white>tag</white> and <white>name</white>"
+        prompt-separator: " <#4B5563>| "
+        prompt-cancel: "<#F87171><bold>[Cancel]</bold>"
+      help:
+        header: "<#C084FC><bold>SoulPact Clans</bold>"
+        back:
+          label: "<#F87171><bold>[Back to menu]</bold>"
+        commands:
+          menu:
+            label: "<#D8B4FE>/clan <#6B7280>— <#9CA3AF>main menu"
+            suggest: "/clan"
+          create:
+            label: "<#D8B4FE>/clan create <#6B7280>— <#9CA3AF>create a clan"
+            suggest: "/clan create "
+          list:
+            label: "<#D8B4FE>/clan list <#6B7280>— <#9CA3AF>clan list"
+            suggest: "/clan list"
+          info:
+            label: "<#D8B4FE>/clan info <tag> <#6B7280>— <#9CA3AF>clan info"
+            suggest: "/clan info "
+          leave:
+            label: "<#D8B4FE>/clan leave <#6B7280>— <#9CA3AF>leave clan"
+            suggest: "/clan leave"
+          disband:
+            label: "<#D8B4FE>/clan disband <#6B7280>— <#9CA3AF>disband clan"
+            suggest: "/clan disband"
+      value:
+        no-clan: "<#6B7280>none"
+        create-cost: "<#E9D5FF>{amount}"
+        create-free: "<#86EFAC>Free"
+      item:
+        overview:
+          name: "<#C084FC><bold>Clans</bold>"
+          lore:
+            - "<#9CA3AF>Clans on server: <white>{total_clans}"
+            - "<#9CA3AF>Your clan: <white>{your_clan}"
+            - "<#9CA3AF>Creation: {create_cost}"
+            - ""
+            - "<#D8B4FE>Click — clan list"
+        profile:
+          name: "<#A78BFA>Your profile"
+          lore:
+            - "<#9CA3AF>Clan card and roster"
+            - "<#9CA3AF>Clan: <white>{your_clan}"
+        settings:
+          name: "<#C084FC>Clan settings"
+          lore:
+            - "<#9CA3AF>Roles and member permissions"
+            - "<#D8B4FE>Click — open"
+        banner:
+          name: "<#F3F4F6>Clan banner"
+          lore:
+            - "<#9CA3AF>Upload and view banner"
+        create:
+          name: "<#86EFAC><bold>Create clan</bold>"
+          lore:
+            - "<#9CA3AF>Cost: {create_cost}"
+            - ""
+            - "<#D8B4FE>Click — type in chat"
+        help:
+          name: "<#D8B4FE>Help"
+          lore:
+            - "<#9CA3AF>Commands and sections"
+            - "<#D8B4FE>Click — hints in chat"
+        filler:
+          name: " "
+    settings:
+      title: "<#581C87><bold>Settings</bold> <#374151>[{tag}]"
+      not-leader: "<#F87171>Only the leader can change clan settings."
+      item:
+        role:
+          name: "{role}"
+          lore:
+            - "<#9CA3AF>Role permissions"
+            - "<#D8B4FE>Click — open"
+        back:
+          name: "<#F87171>Back"
+          lore:
+            - "<#9CA3AF>To main menu"
+      role:
+        title: "<#581C87><bold>{role}</bold>"
+        item:
+          back:
+            name: "<#F87171>Back"
+            lore:
+              - "<#9CA3AF>Back to roles"
+        permission:
+          kick:
+            enabled:
+              name: "<#86EFAC>Kick members"
+              lore:
+                - "<#9CA3AF>Status: <#86EFAC>enabled"
+                - "<#D8B4FE>Click — disable"
+            disabled:
+              name: "<#6B7280>Kick members"
+              lore:
+                - "<#9CA3AF>Status: <#F87171>disabled"
+                - "<#D8B4FE>Click — enable"
+          accept:
+            enabled:
+              name: "<#86EFAC>Accept members"
+              lore:
+                - "<#9CA3AF>Status: <#86EFAC>enabled"
+                - "<#D8B4FE>Click — disable"
+            disabled:
+              name: "<#6B7280>Accept members"
+              lore:
+                - "<#9CA3AF>Status: <#F87171>disabled"
+                - "<#D8B4FE>Click — enable"
+          recruit_lower:
+            enabled:
+              name: "<#86EFAC>Recruit lower ranks"
+              lore:
+                - "<#9CA3AF>Status: <#86EFAC>enabled"
+                - "<#D8B4FE>Click — disable"
+            disabled:
+              name: "<#6B7280>Recruit lower ranks"
+              lore:
+                - "<#9CA3AF>Status: <#F87171>disabled"
+                - "<#D8B4FE>Click — enable"
+    profile:
+      title: "<#581C87><bold>Clan profile</bold>"
+      value-yes: "<#86EFAC>yes"
+      value-no: "<#F87171>no"
+      value-empty-description: "<#6B7280>—"
+      empty:
+        title: "<#374151><bold>No clan</bold>"
+        create:
+          name: "<#86EFAC><bold>Create clan</bold>"
+          lore:
+            - "<#9CA3AF>Cost: {create_cost}"
+            - ""
+            - "<#D8B4FE>Click — chat input"
+        list:
+          name: "<#C084FC><bold>Clan list</bold>"
+          lore:
+            - "<#D8B4FE>Click — all server clans"
+        item:
+          name: "<#F87171>You are not in a clan"
+          lore:
+            - "<#9CA3AF>Create a clan or join"
+            - "<#9CA3AF>via invitation"
+      item:
+        clan:
+          name: "<#C084FC><bold>[{tag}] {name}</bold>"
+          lore:
+            - "<#9CA3AF>ID: <white>#{id}"
+            - "<#9CA3AF>Points: <white>{points}"
+            - "<#9CA3AF>Members: <white>{count}/{max}"
+            - "<#9CA3AF>Created: <white>{created}"
+            - "<#9CA3AF>Verified: {verified}"
+            - "<#9CA3AF>Friendly fire: {ff}"
+            - ""
+            - "<#9CA3AF>Description:"
+            - "<white>{description}"
+        members:
+          name: "<#D8B4FE>Clan roster"
+          lore-total: "<#C084FC><bold>Members: {count}/{max}</bold>"
+          lore-role-named: "{role}: <white>{names}"
+          lore-role-count: "{role}: <white>{count}"
+          lore-role-empty: "{role}: <#6B7280>—"
+          lore-hint: "<#D8B4FE>Click — open roster"
+        requests:
+          name: "<#FDE047><bold>Requests</bold>"
+          lore:
+            - "<#9CA3AF>Pending: <white>{count}</white>"
+            - ""
+            - "<#D8B4FE>Click — request list"
+        leave:
+          name: "<#F87171><bold>Leave clan</bold>"
+          lore:
+            - "<#9CA3AF>Leave <white>[{tag}]</white>"
+        back:
+          name: "<#F87171>Back"
+          lore:
+            - "<#9CA3AF>To main menu"
+    members:
+      title: "<#581C87><bold>Roster</bold> <#374151>[{tag}] <#6B7280>({count}) <#374151>{page}/{pages}"
+      item:
+        entry:
+          name: "<white>{player}</white>"
+          lore:
+            - "{role}"
+            - ""
+            - "<#D8B4FE>Click — profile"
+        previous:
+          name: "<#D8B4FE>Previous"
+          lore:
+            - "<#9CA3AF>Previous page"
+        next:
+          name: "<#D8B4FE>Next"
+          lore:
+            - "<#9CA3AF>Next page"
+        back:
+          name: "<#F87171>Back"
+          lore:
+            - "<#9CA3AF>Back"
+      detail:
+        title: "<#581C87><bold>{player}</bold>"
+        line-role: "<#9CA3AF>Role: <white>{role}"
+        line-joined: "<#9CA3AF>Joined: <white>{joined}"
+        line-stats: "<#9CA3AF>Kills: <white>{kills} <#6B7280>· <#9CA3AF>Deaths: <white>{deaths}"
+        achievements-header: "<#C084FC><bold>Achievements:</bold>"
+        achievements-empty: "<#6B7280>Coming soon"
+        history-header: "<#C084FC><bold>Past clans:</bold>"
+        history-empty: "<#6B7280>No history"
+        history-line: "<#9CA3AF>[{tag}] - {reason}"
+        reason:
+          leave: "left"
+          kick: "kicked"
+          disband: "disbanded"
+          other: "—"
+        player:
+          name: "<white>{player}</white>"
+        back:
+          name: "<#F87171>Back"
+          lore:
+            - "<#9CA3AF>Back to roster"
+        action:
+          assign:
+            name: "<#86EFAC>Assign: {role}"
+            lore:
+              - "<#9CA3AF>Change member role"
+          transfer:
+            name: "<#FCD34D><bold>Transfer clan</bold>"
+            lore:
+              - "<#9CA3AF>Cost: {cost}"
+              - "<#9CA3AF>You will become a deputy"
+          kick:
+            name: "<#F87171><bold>Kick from clan</bold>"
+            lore:
+              - "<#9CA3AF>Remove this member"
+      kick-confirm:
+        title: "<#581C87><bold>Kick {player}?</bold>"
+        item:
+          confirm:
+            name: "<#86EFAC><bold>Yes</bold>"
+            lore:
+              - "<#9CA3AF>Kick from clan"
+          deny:
+            name: "<#F87171><bold>No</bold>"
+            lore:
+              - "<#9CA3AF>Cancel"
+    info:
+      title: "<#581C87><bold>[{tag}] {name}</bold>"
+      item:
+        clan:
+          name: "<#C084FC><bold>[{tag}] {name}</bold>"
+          lore:
+            - "<#9CA3AF>ID: <white>#{id}"
+            - "<#9CA3AF>Points: <white>{points}"
+            - "<#9CA3AF>Members: <white>{count}/{max}"
+            - "<#9CA3AF>Created: <white>{created}"
+            - "<#9CA3AF>Verified: {verified}"
+            - "<#9CA3AF>Friendly fire: {ff}"
+            - "<#9CA3AF>Recruitment open: {recruitment}"
+            - ""
+            - "<#9CA3AF>Description:"
+            - "<white>{description}"
+        members:
+          name: "<#D8B4FE><bold>Clan roster</bold>"
+          lore:
+            - "<#9CA3AF>Members: <white>{count}/{max}"
+            - ""
+            - "<#D8B4FE>Click — open"
+        join:
+          name: "<#86EFAC><bold>Join clan</bold>"
+          lore:
+            - "<#9CA3AF>Send request to leader"
+            - "<#9CA3AF>Clan: <white>[{tag}]</white> <#6B7280>(#{id})"
+        join-closed:
+          name: "<#6B7280><bold>Recruitment closed</bold>"
+          lore:
+            - "<#9CA3AF>This clan is not accepting"
+            - "<#9CA3AF>new applications right now"
+        leave:
+          name: "<#F87171><bold>Leave clan</bold>"
+          lore:
+            - "<#9CA3AF>Leave <white>[{tag}]</white>"
+        back:
+          name: "<#F87171>Back"
+          lore:
+            - "<#9CA3AF>Back to clan list"
+    requests:
+      title: "<#581C87><bold>Requests</bold> <#374151>({count})"
+      item:
+        accept-all:
+          name: "<#86EFAC><bold>Accept all</bold>"
+          lore:
+            - "<#9CA3AF>Requests: <white>{count}</white>"
+        deny-all:
+          name: "<#F87171><bold>Decline all</bold>"
+          lore:
+            - "<#9CA3AF>Requests: <white>{count}</white>"
+        block-all:
+          name: "<#C084FC><bold>Block all</bold>"
+          lore:
+            - "<#9CA3AF>Requests: <white>{count}</white>"
+        toggle-open:
+          name: "<#86EFAC>Requests open"
+          lore:
+            - "<#9CA3AF>Click — close requests"
+        toggle-closed:
+          name: "<#F87171>Requests closed"
+          lore:
+            - "<#9CA3AF>Click — open requests"
+        entry:
+          name: "<white>{player}</white>"
+          lore:
+            - "<#9CA3AF>Click — details"
+        empty:
+          name: "<#6B7280>No requests"
+          lore:
+            - "<#9CA3AF>New requests appear here"
+        back:
+          name: "<#F87171>Back"
+          lore:
+            - "<#9CA3AF>To clan profile"
+      detail:
+        title: "<#581C87><bold>{player}</bold>"
+        player:
+          name: "<white>{player}</white>"
+          lore-static:
+            - "<#9CA3AF>Requested: <white>{date}</white>"
+        history-header: "<#C084FC><bold>Past clans:</bold>"
+        history-empty: "<#6B7280>No history"
+        history-line: "<#9CA3AF>[{tag}] {name} · {role} · {left} · {reason}"
+        reason:
+          leave: "left"
+          kick: "kicked"
+          disband: "disbanded"
+          other: "—"
+        accept:
+          name: "<#86EFAC><bold>Accept</bold>"
+          lore:
+            - "<#9CA3AF>Add to clan"
+        deny:
+          name: "<#F87171><bold>Decline</bold>"
+          lore:
+            - "<#9CA3AF>Decline request"
+        block:
+          name: "<#C084FC><bold>Block</bold>"
+          lore:
+            - "<#9CA3AF>Block requests"
+        back:
+          name: "<#F87171>Back"
+          lore:
+            - "<#9CA3AF>To request list"
+    list:
+      title: "<#581C87><bold>Clans</bold> <#374151>({page}/{pages})"
+      item:
+        entry:
+          name: "<#D8B4FE>[{tag}] <white>{name}"
+          lore:
+            - "<#9CA3AF>ID: <white>#{id}"
+            - "<#9CA3AF>Leader: <white>{leader}"
+            - "<#9CA3AF>Members: <white>{count}/{max}"
+            - "<#9CA3AF>Reputation: <white>{points}"
+            - "<#9CA3AF>Recruitment open: {recruitment}"
+        empty:
+          name: "<#6B7280>No clans yet"
+          lore:
+            - "<#9CA3AF>Nobody has created"
+            - "<#9CA3AF>a clan on this server"
+        previous:
+          name: "<#D8B4FE>← Previous"
+          lore:
+            - "<#9CA3AF>Previous page"
+        next:
+          name: "<#D8B4FE>Next →"
+          lore:
+            - "<#9CA3AF>Next page"
+        back:
+          name: "<#F87171>Back"
+          lore:
+            - "<#9CA3AF>To main menu"
+    extensions:
+      title: "<#581C87><bold>SoulPact modules</bold> <#374151>({page}/{pages})"
+      item:
+        entry:
+          name: "<#D8B4FE>{display_name}"
+          lore:
+            - "<#9CA3AF>ID: <white>{id}"
+            - "<#86EFAC>Active"
+        fallback-name: "<#D8B4FE>{id}"
+        empty:
+          name: "<#6B7280>No modules installed"
+          lore:
+            - "<#9CA3AF>Additional SoulPact JARs"
+            - "<#9CA3AF>will appear here when loaded"
+        previous:
+          name: "<#D8B4FE>← Previous"
+          lore:
+            - "<#9CA3AF>Previous page"
+        next:
+          name: "<#D8B4FE>Next →"
+          lore:
+            - "<#9CA3AF>Next page"
+        back:
+          name: "<#F87171>Back"
+          lore:
+            - "<#9CA3AF>To main menu"
+      modules:
+        quests:
+          display-name: "<#D8B4FE>Quests"
+          lore:
+            - "<#9CA3AF>Clan quests and rewards"
+        chest:
+          display-name: "<#D8B4FE>Clan chest"
+          lore:
+            - "<#9CA3AF>Shared clan storage"
+        war:
+          display-name: "<#D8B4FE>Clan war"
+          lore:
+            - "<#9CA3AF>Sieges and battles"
+        bank:
+          display-name: "<#D8B4FE>Clan bank"
+          lore:
+            - "<#9CA3AF>Treasury and transfers"
+        land:
+          display-name: "<#D8B4FE>Land"
+          lore:
+            - "<#9CA3AF>Territories and claims"
+        gladiator:
+          display-name: "<#D8B4FE>Gladiator"
+          lore:
+            - "<#9CA3AF>Arenas and duels"
+        leaderboard:
+          display-name: "<#D8B4FE>Leaderboard"
+          lore:
+            - "<#9CA3AF>Rankings and stats"
+        farmcoin:
+          display-name: "<#D8B4FE>FarmCoin"
+          lore:
+            - "<#9CA3AF>Clan farming economy"
+        nexus:
+          display-name: "<#D8B4FE>Nexus"
+          lore:
+            - "<#9CA3AF>Clan core and upgrades"
+        league:
+          display-name: "<#D8B4FE>League"
+          lore:
+            - "<#9CA3AF>Seasons and divisions"

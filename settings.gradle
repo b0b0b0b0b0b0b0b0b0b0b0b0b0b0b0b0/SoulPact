@@ -1,0 +1,4 @@
+rootProject.name = 'SoulPact'
+
+include 'soul-pact-api'
+include 'soul-pact-core'
