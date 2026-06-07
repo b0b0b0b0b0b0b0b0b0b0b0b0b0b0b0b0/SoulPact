@@ -16,6 +16,8 @@ public interface ClanTreasuryApi {
 
     CompletableFuture<TreasuryOperationResult> withdraw(Player player, long clanId, double amount);
 
+    CompletableFuture<TreasuryOperationResult> charge(long clanId, java.util.UUID actorId, double amount, String note);
+
     CompletableFuture<TreasuryOperationResult> transferAll(long fromClanId, long toClanId, String note);
 
     CompletableFuture<List<ClanTreasuryEntrySnapshot>> recentEntries(long clanId, int limit);

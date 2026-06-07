@@ -5,6 +5,7 @@ import bm.b0b0b0.SoulPact.clan.role.RoleDefinition;
 import bm.b0b0b0.SoulPact.clan.role.RoleThemeService;
 import bm.b0b0b0.SoulPact.core.database.AsyncDatabaseExecutor;
 import bm.b0b0b0.SoulPact.core.message.MessageService;
+import bm.b0b0b0.SoulPact.core.module.ClanExtensionMembershipNotifier;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -20,19 +21,22 @@ public final class ClanMemberManagementService {
     private final ClanCreateEconomy clanCreateEconomy;
     private final MessageService messageService;
     private final AsyncDatabaseExecutor asyncDatabaseExecutor;
+    private final ClanExtensionMembershipNotifier extensionMembershipNotifier;
 
     public ClanMemberManagementService(
             ClanRepository clanRepository,
             RoleThemeService roleThemeService,
             ClanCreateEconomy clanCreateEconomy,
             MessageService messageService,
-            AsyncDatabaseExecutor asyncDatabaseExecutor
+            AsyncDatabaseExecutor asyncDatabaseExecutor,
+            ClanExtensionMembershipNotifier extensionMembershipNotifier
     ) {
         this.clanRepository = clanRepository;
         this.roleThemeService = roleThemeService;
         this.clanCreateEconomy = clanCreateEconomy;
         this.messageService = messageService;
         this.asyncDatabaseExecutor = asyncDatabaseExecutor;
+        this.extensionMembershipNotifier = extensionMembershipNotifier;
     }
 
     public CompletableFuture<Void> setRole(Player leader, long clanId, UUID targetId, String roleKey) {
@@ -106,6 +110,11 @@ public final class ClanMemberManagementService {
                                 notify(leader, "clan.leadership.failed");
                                 return;
                             }
+                            extensionMembershipNotifier.leadershipTransferred(
+                                    clan.id(),
+                                    leader.getUniqueId(),
+                                    targetId
+                            );
                             notify(leader, "clan.leadership.transferred", Map.of(
                                     "player", ClanPlayerNames.displayName(targetId),
                                     "tag", clan.tag()

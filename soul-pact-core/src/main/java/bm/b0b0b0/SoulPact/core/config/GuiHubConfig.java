@@ -2,7 +2,9 @@ package bm.b0b0b0.SoulPact.core.config;
 
 import bm.b0b0b0.SoulPact.core.config.settings.HubGuiSettings;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.bukkit.Material;
 
 public final class GuiHubConfig {
@@ -14,7 +16,7 @@ public final class GuiHubConfig {
     private final int bannerSlot;
     private final int createSlot;
     private final int helpSlot;
-    private final List<Integer> moduleSlots;
+    private final HubModuleSlotMapping moduleSlotMapping;
     private final Material overviewMaterial;
     private final Material profileMaterial;
     private final Material settingsMaterial;
@@ -32,7 +34,7 @@ public final class GuiHubConfig {
         this.bannerSlot = settings.slots.banner;
         this.createSlot = settings.slots.create;
         this.helpSlot = settings.slots.help;
-        this.moduleSlots = parseModuleSlots(settings.slots.modules);
+        this.moduleSlotMapping = parseModuleSlots(settings.slots.modules);
         this.overviewMaterial = parseMaterial(settings.materials.overview, Material.NETHER_STAR);
         this.profileMaterial = parseMaterial(settings.materials.profile, Material.PLAYER_HEAD);
         this.settingsMaterial = parseMaterial(settings.materials.settings, Material.COMPARATOR);
@@ -75,8 +77,8 @@ public final class GuiHubConfig {
         return helpSlot;
     }
 
-    public List<Integer> moduleSlots() {
-        return moduleSlots;
+    public HubModuleSlotMapping moduleSlotMapping() {
+        return moduleSlotMapping;
     }
 
     public Material overviewMaterial() {
@@ -111,22 +113,35 @@ public final class GuiHubConfig {
         return fillerMaterial;
     }
 
-    private static List<Integer> parseModuleSlots(String rawValue) {
+    private static HubModuleSlotMapping parseModuleSlots(String rawValue) {
         if (rawValue == null || rawValue.isBlank()) {
-            return List.of(26);
+            return new HubModuleSlotMapping(Map.of("bank", 26, "land", 25), List.of());
         }
-        List<Integer> slots = new ArrayList<>();
+        Map<String, Integer> byExtensionId = new LinkedHashMap<>();
+        List<Integer> legacyOrderSlots = new ArrayList<>();
         for (String part : rawValue.split(",")) {
             String trimmed = part.trim();
             if (trimmed.isEmpty()) {
                 continue;
             }
+            int separator = trimmed.indexOf(':');
+            if (separator > 0) {
+                String extensionId = trimmed.substring(0, separator).trim().toLowerCase();
+                try {
+                    byExtensionId.put(extensionId, Integer.parseInt(trimmed.substring(separator + 1).trim()));
+                } catch (NumberFormatException ignored) {
+                }
+                continue;
+            }
             try {
-                slots.add(Integer.parseInt(trimmed));
+                legacyOrderSlots.add(Integer.parseInt(trimmed));
             } catch (NumberFormatException ignored) {
             }
         }
-        return slots.isEmpty() ? List.of(26) : List.copyOf(slots);
+        if (byExtensionId.isEmpty() && legacyOrderSlots.isEmpty()) {
+            return new HubModuleSlotMapping(Map.of("bank", 26, "land", 25), List.of());
+        }
+        return new HubModuleSlotMapping(byExtensionId, legacyOrderSlots);
     }
 
     private static Material parseMaterial(String rawValue, Material fallback) {

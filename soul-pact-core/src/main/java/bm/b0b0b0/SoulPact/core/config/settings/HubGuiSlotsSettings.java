@@ -23,6 +23,6 @@ public final class HubGuiSlotsSettings {
     @Comment(@CommentValue("Справка (нижний ряд, справа)"))
     public int help = 49;
 
-    @Comment(@CommentValue("Модули (bank, chest...) — слоты через запятую, по порядку регистрации"))
-    public String modules = "26";
+    @Comment(@CommentValue("Модули: id:slot через запятую (bank:26,land:25)"))
+    public String modules = "bank:26,land:25";
 }

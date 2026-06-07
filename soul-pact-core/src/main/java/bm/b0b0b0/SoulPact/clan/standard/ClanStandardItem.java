@@ -88,6 +88,13 @@ public final class ClanStandardItem {
         return tileState.getPersistentDataContainer().get(keys.clanId(), PersistentDataType.LONG);
     }
 
+    public String readClanTagFromBlock(BlockState blockState) {
+        if (!(blockState instanceof TileState tileState)) {
+            return null;
+        }
+        return tileState.getPersistentDataContainer().get(keys.clanTag(), PersistentDataType.STRING);
+    }
+
     private void markContainer(PersistentDataContainer container, long clanId, String clanTag) {
         container.set(keys.clanId(), PersistentDataType.LONG, clanId);
         container.set(keys.clanTag(), PersistentDataType.STRING, clanTag);

@@ -10,6 +10,7 @@ import bm.b0b0b0.SoulPact.clan.repository.ClanMembershipRepository;
 import bm.b0b0b0.SoulPact.clan.repository.ClanRepository;
 import bm.b0b0b0.SoulPact.core.database.AsyncDatabaseExecutor;
 import bm.b0b0b0.SoulPact.core.message.MessageService;
+import bm.b0b0b0.SoulPact.core.module.ClanExtensionMembershipNotifier;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,6 +33,7 @@ public final class ClanMembershipService {
     private final MessageService messageService;
     private final AsyncDatabaseExecutor asyncDatabaseExecutor;
     private final ClanRolePermissionService rolePermissionService;
+    private final ClanExtensionMembershipNotifier extensionMembershipNotifier;
 
     public ClanMembershipService(
             ClanRepository clanRepository,
@@ -41,7 +43,8 @@ public final class ClanMembershipService {
             ClanPendingChatPresenter pendingChatPresenter,
             MessageService messageService,
             AsyncDatabaseExecutor asyncDatabaseExecutor,
-            ClanRolePermissionService rolePermissionService
+            ClanRolePermissionService rolePermissionService,
+            ClanExtensionMembershipNotifier extensionMembershipNotifier
     ) {
         this.clanRepository = clanRepository;
         this.membershipRepository = membershipRepository;
@@ -51,6 +54,7 @@ public final class ClanMembershipService {
         this.messageService = messageService;
         this.asyncDatabaseExecutor = asyncDatabaseExecutor;
         this.rolePermissionService = rolePermissionService;
+        this.extensionMembershipNotifier = extensionMembershipNotifier;
     }
 
     public void submitJoinRequest(Player player, String target) {
@@ -487,6 +491,7 @@ public final class ClanMembershipService {
                             notify(notifyReceiver, "clan.join.failed");
                             return CompletableFuture.completedFuture(null);
                         }
+                        extensionMembershipNotifier.memberJoined(clan.id(), playerId);
                         CompletableFuture<Integer> deleteRequestFuture = requestIdToDelete == null
                                 ? CompletableFuture.completedFuture(0)
                                 : membershipRepository.deleteJoinRequest(requestIdToDelete).thenApply(deleted -> deleted ? 1 : 0);

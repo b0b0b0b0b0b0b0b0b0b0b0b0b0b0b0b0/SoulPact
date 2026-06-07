@@ -161,6 +161,24 @@ public final class ClanStandardService {
         });
     }
 
+    public void restoreStandardToPlayer(Player player, long clanId, String clanTag) {
+        clanBannerService.loadBanner(clanId).thenAccept(banner ->
+                asyncDatabaseExecutor.runSync(() -> deliverStandard(player, clanId, clanTag, banner))
+        );
+    }
+
+    private void deliverStandard(Player player, long clanId, String clanTag, ItemStack banner) {
+        if (!player.isOnline()) {
+            return;
+        }
+        ItemStack standard = clanStandardItem.create(player, banner, clanId, clanTag);
+        Map<Integer, ItemStack> leftovers = player.getInventory().addItem(standard);
+        if (!leftovers.isEmpty()) {
+            leftovers.values().forEach(leftover -> player.getWorld().dropItemNaturally(player.getLocation(), leftover));
+        }
+        presence.trackInventory(clanId, player.getUniqueId());
+    }
+
     private void replaceInventoryStandard(Player player, long clanId, String clanTag, ItemStack bannerDesign) {
         ItemStack[] contents = player.getInventory().getContents();
         for (int slot = 0; slot < contents.length; slot++) {

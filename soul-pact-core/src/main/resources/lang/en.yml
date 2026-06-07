@@ -788,9 +788,10 @@ clan:
             - "<#9CA3AF>Treasury and transfers"
             - "<#D8B4FE>Click — open"
         land:
-          display-name: "<#D8B4FE>Land"
+          display-name: "<#D8B4FE>Base"
           lore:
-            - "<#9CA3AF>Territories and claims"
+            - "<#9CA3AF>Flag, region and settings"
+            - "<#D8B4FE>Click — open"
         gladiator:
           display-name: "<#D8B4FE>Gladiator"
           lore:

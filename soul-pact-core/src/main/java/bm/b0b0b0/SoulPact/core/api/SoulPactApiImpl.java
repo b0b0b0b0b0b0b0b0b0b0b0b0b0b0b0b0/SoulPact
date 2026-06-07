@@ -2,6 +2,7 @@ package bm.b0b0b0.SoulPact.core.api;
 
 import bm.b0b0b0.SoulPact.api.SoulPactApi;
 import bm.b0b0b0.SoulPact.api.clan.ClanSnapshot;
+import bm.b0b0b0.SoulPact.api.clan.SoulPactClanStandard;
 import bm.b0b0b0.SoulPact.api.extension.ExtensionRegistry;
 import bm.b0b0b0.SoulPact.api.message.SoulPactMessages;
 import bm.b0b0b0.SoulPact.api.platform.SoulPactClanAccess;
@@ -23,6 +24,7 @@ public final class SoulPactApiImpl implements SoulPactApi {
     private final SoulPactScheduler scheduler;
     private final SoulPactClanAccess clanAccess;
     private final SoulPactClanGui clanGui;
+    private final SoulPactClanStandard clanStandard;
     private final DataSourceProvider dataSourceProvider;
     private final ClanQueryService clanQueryService;
 
@@ -33,6 +35,7 @@ public final class SoulPactApiImpl implements SoulPactApi {
             SoulPactScheduler scheduler,
             SoulPactClanAccess clanAccess,
             SoulPactClanGui clanGui,
+            SoulPactClanStandard clanStandard,
             DataSourceProvider dataSourceProvider,
             ClanQueryService clanQueryService
     ) {
@@ -42,6 +45,7 @@ public final class SoulPactApiImpl implements SoulPactApi {
         this.scheduler = scheduler;
         this.clanAccess = clanAccess;
         this.clanGui = clanGui;
+        this.clanStandard = clanStandard;
         this.dataSourceProvider = dataSourceProvider;
         this.clanQueryService = clanQueryService;
     }
@@ -74,6 +78,11 @@ public final class SoulPactApiImpl implements SoulPactApi {
     @Override
     public SoulPactClanGui clanGui() {
         return clanGui;
+    }
+
+    @Override
+    public SoulPactClanStandard clanStandard() {
+        return clanStandard;
     }
 
     @Override

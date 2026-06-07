@@ -5,6 +5,7 @@ import bm.b0b0b0.SoulPact.clan.model.ClanMember;
 import bm.b0b0b0.SoulPact.clan.repository.ClanRepository;
 import bm.b0b0b0.SoulPact.core.database.AsyncDatabaseExecutor;
 import bm.b0b0b0.SoulPact.core.message.MessageService;
+import bm.b0b0b0.SoulPact.core.module.ClanExtensionMembershipNotifier;
 import java.util.Map;
 import java.util.Optional;
 import org.bukkit.entity.Player;
@@ -15,17 +16,20 @@ public final class ClanLeaveService {
     private final ClanMembershipHistoryService membershipHistoryService;
     private final MessageService messageService;
     private final AsyncDatabaseExecutor asyncDatabaseExecutor;
+    private final ClanExtensionMembershipNotifier extensionMembershipNotifier;
 
     public ClanLeaveService(
             ClanRepository clanRepository,
             ClanMembershipHistoryService membershipHistoryService,
             MessageService messageService,
-            AsyncDatabaseExecutor asyncDatabaseExecutor
+            AsyncDatabaseExecutor asyncDatabaseExecutor,
+            ClanExtensionMembershipNotifier extensionMembershipNotifier
     ) {
         this.clanRepository = clanRepository;
         this.membershipHistoryService = membershipHistoryService;
         this.messageService = messageService;
         this.asyncDatabaseExecutor = asyncDatabaseExecutor;
+        this.extensionMembershipNotifier = extensionMembershipNotifier;
     }
 
     public void leave(Player player) {
@@ -53,6 +57,7 @@ public final class ClanLeaveService {
                         messageService.send(player, "clan.leave.failed");
                         return;
                     }
+                    extensionMembershipNotifier.memberLeft(clan.id(), player.getUniqueId());
                     messageService.send(player, "clan.leave.success", Map.of("tag", clan.tag()));
                 });
                 return removed;

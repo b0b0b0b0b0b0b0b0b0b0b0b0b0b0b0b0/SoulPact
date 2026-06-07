@@ -787,9 +787,10 @@ clan:
             - "<#9CA3AF>Казна и переводы"
             - "<#D8B4FE>Нажмите — открыть"
         land:
-          display-name: "<#D8B4FE>Земли"
+          display-name: "<#D8B4FE>База"
           lore:
-            - "<#9CA3AF>Территории и claims"
+            - "<#9CA3AF>Флаг, регион и настройки"
+            - "<#D8B4FE>Нажмите — открыть"
         gladiator:
           display-name: "<#D8B4FE>Гладиатор"
           lore:

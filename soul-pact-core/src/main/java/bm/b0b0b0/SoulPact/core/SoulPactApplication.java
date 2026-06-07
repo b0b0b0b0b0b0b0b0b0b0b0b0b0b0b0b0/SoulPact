@@ -95,6 +95,7 @@ import bm.b0b0b0.SoulPact.clan.service.ClanProfileMembersLoreBuilder;
 import bm.b0b0b0.SoulPact.clan.service.ClanQueryService;
 import bm.b0b0b0.SoulPact.clan.role.RoleThemeService;
 import bm.b0b0b0.SoulPact.core.api.SoulPactApiImpl;
+import bm.b0b0b0.SoulPact.core.api.SoulPactClanStandardImpl;
 import bm.b0b0b0.SoulPact.core.api.SoulPactClanAccessImpl;
 import bm.b0b0b0.SoulPact.core.api.SoulPactClanGuiImpl;
 import bm.b0b0b0.SoulPact.core.api.SoulPactSchedulerImpl;
@@ -109,6 +110,7 @@ import bm.b0b0b0.SoulPact.core.integration.IntegrationRegistry;
 import bm.b0b0b0.SoulPact.core.message.MessageService;
 import bm.b0b0b0.SoulPact.core.message.StartupConsolePresenter;
 import bm.b0b0b0.SoulPact.core.module.ExtensionRegistryImpl;
+import bm.b0b0b0.SoulPact.core.module.ClanExtensionMembershipNotifier;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.plugin.ServicePriority;
@@ -174,6 +176,7 @@ public final class SoulPactApplication {
         messageService = new MessageService(plugin, pluginConfig.locale());
         messageService.load();
         integrationBootstrap.hookAll();
+        PlayerHeadSkinApplier.clearCache();
         new StartupConsolePresenter(plugin, messageService).logReloadComplete(
                 integrationRegistry,
                 pluginConfig.economy(),
@@ -335,6 +338,7 @@ public final class SoulPactApplication {
         ClanInfoViewDataService infoViewDataService = new ClanInfoViewDataService(clanRepository);
         ClanTargetResolver targetResolver = new ClanTargetResolver(clanRepository);
         ClanPendingChatPresenter pendingChatPresenter = new ClanPendingChatPresenter(messageService);
+        ClanExtensionMembershipNotifier extensionMembershipNotifier = new ClanExtensionMembershipNotifier(extensionRegistry);
         ClanMembershipService membershipService = new ClanMembershipService(
                 clanRepository,
                 membershipRepository,
@@ -343,7 +347,8 @@ public final class SoulPactApplication {
                 pendingChatPresenter,
                 messageService,
                 asyncDatabaseExecutor,
-                rolePermissionService
+                rolePermissionService,
+                extensionMembershipNotifier
         );
         ClanExtensionsDataService extensionsDataService = new ClanExtensionsDataService(
                 extensionRegistry,
@@ -495,7 +500,8 @@ public final class SoulPactApplication {
                 clanRepository,
                 membershipHistoryService,
                 messageService,
-                asyncDatabaseExecutor
+                asyncDatabaseExecutor,
+                extensionMembershipNotifier
         );
         ClanKickService kickService = new ClanKickService(
                 clanRepository,
@@ -503,7 +509,8 @@ public final class SoulPactApplication {
                 rolePermissionService,
                 roleThemeService,
                 messageService,
-                asyncDatabaseExecutor
+                asyncDatabaseExecutor,
+                extensionMembershipNotifier
         );
         ClanCreateEconomy createEconomy = new ClanCreateEconomy(
                 pluginConfig.economy(),
@@ -514,7 +521,8 @@ public final class SoulPactApplication {
                 roleThemeService,
                 createEconomy,
                 messageService,
-                asyncDatabaseExecutor
+                asyncDatabaseExecutor,
+                extensionMembershipNotifier
         );
         ClanHubClickHandler hubClickHandler = new ClanHubClickHandler(
                 messageService,
@@ -618,6 +626,7 @@ public final class SoulPactApplication {
                 new SoulPactSchedulerImpl(asyncDatabaseExecutor),
                 new SoulPactClanAccessImpl(clanRepository, rolePermissionService),
                 clanGui,
+                new SoulPactClanStandardImpl(clanStandardService),
                 dataSourceProvider,
                 clanQueryService
         );

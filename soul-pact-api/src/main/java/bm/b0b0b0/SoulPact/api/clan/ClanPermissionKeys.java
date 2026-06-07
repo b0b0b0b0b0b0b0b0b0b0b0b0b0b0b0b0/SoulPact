@@ -7,6 +7,7 @@ public final class ClanPermissionKeys {
     public static final String RECRUIT_LOWER = "recruit_lower";
     public static final String BANK_DEPOSIT = "bank_deposit";
     public static final String BANK_WITHDRAW = "bank_withdraw";
+    public static final String LAND_MANAGE = "land_manage";
 
     private ClanPermissionKeys() {
     }

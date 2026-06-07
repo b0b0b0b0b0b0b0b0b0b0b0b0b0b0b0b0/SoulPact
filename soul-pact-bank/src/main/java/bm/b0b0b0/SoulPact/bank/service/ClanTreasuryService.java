@@ -26,6 +26,7 @@ public final class ClanTreasuryService implements ClanTreasuryApi {
     public static final String ENTRY_WITHDRAW = "WITHDRAW";
     public static final String ENTRY_TRANSFER_IN = "TRANSFER_IN";
     public static final String ENTRY_TRANSFER_OUT = "TRANSFER_OUT";
+    public static final String ENTRY_CHARGE = "CHARGE";
 
     private final SoulPactApi api;
     private final ClanTreasuryRepository repository;
@@ -79,6 +80,19 @@ public final class ClanTreasuryService implements ClanTreasuryApi {
                 return CompletableFuture.completedFuture(result);
             }
             return api.scheduler().supplyAsync(() -> executeWithdraw(player, clanId, amount));
+        });
+    }
+
+    @Override
+    public CompletableFuture<TreasuryOperationResult> charge(long clanId, UUID actorId, double amount, String note) {
+        if (!isValidAmount(amount)) {
+            return CompletableFuture.completedFuture(TreasuryOperationResult.INVALID_AMOUNT);
+        }
+        return isLocked(clanId).thenCompose(locked -> {
+            if (locked) {
+                return CompletableFuture.completedFuture(TreasuryOperationResult.TREASURY_LOCKED);
+            }
+            return api.scheduler().supplyAsync(() -> executeCharge(clanId, actorId, amount, note));
         });
     }
 
@@ -235,6 +249,24 @@ public final class ClanTreasuryService implements ClanTreasuryApi {
             return TreasuryOperationResult.FAILED;
         }
         notifyWithdraw(player, clanId, cappedAmount, mutationResult.balanceAfter());
+        return TreasuryOperationResult.SUCCESS;
+    }
+
+    private TreasuryOperationResult executeCharge(long clanId, UUID actorId, double amount, String note) {
+        ClanTreasuryRepository.TreasuryMutationResult mutationResult = repository.applyMutation(
+                new ClanTreasuryRepository.TreasuryMutation(
+                        clanId,
+                        actorId,
+                        ENTRY_CHARGE,
+                        -amount,
+                        note,
+                        false,
+                        System.currentTimeMillis()
+                )
+        );
+        if (!mutationResult.success()) {
+            return TreasuryOperationResult.INSUFFICIENT_TREASURY_FUNDS;
+        }
         return TreasuryOperationResult.SUCCESS;
     }
 

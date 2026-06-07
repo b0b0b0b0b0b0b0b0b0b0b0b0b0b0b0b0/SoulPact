@@ -6,6 +6,7 @@ import bm.b0b0b0.SoulPact.clan.repository.ClanRepository;
 import bm.b0b0b0.SoulPact.clan.role.RoleThemeService;
 import bm.b0b0b0.SoulPact.core.database.AsyncDatabaseExecutor;
 import bm.b0b0b0.SoulPact.core.message.MessageService;
+import bm.b0b0b0.SoulPact.core.module.ClanExtensionMembershipNotifier;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public final class ClanKickService {
     private final RoleThemeService roleThemeService;
     private final MessageService messageService;
     private final AsyncDatabaseExecutor asyncDatabaseExecutor;
+    private final ClanExtensionMembershipNotifier extensionMembershipNotifier;
 
     public ClanKickService(
             ClanRepository clanRepository,
@@ -29,7 +31,8 @@ public final class ClanKickService {
             ClanRolePermissionService rolePermissionService,
             RoleThemeService roleThemeService,
             MessageService messageService,
-            AsyncDatabaseExecutor asyncDatabaseExecutor
+            AsyncDatabaseExecutor asyncDatabaseExecutor,
+            ClanExtensionMembershipNotifier extensionMembershipNotifier
     ) {
         this.clanRepository = clanRepository;
         this.membershipHistoryService = membershipHistoryService;
@@ -37,6 +40,7 @@ public final class ClanKickService {
         this.roleThemeService = roleThemeService;
         this.messageService = messageService;
         this.asyncDatabaseExecutor = asyncDatabaseExecutor;
+        this.extensionMembershipNotifier = extensionMembershipNotifier;
     }
 
     public CompletableFuture<Boolean> kick(Player actor, long clanId, UUID targetId) {
@@ -67,6 +71,9 @@ public final class ClanKickService {
                                 return membershipHistoryService.recordKick(clan, target, System.currentTimeMillis())
                                         .thenCompose(ignored -> clanRepository.removeMember(clan.id(), targetId))
                                         .thenApply(removed -> {
+                                            if (removed) {
+                                                extensionMembershipNotifier.memberLeft(clan.id(), targetId);
+                                            }
                                             asyncDatabaseExecutor.runSync(() -> {
                                                 if (!actor.isOnline()) {
                                                     return;
