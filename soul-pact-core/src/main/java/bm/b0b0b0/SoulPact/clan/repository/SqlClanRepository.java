@@ -122,6 +122,7 @@ public final class SqlClanRepository implements ClanRepository {
                             "",
                             record.leaderUuid(),
                             0,
+                            0,
                             record.maxSlots(),
                             false,
                             false,
@@ -156,7 +157,7 @@ public final class SqlClanRepository implements ClanRepository {
 
     private List<Clan> queryAll(int limit) {
         String sql = """
-                SELECT id, tag, name, description, leader_uuid, points, max_slots, verified, friendly_fire, join_requests_open, created_at
+                SELECT id, tag, name, description, leader_uuid, points, wars_won, max_slots, verified, friendly_fire, join_requests_open, created_at
                 FROM clans
                 ORDER BY tag ASC
                 LIMIT ?
@@ -178,7 +179,7 @@ public final class SqlClanRepository implements ClanRepository {
 
     private List<ClanListEntry> queryPageEntries(int offset, int limit) {
         String sql = """
-                SELECT c.id, c.tag, c.name, c.description, c.leader_uuid, c.points, c.max_slots,
+                SELECT c.id, c.tag, c.name, c.description, c.leader_uuid, c.points, c.wars_won, c.max_slots,
                        c.verified, c.friendly_fire, c.join_requests_open, c.created_at, COUNT(m.player_uuid) AS member_count
                 FROM clans c
                 LEFT JOIN clan_members m ON m.clan_id = c.id
@@ -208,7 +209,7 @@ public final class SqlClanRepository implements ClanRepository {
 
     private Optional<Clan> queryById(long clanId) {
         String sql = """
-                SELECT id, tag, name, description, leader_uuid, points, max_slots, verified, friendly_fire, join_requests_open, created_at
+                SELECT id, tag, name, description, leader_uuid, points, wars_won, max_slots, verified, friendly_fire, join_requests_open, created_at
                 FROM clans
                 WHERE id = ?
                 """;
@@ -228,7 +229,7 @@ public final class SqlClanRepository implements ClanRepository {
 
     private Optional<Clan> queryByTag(String tag) {
         String sql = """
-                SELECT id, tag, name, description, leader_uuid, points, max_slots, verified, friendly_fire, join_requests_open, created_at
+                SELECT id, tag, name, description, leader_uuid, points, wars_won, max_slots, verified, friendly_fire, join_requests_open, created_at
                 FROM clans
                 WHERE UPPER(tag) = UPPER(?)
                 """;
@@ -248,7 +249,7 @@ public final class SqlClanRepository implements ClanRepository {
 
     private Optional<Clan> queryByPlayerId(UUID playerId) {
         String sql = """
-                SELECT c.id, c.tag, c.name, c.description, c.leader_uuid, c.points, c.max_slots, c.verified, c.friendly_fire, c.join_requests_open, c.created_at
+                SELECT c.id, c.tag, c.name, c.description, c.leader_uuid, c.points, c.wars_won, c.max_slots, c.verified, c.friendly_fire, c.join_requests_open, c.created_at
                 FROM clans c
                 INNER JOIN clan_members m ON m.clan_id = c.id
                 WHERE m.player_uuid = ?
@@ -362,6 +363,11 @@ public final class SqlClanRepository implements ClanRepository {
     }
 
     @Override
+    public CompletableFuture<Boolean> updateDescription(long clanId, String description) {
+        return asyncDatabaseExecutor.supply(() -> updateDescriptionSync(clanId, description));
+    }
+
+    @Override
     public CompletableFuture<Boolean> updateMemberRole(long clanId, UUID playerId, String role) {
         return asyncDatabaseExecutor.supply(() -> updateMemberRoleSync(clanId, playerId, role));
     }
@@ -454,6 +460,18 @@ public final class SqlClanRepository implements ClanRepository {
         }
     }
 
+    private boolean updateDescriptionSync(long clanId, String description) {
+        String sql = "UPDATE clans SET description = ? WHERE id = ?";
+        try (Connection connection = dataSourceProvider.dataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, description);
+            statement.setLong(2, clanId);
+            return statement.executeUpdate() > 0;
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to update clan description", exception);
+        }
+    }
+
     private static Clan mapRow(ResultSet resultSet) throws Exception {
         return new Clan(
                 resultSet.getLong("id"),
@@ -462,12 +480,21 @@ public final class SqlClanRepository implements ClanRepository {
                 resultSet.getString("description"),
                 UUID.fromString(resultSet.getString("leader_uuid")),
                 resultSet.getInt("points"),
+                readWarsWon(resultSet),
                 resultSet.getInt("max_slots"),
                 resultSet.getInt("verified") == 1,
                 resultSet.getInt("friendly_fire") == 1,
                 readJoinRequestsOpen(resultSet),
                 resultSet.getLong("created_at")
         );
+    }
+
+    private static int readWarsWon(ResultSet resultSet) throws Exception {
+        try {
+            return resultSet.getInt("wars_won");
+        } catch (Exception ignored) {
+            return 0;
+        }
     }
 
     private static boolean readJoinRequestsOpen(ResultSet resultSet) throws Exception {

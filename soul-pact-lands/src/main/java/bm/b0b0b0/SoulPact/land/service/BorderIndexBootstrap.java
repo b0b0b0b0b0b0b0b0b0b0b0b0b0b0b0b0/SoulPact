@@ -12,17 +12,20 @@ public final class BorderIndexBootstrap {
     private final ClanBaseRepository repository;
     private final BorderBlockIndex borderBlockIndex;
     private final BaseFlagIndex flagIndex;
+    private final ClanBaseRecordIndex recordIndex;
 
     public BorderIndexBootstrap(
             SoulPactApi api,
             ClanBaseRepository repository,
             BorderBlockIndex borderBlockIndex,
-            BaseFlagIndex flagIndex
+            BaseFlagIndex flagIndex,
+            ClanBaseRecordIndex recordIndex
     ) {
         this.api = api;
         this.repository = repository;
         this.borderBlockIndex = borderBlockIndex;
         this.flagIndex = flagIndex;
+        this.recordIndex = recordIndex;
     }
 
     public void loadAll() {
@@ -36,8 +39,10 @@ public final class BorderIndexBootstrap {
         }).thenAccept(indexed -> api.scheduler().runSync(() -> {
             borderBlockIndex.clear();
             flagIndex.clear();
+            recordIndex.clear();
             for (IndexedBase entry : indexed) {
                 flagIndex.register(entry.base());
+                recordIndex.register(entry.base());
                 borderBlockIndex.register(entry.base().id(), entry.base().world(), entry.blocks());
             }
         }));

@@ -3,6 +3,7 @@ package bm.b0b0b0.SoulPact.coalition.service;
 import bm.b0b0b0.SoulPact.api.SoulPactApi;
 import bm.b0b0b0.SoulPact.api.clan.ClanSnapshot;
 import bm.b0b0b0.SoulPact.api.coalition.CoalitionAllySnapshot;
+import bm.b0b0b0.SoulPact.api.coalition.CoalitionDisplayExtras;
 import bm.b0b0b0.SoulPact.coalition.config.CoalitionConfig;
 import bm.b0b0b0.SoulPact.coalition.message.CoalitionInviteChatPresenter;
 import bm.b0b0b0.SoulPact.coalition.message.CoalitionMessages;
@@ -108,6 +109,46 @@ public final class CoalitionService {
         return chain;
     }
 
+    public CompletableFuture<CoalitionDisplayExtras> enrichInfoView(Player viewer, long targetClanId) {
+        return coalitionLineForList(targetClanId).thenCombine(
+                alliesForInfo(targetClanId),
+                (line, allies) -> new CoalitionDisplayExtras(line, allies, false)
+        ).thenCombine(canShowInviteFromInfo(viewer, targetClanId), (extras, showInvite) ->
+                new CoalitionDisplayExtras(extras.coalitionLine(), extras.allies(), showInvite)
+        );
+    }
+
+    public CompletableFuture<Boolean> inviteByClanId(Player player, long targetClanId) {
+        return clanLookup.findClan(targetClanId).thenCompose(targetOptional -> {
+            if (targetOptional.isEmpty()) {
+                api.scheduler().runSync(() -> messages.send(player, "coalition.error.target-not-found"));
+                return CompletableFuture.completedFuture(false);
+            }
+            return invite(player, targetOptional.get().tag());
+        });
+    }
+
+    public void handleInfoInviteClick(Player player, long targetClanId, int listPage) {
+        player.closeInventory();
+        inviteByClanId(player, targetClanId);
+    }
+
+    public CompletableFuture<Boolean> canShowInviteFromInfo(Player viewer, long targetClanId) {
+        return api.findClanByPlayer(viewer.getUniqueId()).thenCompose(viewerClanOptional -> {
+            if (viewerClanOptional.isEmpty()) {
+                return CompletableFuture.completedFuture(false);
+            }
+            ClanSnapshot viewerClan = viewerClanOptional.get();
+            if (!viewerClan.leaderId().equals(viewer.getUniqueId()) || viewerClan.id() == targetClanId) {
+                return CompletableFuture.completedFuture(false);
+            }
+            if (membershipCache.coalitionsOverlap(viewerClan.id(), targetClanId)) {
+                return CompletableFuture.completedFuture(false);
+            }
+            return api.scheduler().supplyAsync(() -> canInviteToCoalition(viewerClan.id(), targetClanId));
+        });
+    }
+
     public CompletableFuture<Boolean> canDeclareWar(long attackerClanId, long defenderClanId) {
         return api.scheduler().supplyAsync(() -> !membershipCache.coalitionsOverlap(attackerClanId, defenderClanId));
     }
@@ -149,6 +190,10 @@ public final class CoalitionService {
                 }
                 return api.scheduler().supplyAsync(() -> prepareInvite(inviterClan, targetClan, player))
                         .thenApply(inviteId -> {
+                            if (inviteId == -2L) {
+                                api.scheduler().runSync(() -> messages.send(player, "coalition.error.blocked-by-target"));
+                                return false;
+                            }
                             if (inviteId == -1L) {
                                 api.scheduler().runSync(() -> messages.send(player, "coalition.error.already-sent"));
                                 return false;
@@ -191,6 +236,7 @@ public final class CoalitionService {
                             }
                             api.scheduler().runSync(() -> {
                                 messages.send(player, "coalition.invite.accepted");
+                                inviteChatPresenter.notifyInviterAccepted(invite);
                                 bossBarService.refreshCoalition(targetClan.id());
                                 bossBarService.refreshCoalition(invite.inviterClanId());
                             });
@@ -214,8 +260,43 @@ public final class CoalitionService {
                     return false;
                 }
                 repository.updateInviteStatus(inviteOptional.get().id(), CoalitionInviteStatuses.DENIED);
-                api.scheduler().runSync(() -> messages.send(player, "coalition.invite.denied"));
+                CoalitionInviteRecord invite = inviteOptional.get();
+                api.scheduler().runSync(() -> {
+                    messages.send(player, "coalition.invite.denied");
+                    inviteChatPresenter.notifyInviterDenied(invite);
+                });
                 return true;
+            });
+        });
+    }
+
+    public CompletableFuture<Boolean> blockInvite(Player player, long inviteId) {
+        return resolveLeaderClan(player).thenCompose(leaderClanOptional -> {
+            if (leaderClanOptional.isEmpty()) {
+                return CompletableFuture.completedFuture(false);
+            }
+            long targetClanId = leaderClanOptional.get().id();
+            return api.scheduler().supplyAsync(() ->
+                    repository.findPendingInviteForTarget(targetClanId, inviteId)
+            ).thenCompose(inviteOptional -> {
+                if (inviteOptional.isEmpty()) {
+                    api.scheduler().runSync(() -> messages.send(player, "coalition.error.invite-not-found"));
+                    return CompletableFuture.completedFuture(false);
+                }
+                CoalitionInviteRecord invite = inviteOptional.get();
+                return api.scheduler().supplyAsync(() -> {
+                    repository.updateInviteStatus(invite.id(), CoalitionInviteStatuses.DENIED);
+                    repository.blockInviter(targetClanId, invite.inviterClanId(), System.currentTimeMillis());
+                    return invite;
+                }).thenCompose(blockedInvite -> clanLookup.findClan(blockedInvite.inviterClanId()).thenApply(inviterOptional -> {
+                    String inviterTag = inviterOptional.map(ClanSnapshot::tag)
+                            .orElse("#" + blockedInvite.inviterClanId());
+                    api.scheduler().runSync(() -> {
+                        messages.send(player, "coalition.invite.blocked", Map.of("inviter_tag", inviterTag));
+                        inviteChatPresenter.notifyInviterBlocked(blockedInvite);
+                    });
+                    return true;
+                }));
             });
         });
     }
@@ -260,7 +341,24 @@ public final class CoalitionService {
         });
     }
 
+    private boolean canInviteToCoalition(long inviterClanId, long targetClanId) {
+        if (repository.isInviteBlocked(targetClanId, inviterClanId)) {
+            return false;
+        }
+        if (repository.findCoalitionIdByClan(targetClanId).isPresent()) {
+            return false;
+        }
+        Optional<Long> inviterCoalition = repository.findCoalitionIdByClan(inviterClanId);
+        if (inviterCoalition.isPresent() && repository.countMembers(inviterCoalition.get()) >= config.maxMembers()) {
+            return false;
+        }
+        return repository.listPendingForTarget(targetClanId).isEmpty();
+    }
+
     private long prepareInvite(ClanSnapshot inviterClan, ClanSnapshot targetClan, Player player) {
+        if (repository.isInviteBlocked(targetClan.id(), inviterClan.id())) {
+            return -2L;
+        }
         long coalitionId = repository.findCoalitionIdByClan(inviterClan.id()).orElseGet(() -> {
             long created = repository.createCoalition(System.currentTimeMillis());
             repository.addMember(created, inviterClan.id(), System.currentTimeMillis());

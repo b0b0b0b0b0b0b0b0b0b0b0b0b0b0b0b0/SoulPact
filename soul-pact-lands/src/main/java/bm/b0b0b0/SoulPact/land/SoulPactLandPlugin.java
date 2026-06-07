@@ -2,7 +2,7 @@ package bm.b0b0b0.SoulPact.land;
 
 import bm.b0b0b0.SoulPact.api.SoulPactApi;
 import bm.b0b0b0.SoulPact.land.config.LandConfig;
-import bm.b0b0b0.SoulPact.land.config.LandConfigLoader;
+import bm.b0b0b0.SoulPact.land.config.LandConfigurationLoader;
 import bm.b0b0b0.SoulPact.land.extension.LandExtension;
 import bm.b0b0b0.SoulPact.land.gui.LandGuiListener;
 import bm.b0b0b0.SoulPact.land.gui.LandGuiService;
@@ -19,6 +19,7 @@ import bm.b0b0b0.SoulPact.land.service.BaseExpansionPaymentService;
 import bm.b0b0b0.SoulPact.land.service.BaseFlagIndex;
 import bm.b0b0b0.SoulPact.land.service.BorderBlockIndex;
 import bm.b0b0b0.SoulPact.land.service.BorderIndexBootstrap;
+import bm.b0b0b0.SoulPact.land.service.ClanBaseRecordIndex;
 import bm.b0b0b0.SoulPact.land.service.ClanBaseService;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
@@ -36,12 +37,13 @@ public final class SoulPactLandPlugin extends JavaPlugin {
     private LandGuiService guiService;
     private LandMessages landMessages;
     private LandStartupConsolePresenter startupPresenter;
+    private LandConfigurationLoader configurationLoader;
     private LandConfig config;
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
-        config = LandConfigLoader.load(this);
+        configurationLoader = new LandConfigurationLoader(this);
+        config = configurationLoader.load();
         landMessages = new LandMessages(this, config.locale(), config.fallbackLocale());
         landMessages.load();
         startupPresenter = new LandStartupConsolePresenter(this, landMessages);
@@ -95,7 +97,8 @@ public final class SoulPactLandPlugin extends JavaPlugin {
         BorderBlockIndex borderBlockIndex = new BorderBlockIndex();
         SqlClanBaseRepository baseRepository = new SqlClanBaseRepository(api);
         BaseFlagIndex flagIndex = new BaseFlagIndex();
-        new BorderIndexBootstrap(api, baseRepository, borderBlockIndex, flagIndex).loadAll();
+        ClanBaseRecordIndex recordIndex = new ClanBaseRecordIndex();
+        new BorderIndexBootstrap(api, baseRepository, borderBlockIndex, flagIndex, recordIndex).loadAll();
         BaseBorderService borderService = new BaseBorderService(config, borderBlockIndex);
         SqlClanMemberUuidRepository memberRepository = new SqlClanMemberUuidRepository(api);
         LandVaultGateway vaultGateway = new LandVaultGateway();
@@ -110,7 +113,8 @@ public final class SoulPactLandPlugin extends JavaPlugin {
                 worldGuardGateway,
                 borderService,
                 paymentService,
-                flagIndex
+                flagIndex,
+                recordIndex
         );
         guiService = new LandGuiService(api, config, landMessages, baseService);
         extension = new LandExtension(baseService, guiService);
@@ -121,7 +125,7 @@ public final class SoulPactLandPlugin extends JavaPlugin {
                 this
         );
         Bukkit.getPluginManager().registerEvents(
-                new BaseWorldListener(api, baseService, borderBlockIndex, flagIndex, landMessages),
+                new BaseWorldListener(api, baseService, borderBlockIndex, landMessages),
                 this
         );
         PluginCommand command = getCommand("clanland");

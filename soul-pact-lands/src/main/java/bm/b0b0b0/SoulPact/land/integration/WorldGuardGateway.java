@@ -119,6 +119,22 @@ public final class WorldGuardGateway {
         region.setFlag(Flags.MOB_SPAWNING, mobSpawnEnabled ? StateFlag.State.ALLOW : StateFlag.State.DENY);
     }
 
+    public void forcePvpAllow(World world, String regionId) {
+        ProtectedRegion region = region(world, regionId);
+        if (region == null) {
+            return;
+        }
+        region.setFlag(Flags.PVP, StateFlag.State.ALLOW);
+    }
+
+    public void restorePvp(World world, String regionId, boolean pvpEnabled) {
+        ProtectedRegion region = region(world, regionId);
+        if (region == null) {
+            return;
+        }
+        region.setFlag(Flags.PVP, pvpEnabled ? StateFlag.State.ALLOW : StateFlag.State.DENY);
+    }
+
     public void resizeRegion(World world, String regionId, BaseBounds newBounds) {
         RegionManager manager = requireManager(world);
         ProtectedRegion existing = manager.getRegion(regionId);

@@ -30,6 +30,26 @@ public final class LandClanNavigation {
                 player.performCommand("clan");
             }
         };
+        runSyncLater(openAction);
+    }
+
+    public void openBanner(Player player) {
+        Runnable openAction = () -> {
+            if (!player.isOnline()) {
+                return;
+            }
+            try {
+                SoulPactClanGui clanGui = resolveClanGui();
+                if (clanGui != null) {
+                    clanGui.openBannerFromLand(player);
+                }
+            } catch (Throwable ignored) {
+            }
+        };
+        runSyncLater(openAction);
+    }
+
+    private void runSyncLater(Runnable openAction) {
         try {
             api.scheduler().runSyncLater(1L, openAction);
         } catch (Throwable throwable) {

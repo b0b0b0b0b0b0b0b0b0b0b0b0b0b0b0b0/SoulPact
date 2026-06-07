@@ -1,5 +1,6 @@
 package bm.b0b0b0.SoulPact.war.service;
 
+import bm.b0b0b0.SoulPact.api.coalition.CoalitionWarBridge;
 import bm.b0b0b0.SoulPact.war.config.WarConfig;
 import bm.b0b0b0.SoulPact.war.message.WarMessages;
 import bm.b0b0b0.SoulPact.war.model.ActiveWarRecord;
@@ -22,27 +23,33 @@ public final class WarBossBarService {
     private final WarMessages messages;
     private final WarStateCache stateCache;
     private final WarPlayerClanCache playerClanCache;
+    private final WarClanLookup clanLookup;
+    private final CoalitionWarBridgeLookup coalitionWarBridgeLookup;
     private final Map<UUID, BossBar> barsByPlayer = new ConcurrentHashMap<>();
 
     public WarBossBarService(
             WarConfig config,
             WarMessages messages,
             WarStateCache stateCache,
-            WarPlayerClanCache playerClanCache
+            WarPlayerClanCache playerClanCache,
+            WarClanLookup clanLookup,
+            CoalitionWarBridgeLookup coalitionWarBridgeLookup
     ) {
         this.config = config;
         this.messages = messages;
         this.stateCache = stateCache;
         this.playerClanCache = playerClanCache;
+        this.clanLookup = clanLookup;
+        this.coalitionWarBridgeLookup = coalitionWarBridgeLookup;
     }
 
     public void refreshPlayer(Player player) {
-        Long clanId = playerClanCache.find(player.getUniqueId());
+        Long clanId = resolveClanId(player.getUniqueId());
         if (clanId == null) {
             removePlayer(player.getUniqueId());
             return;
         }
-        Optional<ActiveWarRecord> warOptional = stateCache.activeWarFor(clanId);
+        Optional<ActiveWarRecord> warOptional = findWarForParticipant(clanId);
         if (warOptional.isPresent()) {
             ActiveWarRecord war = warOptional.get();
             Optional<WarCaptureState> captureOptional = stateCache.captureForWar(war.id());
@@ -50,7 +57,10 @@ public final class WarBossBarService {
                 WarCaptureState capture = captureOptional.get();
                 long secondsLeft = secondsLeft(capture.deadlineAt());
                 float progress = captureProgress(capture.deadlineAt());
-                if (clanId == capture.targetClanId()) {
+                long playerSide = warSideRoot(war, clanId);
+                long holderSide = warSideRoot(war, capture.holderClanId());
+                long targetSide = warSideRoot(war, capture.targetClanId());
+                if (playerSide != 0L && playerSide == targetSide) {
                     applyBar(
                             player,
                             "war.bossbar.capture-defending",
@@ -60,7 +70,7 @@ public final class WarBossBarService {
                     );
                     return;
                 }
-                if (clanId == capture.holderClanId()) {
+                if (playerSide != 0L && playerSide == holderSide) {
                     applyBar(
                             player,
                             "war.bossbar.capture-attacking",
@@ -71,11 +81,18 @@ public final class WarBossBarService {
                     return;
                 }
             }
-            if (clanId == war.attackerClanId()) {
+            long playerSide = warSideRoot(war, clanId);
+            if (playerSide == war.attackerClanId()) {
                 applyBar(player, "war.bossbar.active-attacker", Map.of(), config.activeColor(), 1.0F);
                 return;
             }
-            applyBar(player, "war.bossbar.active-defender", Map.of(), config.activeColor(), 1.0F);
+            if (playerSide == war.defenderClanId()) {
+                applyBar(player, "war.bossbar.active-defender", Map.of(), config.activeColor(), 1.0F);
+                return;
+            }
+        }
+        if (stateCache.hasPendingForAttacker(clanId)) {
+            applyBar(player, "war.bossbar.pending-attacker", Map.of(), config.pendingColor(), 1.0F);
             return;
         }
         if (stateCache.hasPendingForDefender(clanId)) {
@@ -87,7 +104,7 @@ public final class WarBossBarService {
 
     public void refreshClan(long clanId) {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            Long playerClanId = playerClanCache.find(player.getUniqueId());
+            Long playerClanId = resolveClanId(player.getUniqueId());
             if (playerClanId != null && playerClanId == clanId) {
                 refreshPlayer(player);
             }
@@ -95,8 +112,17 @@ public final class WarBossBarService {
     }
 
     public void refreshWarClans(ActiveWarRecord war) {
-        refreshClan(war.attackerClanId());
-        refreshClan(war.defenderClanId());
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            Long clanId = resolveClanId(player.getUniqueId());
+            if (clanId == null) {
+                continue;
+            }
+            findWarForParticipant(clanId).ifPresent(activeWar -> {
+                if (activeWar.id() == war.id()) {
+                    refreshPlayer(player);
+                }
+            });
+        }
     }
 
     public void tick() {
@@ -119,6 +145,61 @@ public final class WarBossBarService {
         barsByPlayer.clear();
     }
 
+    private Long resolveClanId(UUID playerId) {
+        Long cached = playerClanCache.find(playerId);
+        if (cached != null) {
+            return cached;
+        }
+        Optional<Long> lookedUp = clanLookup.findClanIdByPlayerSync(playerId);
+        lookedUp.ifPresent(clanId -> playerClanCache.put(playerId, clanId));
+        return lookedUp.orElse(null);
+    }
+
+    private Optional<ActiveWarRecord> findWarForParticipant(long clanId) {
+        Optional<ActiveWarRecord> direct = stateCache.activeWarFor(clanId);
+        if (direct.isPresent()) {
+            return direct;
+        }
+        return coalitionWarBridgeLookup.resolve().flatMap(bridge -> findCoalitionParticipantWar(clanId, bridge));
+    }
+
+    private Optional<ActiveWarRecord> findCoalitionParticipantWar(long clanId, CoalitionWarBridge bridge) {
+        for (ActiveWarRecord war : stateCache.allActiveWars()) {
+            if (isCoalitionWarAlly(clanId, war, bridge)) {
+                return Optional.of(war);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private boolean isCoalitionWarAlly(long clanId, ActiveWarRecord war, CoalitionWarBridge bridge) {
+        if (clanId == war.attackerClanId() || clanId == war.defenderClanId()) {
+            return false;
+        }
+        return bridge.coalitionClanIds(war.attackerClanId()).contains(clanId)
+                || bridge.coalitionClanIds(war.defenderClanId()).contains(clanId);
+    }
+
+    private long warSideRoot(ActiveWarRecord war, long clanId) {
+        if (clanId == war.attackerClanId()) {
+            return war.attackerClanId();
+        }
+        if (clanId == war.defenderClanId()) {
+            return war.defenderClanId();
+        }
+        return coalitionWarBridgeLookup.resolve()
+                .map(bridge -> {
+                    if (bridge.coalitionClanIds(war.attackerClanId()).contains(clanId)) {
+                        return war.attackerClanId();
+                    }
+                    if (bridge.coalitionClanIds(war.defenderClanId()).contains(clanId)) {
+                        return war.defenderClanId();
+                    }
+                    return 0L;
+                })
+                .orElse(0L);
+    }
+
     private void applyBar(Player player, String key, Map<String, String> placeholders, BarColor color, float progress) {
         Component title = messages.component(player, key, placeholders);
         String plainTitle = PlainTextComponentSerializer.plainText().serialize(title);
@@ -135,7 +216,11 @@ public final class WarBossBarService {
     }
 
     private long secondsLeft(long deadlineAt) {
-        return Math.max(0L, (deadlineAt - System.currentTimeMillis() + 999L) / 1000L);
+        long millisLeft = deadlineAt - System.currentTimeMillis();
+        if (millisLeft <= 0L) {
+            return 0L;
+        }
+        return (millisLeft + 999L) / 1000L;
     }
 
     private float captureProgress(long deadlineAt) {

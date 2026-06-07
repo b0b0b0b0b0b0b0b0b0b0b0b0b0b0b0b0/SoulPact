@@ -6,7 +6,9 @@ public final class InfoGuiMaterialsSettings {
     public String join = "LIME_DYE";
     public String joinClosed = "GRAY_DYE";
     public String leave = "RED_DYE";
+    public String inviteCoalition = "PINK_BANNER";
     public String declareWar = "IRON_SWORD";
+    public String declareWarBlocked = "BARRIER";
     public String ally = "PLAYER_HEAD";
     public String members = "PLAYER_HEAD";
     public String back = "ARROW";

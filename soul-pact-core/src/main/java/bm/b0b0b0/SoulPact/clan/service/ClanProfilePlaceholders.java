@@ -22,6 +22,7 @@ public final class ClanProfilePlaceholders {
         placeholders.put("id", String.valueOf(clan.id()));
         placeholders.put("name", clan.name());
         placeholders.put("points", String.valueOf(clan.points()));
+        placeholders.put("wars_won", String.valueOf(clan.warsWon()));
         placeholders.put("count", String.valueOf(memberCount));
         placeholders.put("max", String.valueOf(clan.maxSlots()));
         placeholders.put("created", formatCreated(clan.createdAt()));

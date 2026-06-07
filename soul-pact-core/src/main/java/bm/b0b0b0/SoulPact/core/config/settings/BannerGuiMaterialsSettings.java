@@ -3,7 +3,7 @@ package bm.b0b0b0.SoulPact.core.config.settings;
 public final class BannerGuiMaterialsSettings {
 
     public String clearPatterns = "BARRIER";
-    public String patternColor = "WHITE_DYE";
+    public String patternColor = "PURPLE_DYE";
     public String fromHand = "HOPPER";
     public String undoPattern = "SHEARS";
     public String save = "LIME_DYE";

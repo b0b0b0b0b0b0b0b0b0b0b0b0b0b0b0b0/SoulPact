@@ -40,7 +40,7 @@ public final class LandMenuPopulator {
         inventory.setItem(config.infoSlot(), LandGuiItems.create(
                 player,
                 messages,
-                Material.MAP,
+                snapshot.base().isPresent() ? Material.WHITE_BANNER : Material.GRAY_BANNER,
                 snapshot.base().isPresent() ? "land.gui.item.info-active.name" : "land.gui.item.info-empty.name",
                 snapshot.base().isPresent()
                         ? messages.resolveList(player, "land.gui.item.info-active.lore", placeholders)
@@ -49,10 +49,10 @@ public final class LandMenuPopulator {
         ));
         if (snapshot.leader() && snapshot.base().isPresent()) {
             var base = snapshot.base().get();
-            populateExpansion(inventory, player, base, BaseExpansionAxis.NORTH, config.expandNorthSlot(), Material.LIGHT_BLUE_WOOL);
-            populateExpansion(inventory, player, base, BaseExpansionAxis.WEST, config.expandWestSlot(), Material.RED_WOOL);
-            populateExpansion(inventory, player, base, BaseExpansionAxis.EAST, config.expandEastSlot(), Material.LIME_WOOL);
-            populateExpansion(inventory, player, base, BaseExpansionAxis.SOUTH, config.expandSouthSlot(), Material.ORANGE_WOOL);
+            populateExpansion(inventory, player, base, BaseExpansionAxis.NORTH, config.expandNorthSlot(), Material.LIGHT_BLUE_CONCRETE);
+            populateExpansion(inventory, player, base, BaseExpansionAxis.WEST, config.expandWestSlot(), Material.RED_CONCRETE);
+            populateExpansion(inventory, player, base, BaseExpansionAxis.EAST, config.expandEastSlot(), Material.LIME_CONCRETE);
+            populateExpansion(inventory, player, base, BaseExpansionAxis.SOUTH, config.expandSouthSlot(), Material.ORANGE_CONCRETE);
             inventory.setItem(config.pvpSlot(), LandGuiItems.simple(
                     player,
                     messages,
@@ -69,16 +69,16 @@ public final class LandMenuPopulator {
                     base.mobSpawnEnabled() ? "land.gui.item.mob-on.lore" : "land.gui.item.mob-off.lore",
                     placeholders
             ));
-            Material borderMaterial = config.borderColors().resolve(base.borderMaterial());
+            Material borderGuiMaterial = config.borderColors().resolveGui(base.borderMaterial());
             Map<String, String> borderPlaceholders = new HashMap<>(placeholders);
             borderPlaceholders.put(
                     "color",
-                    messages.resolve(player, "land.gui.border-colors." + config.borderColors().displayKey(borderMaterial))
+                    messages.resolve(player, "land.gui.border-colors." + config.borderColors().displayKey(borderGuiMaterial))
             );
             inventory.setItem(config.borderColorSlot(), LandGuiItems.simple(
                     player,
                     messages,
-                    borderMaterial,
+                    borderGuiMaterial,
                     "land.gui.item.border-color.name",
                     "land.gui.item.border-color.lore",
                     borderPlaceholders

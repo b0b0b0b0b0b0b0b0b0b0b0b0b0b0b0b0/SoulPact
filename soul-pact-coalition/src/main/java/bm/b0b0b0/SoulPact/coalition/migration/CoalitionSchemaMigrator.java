@@ -26,6 +26,7 @@ public final class CoalitionSchemaMigrator {
     public void migrate() {
         try {
             runScript("database/001_coalition.sql");
+            runScript("database/002_coalition_blocks.sql");
         } catch (SQLException | IOException exception) {
             throw new IllegalStateException("Failed to migrate coalition schema", exception);
         }

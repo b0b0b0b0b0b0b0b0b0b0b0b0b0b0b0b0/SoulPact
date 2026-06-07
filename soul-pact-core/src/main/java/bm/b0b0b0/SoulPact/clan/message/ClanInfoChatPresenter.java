@@ -28,7 +28,7 @@ public final class ClanInfoChatPresenter {
         messageService.send(player, "clan.info.header", placeholders);
         messageService.send(player, "clan.info.line-leader", placeholders);
         messageService.send(player, "clan.info.line-members", placeholders);
-        messageService.send(player, "clan.info.line-points", placeholders);
+        messageService.send(player, "clan.info.line-wars-won", placeholders);
         messageService.send(player, "clan.info.line-verified", placeholders);
         messageService.send(player, "clan.info.line-ff", placeholders);
         messageService.send(player, "clan.info.line-created", placeholders);
@@ -43,6 +43,7 @@ public final class ClanInfoChatPresenter {
         placeholders.put("leader", resolveLeaderName(clan.leaderId()));
         placeholders.put("count", String.valueOf(memberCount));
         placeholders.put("max", String.valueOf(clan.maxSlots()));
+        placeholders.put("wars_won", String.valueOf(clan.warsWon()));
         placeholders.put("points", String.valueOf(clan.points()));
         placeholders.put("verified", resolveBoolean(player, clan.verified()));
         placeholders.put("ff", resolveBoolean(player, clan.friendlyFire()));

@@ -244,6 +244,43 @@ public final class SqlCoalitionRepository implements CoalitionRepository {
         }
     }
 
+    @Override
+    public boolean isInviteBlocked(long targetClanId, long inviterClanId) {
+        String sql = """
+                SELECT 1 FROM coalition_invite_blocks
+                WHERE target_clan_id = ? AND inviter_clan_id = ?
+                LIMIT 1
+                """;
+        try (Connection connection = api.dataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, targetClanId);
+            statement.setLong(2, inviterClanId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next();
+            }
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Failed to check coalition invite block", exception);
+        }
+    }
+
+    @Override
+    public void blockInviter(long targetClanId, long inviterClanId, long blockedAt) {
+        String sql = """
+                INSERT INTO coalition_invite_blocks(target_clan_id, inviter_clan_id, blocked_at)
+                VALUES(?, ?, ?)
+                ON CONFLICT(target_clan_id, inviter_clan_id) DO UPDATE SET blocked_at = excluded.blocked_at
+                """;
+        try (Connection connection = api.dataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, targetClanId);
+            statement.setLong(2, inviterClanId);
+            statement.setLong(3, blockedAt);
+            statement.executeUpdate();
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Failed to block coalition inviter", exception);
+        }
+    }
+
     private Optional<CoalitionInviteRecord> findInvite(long inviteId, String status) {
         String sql = """
                 SELECT id, coalition_id, inviter_clan_id, target_clan_id, invited_by_uuid, created_at, status

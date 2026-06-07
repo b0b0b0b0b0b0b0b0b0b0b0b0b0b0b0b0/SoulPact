@@ -43,6 +43,16 @@ public final class LandExtension implements ClanLandProvider {
     }
 
     @Override
+    public void applyWarCombatZone(long clanId) {
+        baseService.applyWarCombatZone(clanId);
+    }
+
+    @Override
+    public void restoreCombatZone(long clanId) {
+        baseService.restoreCombatZone(clanId);
+    }
+
+    @Override
     public void openGui(Player player) {
         guiService.open(player);
     }

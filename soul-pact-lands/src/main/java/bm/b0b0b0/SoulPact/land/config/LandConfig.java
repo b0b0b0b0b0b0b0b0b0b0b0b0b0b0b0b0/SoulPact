@@ -82,7 +82,7 @@ public final class LandConfig {
     }
 
     public Material borderMaterial() {
-        return borderColors.defaultColor();
+        return borderColors.defaultWorldColor();
     }
 
     public int guiRows() {

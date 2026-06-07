@@ -65,6 +65,15 @@ public final class WarMessages {
         player.sendMessage(component(player, key, placeholders));
     }
 
+    public void sendList(Player player, String key, Map<String, String> placeholders) {
+        for (String line : resolveList(player, key, placeholders)) {
+            if (line == null || line.isBlank()) {
+                continue;
+            }
+            player.sendMessage(parse(line));
+        }
+    }
+
     public void send(CommandSender sender, String key, Map<String, String> placeholders) {
         if (sender instanceof Player player) {
             send(player, key, placeholders);
@@ -82,7 +91,7 @@ public final class WarMessages {
     }
 
     public List<String> resolveList(Player player, String key, Map<String, String> placeholders) {
-        FileConfiguration bundle = player == null ? bundle(fallbackLocale) : bundleFor(player);
+        FileConfiguration bundle = player == null ? bundleForConsole() : bundleFor(player);
         List<String> lines = bundle.getStringList(key);
         if (lines.isEmpty()) {
             FileConfiguration fallback = bundle(fallbackLocale);
@@ -114,7 +123,7 @@ public final class WarMessages {
     }
 
     private String resolveRaw(Player player, String key) {
-        FileConfiguration bundle = player == null ? bundle(fallbackLocale) : bundleFor(player);
+        FileConfiguration bundle = player == null ? bundleForConsole() : bundleFor(player);
         String value = bundle.getString(key);
         if (value == null) {
             FileConfiguration fallback = bundle(fallbackLocale);
@@ -125,7 +134,15 @@ public final class WarMessages {
 
     private FileConfiguration bundleFor(Player player) {
         FileConfiguration configured = bundle(locale);
-        return configured == null ? bundle(fallbackLocale) : configured;
+        if (configured != null) {
+            return configured;
+        }
+        FileConfiguration fallback = bundle(fallbackLocale);
+        return fallback == null ? new YamlConfiguration() : fallback;
+    }
+
+    private FileConfiguration bundleForConsole() {
+        return bundleFor(null);
     }
 
     private FileConfiguration bundle(String code) {

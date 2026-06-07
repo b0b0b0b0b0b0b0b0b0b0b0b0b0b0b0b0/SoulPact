@@ -10,6 +10,7 @@ public final class Clan {
     private final String description;
     private final UUID leaderId;
     private final int points;
+    private final int warsWon;
     private final int maxSlots;
     private final boolean verified;
     private final boolean friendlyFire;
@@ -23,6 +24,7 @@ public final class Clan {
             String description,
             UUID leaderId,
             int points,
+            int warsWon,
             int maxSlots,
             boolean verified,
             boolean friendlyFire,
@@ -35,6 +37,7 @@ public final class Clan {
         this.description = description;
         this.leaderId = leaderId;
         this.points = points;
+        this.warsWon = warsWon;
         this.maxSlots = maxSlots;
         this.verified = verified;
         this.friendlyFire = friendlyFire;
@@ -64,6 +67,10 @@ public final class Clan {
 
     public int points() {
         return points;
+    }
+
+    public int warsWon() {
+        return warsWon;
     }
 
     public int maxSlots() {

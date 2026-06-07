@@ -21,6 +21,7 @@ public final class WarGuiService {
     private final WarDeclareConfirmMenuPopulator declareConfirmPopulator;
     private final WarPendingListMenuPopulator pendingListPopulator;
     private final WarPendingDetailMenuPopulator pendingDetailPopulator;
+    private final WarHubMenuPopulator hubPopulator;
     private final WarGuiClickHandler clickHandler;
 
     public WarGuiService(
@@ -38,6 +39,7 @@ public final class WarGuiService {
         this.declareConfirmPopulator = new WarDeclareConfirmMenuPopulator(config, messages);
         this.pendingListPopulator = new WarPendingListMenuPopulator(config, messages);
         this.pendingDetailPopulator = new WarPendingDetailMenuPopulator(config, messages, warService);
+        this.hubPopulator = new WarHubMenuPopulator(config, messages);
         this.clickHandler = new WarGuiClickHandler(this, warService, api);
     }
 
@@ -80,6 +82,16 @@ public final class WarGuiService {
                     player.openInventory(menu.getInventory());
                 })
         );
+    }
+
+    public void openWarHub(Player player) {
+        warService.buildHubView(player).thenAccept(viewData -> api.scheduler().runSync(() -> {
+            if (!player.isOnline()) {
+                return;
+            }
+            WarHubMenu menu = new WarHubMenu(config, hubPopulator, messages, player, viewData);
+            player.openInventory(menu.getInventory());
+        }));
     }
 
     public void openPendingDetail(Player player, WarDeclarationRecord declaration) {

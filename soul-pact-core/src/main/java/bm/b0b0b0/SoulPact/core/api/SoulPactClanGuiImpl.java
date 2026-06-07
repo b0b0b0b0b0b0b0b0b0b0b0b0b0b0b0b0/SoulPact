@@ -18,6 +18,11 @@ public final class SoulPactClanGuiImpl implements SoulPactClanGui {
     }
 
     @Override
+    public void openProfile(Player player) {
+        guiOpenService.openProfile(player);
+    }
+
+    @Override
     public void openList(Player player, int page) {
         guiOpenService.openList(player, page);
     }
@@ -25,5 +30,15 @@ public final class SoulPactClanGuiImpl implements SoulPactClanGui {
     @Override
     public void openInfo(Player player, long clanId, int listPage) {
         guiOpenService.openInfo(player, clanId, listPage);
+    }
+
+    @Override
+    public void openBanner(Player player) {
+        guiOpenService.openBanner(player);
+    }
+
+    @Override
+    public void openBannerFromLand(Player player) {
+        guiOpenService.openBannerFromLand(player);
     }
 }

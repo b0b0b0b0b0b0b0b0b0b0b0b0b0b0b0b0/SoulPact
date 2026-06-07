@@ -2,7 +2,7 @@ package bm.b0b0b0.SoulPact.bank;
 
 import bm.b0b0b0.SoulPact.api.SoulPactApi;
 import bm.b0b0b0.SoulPact.bank.config.BankConfig;
-import bm.b0b0b0.SoulPact.bank.config.BankConfigLoader;
+import bm.b0b0b0.SoulPact.bank.config.BankConfigurationLoader;
 import bm.b0b0b0.SoulPact.bank.economy.VaultGateway;
 import bm.b0b0b0.SoulPact.bank.extension.BankExtension;
 import bm.b0b0b0.SoulPact.bank.gui.BankGuiListener;
@@ -28,12 +28,13 @@ public final class SoulPactBankPlugin extends JavaPlugin {
     private BankGuiService guiService;
     private BankMessages bankMessages;
     private BankStartupConsolePresenter startupPresenter;
+    private BankConfigurationLoader configurationLoader;
     private BankConfig config;
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
-        config = BankConfigLoader.load(this);
+        configurationLoader = new BankConfigurationLoader(this);
+        config = configurationLoader.load();
         bankMessages = new BankMessages(this, config.locale(), config.fallbackLocale());
         bankMessages.load();
         startupPresenter = new BankStartupConsolePresenter(this, bankMessages);

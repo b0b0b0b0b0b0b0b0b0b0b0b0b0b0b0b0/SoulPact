@@ -8,6 +8,7 @@ public final class GuiInfoConfig {
     private final int rows;
     private final int clanCardSlot;
     private final int actionSlot;
+    private final int inviteCoalitionSlot;
     private final int declareWarSlot;
     private final int membersSlot;
     private final int allyFirstSlot;
@@ -18,7 +19,9 @@ public final class GuiInfoConfig {
     private final Material joinMaterial;
     private final Material joinClosedMaterial;
     private final Material leaveMaterial;
+    private final Material inviteCoalitionMaterial;
     private final Material declareWarMaterial;
+    private final Material declareWarBlockedMaterial;
     private final Material allyMaterial;
     private final Material membersMaterial;
     private final Material backMaterial;
@@ -28,6 +31,7 @@ public final class GuiInfoConfig {
         this.rows = settings.rows;
         this.clanCardSlot = settings.slots.clanCard;
         this.actionSlot = settings.slots.action;
+        this.inviteCoalitionSlot = settings.slots.inviteCoalition;
         this.declareWarSlot = settings.slots.declareWar;
         this.membersSlot = settings.slots.members;
         this.allyFirstSlot = settings.slots.allyFirst;
@@ -38,7 +42,9 @@ public final class GuiInfoConfig {
         this.joinMaterial = parseMaterial(settings.materials.join, Material.LIME_DYE);
         this.joinClosedMaterial = parseMaterial(settings.materials.joinClosed, Material.GRAY_DYE);
         this.leaveMaterial = parseMaterial(settings.materials.leave, Material.RED_DYE);
+        this.inviteCoalitionMaterial = parseMaterial(settings.materials.inviteCoalition, Material.PINK_BANNER);
         this.declareWarMaterial = parseMaterial(settings.materials.declareWar, Material.IRON_SWORD);
+        this.declareWarBlockedMaterial = parseMaterial(settings.materials.declareWarBlocked, Material.BARRIER);
         this.allyMaterial = parseMaterial(settings.materials.ally, Material.PLAYER_HEAD);
         this.membersMaterial = parseMaterial(settings.materials.members, Material.PLAYER_HEAD);
         this.backMaterial = parseMaterial(settings.materials.back, Material.ARROW);
@@ -55,6 +61,10 @@ public final class GuiInfoConfig {
 
     public int actionSlot() {
         return actionSlot;
+    }
+
+    public int inviteCoalitionSlot() {
+        return inviteCoalitionSlot;
     }
 
     public int declareWarSlot() {
@@ -97,8 +107,16 @@ public final class GuiInfoConfig {
         return leaveMaterial;
     }
 
+    public Material inviteCoalitionMaterial() {
+        return inviteCoalitionMaterial;
+    }
+
     public Material declareWarMaterial() {
         return declareWarMaterial;
+    }
+
+    public Material declareWarBlockedMaterial() {
+        return declareWarBlockedMaterial;
     }
 
     public Material allyMaterial() {

@@ -8,9 +8,11 @@ public final class GuiClanSettingsConfig {
     private final int rows;
     private final int backSlot;
     private final int bannerSlot;
+    private final int descriptionSlot;
     private final int contentStart;
     private final int contentSize;
     private final Material roleMaterial;
+    private final Material descriptionMaterial;
     private final Material backMaterial;
     private final Material fillerMaterial;
 
@@ -18,9 +20,11 @@ public final class GuiClanSettingsConfig {
         this.rows = settings.rows;
         this.backSlot = settings.slots.back;
         this.bannerSlot = settings.slots.banner;
+        this.descriptionSlot = settings.slots.description;
         this.contentStart = 10;
         this.contentSize = Math.max(0, (rows - 2) * 9);
         this.roleMaterial = parseMaterial(settings.materials.role, Material.WRITABLE_BOOK);
+        this.descriptionMaterial = parseMaterial(settings.materials.description, Material.BOOK);
         this.backMaterial = parseMaterial(settings.materials.back, Material.ARROW);
         this.fillerMaterial = parseMaterial(settings.materials.filler, Material.GRAY_STAINED_GLASS_PANE);
     }
@@ -41,6 +45,10 @@ public final class GuiClanSettingsConfig {
         return bannerSlot;
     }
 
+    public int descriptionSlot() {
+        return descriptionSlot;
+    }
+
     public int contentStart() {
         return contentStart;
     }
@@ -55,6 +63,10 @@ public final class GuiClanSettingsConfig {
 
     public Material roleMaterial() {
         return roleMaterial;
+    }
+
+    public Material descriptionMaterial() {
+        return descriptionMaterial;
     }
 
     public Material backMaterial() {

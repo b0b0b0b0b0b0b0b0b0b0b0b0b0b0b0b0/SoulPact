@@ -10,4 +10,7 @@ public final class SettingsGuiSlotsSettings {
 
     @Comment(@CommentValue("Редактор баннера (2-я строка, последняя ячейка)"))
     public int banner = 17;
+
+    @Comment(@CommentValue("Краткое описание клана"))
+    public int description = 15;
 }

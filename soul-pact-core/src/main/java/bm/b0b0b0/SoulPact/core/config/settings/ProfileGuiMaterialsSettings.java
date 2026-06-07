@@ -31,4 +31,7 @@ public final class ProfileGuiMaterialsSettings {
 
     @Comment(@CommentValue("Заполнитель"))
     public String filler = "GRAY_STAINED_GLASS_PANE";
+
+    @Comment(@CommentValue("Война (модуль SoulPact-War)"))
+    public String war = "IRON_SWORD";
 }

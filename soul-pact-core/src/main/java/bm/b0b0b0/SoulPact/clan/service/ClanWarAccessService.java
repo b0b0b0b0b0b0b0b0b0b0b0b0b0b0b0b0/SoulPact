@@ -14,11 +14,19 @@ public final class ClanWarAccessService {
         this.extensionRegistry = extensionRegistry;
     }
 
+    public boolean available() {
+        return resolveUi().map(ClanWarUiBridge::available).orElse(false);
+    }
+
     public Optional<ClanWarUiBridge> resolveUi() {
         return extensionRegistry.find("war")
                 .filter(ClanWarProvider.class::isInstance)
                 .map(ClanWarProvider.class::cast)
                 .map(ClanWarProvider::ui);
+    }
+
+    public void openWarHub(Player player) {
+        resolveUi().ifPresent(ui -> ui.openWarHub(player));
     }
 
     public void handleInfoDeclareClick(Player player, long targetClanId, int listPage) {

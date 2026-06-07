@@ -5,6 +5,7 @@ plugins {
 dependencies {
     compileOnly('io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT')
     compileOnly project(':soul-pact-api')
+    implementation('net.elytrium:serializer:1.1.1')
 }
 
 tasks.named('jar') {

@@ -5,6 +5,7 @@ import bm.b0b0b0.SoulPact.clan.service.ClanPlayerNames;
 import bm.b0b0b0.SoulPact.clan.service.ClanProfileMembersLoreBuilder;
 import bm.b0b0b0.SoulPact.clan.service.ClanProfilePlaceholders;
 import bm.b0b0b0.SoulPact.clan.service.ClanProfileSnapshot;
+import bm.b0b0b0.SoulPact.clan.service.ClanWarAccessService;
 import bm.b0b0b0.SoulPact.core.config.GuiProfileConfig;
 import bm.b0b0b0.SoulPact.core.message.MessageService;
 import java.util.List;
@@ -20,19 +21,22 @@ public final class ClanProfileMenuPopulator {
     private final ClanProfileMembersLoreBuilder membersLoreBuilder;
     private final MessageService messageService;
     private final ClanEconomyMessages clanEconomyMessages;
+    private final ClanWarAccessService warAccessService;
 
     public ClanProfileMenuPopulator(
             GuiProfileConfig guiProfileConfig,
             GuiItemBuilder guiItemBuilder,
             ClanProfileMembersLoreBuilder membersLoreBuilder,
             MessageService messageService,
-            ClanEconomyMessages clanEconomyMessages
+            ClanEconomyMessages clanEconomyMessages,
+            ClanWarAccessService warAccessService
     ) {
         this.guiProfileConfig = guiProfileConfig;
         this.guiItemBuilder = guiItemBuilder;
         this.membersLoreBuilder = membersLoreBuilder;
         this.messageService = messageService;
         this.clanEconomyMessages = clanEconomyMessages;
+        this.warAccessService = warAccessService;
     }
 
     public void populate(Inventory inventory, Player player, ClanProfileSnapshot snapshot) {
@@ -80,6 +84,15 @@ public final class ClanProfileMenuPopulator {
                     guiProfileConfig.leaveMaterial(),
                     "clan.gui.profile.item.leave.name",
                     "clan.gui.profile.item.leave.lore",
+                    placeholders
+            ));
+        }
+        if (warAccessService.available()) {
+            inventory.setItem(guiProfileConfig.warSlot(), guiItemBuilder.build(
+                    player,
+                    guiProfileConfig.warMaterial(),
+                    "clan.gui.profile.item.war.name",
+                    "clan.gui.profile.item.war.lore",
                     placeholders
             ));
         }

@@ -4,9 +4,10 @@ import java.util.List;
 
 public record CoalitionDisplayExtras(
         String coalitionLine,
-        List<CoalitionAllySnapshot> allies
+        List<CoalitionAllySnapshot> allies,
+        boolean showInviteCoalition
 ) {
     public static CoalitionDisplayExtras empty() {
-        return new CoalitionDisplayExtras("", List.of());
+        return new CoalitionDisplayExtras("", List.of(), false);
     }
 }

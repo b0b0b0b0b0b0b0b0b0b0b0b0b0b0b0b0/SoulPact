@@ -29,6 +29,10 @@ public final class LandClickHandler {
             clanNavigation.openHub(player);
             return;
         }
+        if (slot == config.infoSlot() && menu.snapshot().leader()) {
+            clanNavigation.openBanner(player);
+            return;
+        }
         if (!menu.snapshot().leader()) {
             return;
         }

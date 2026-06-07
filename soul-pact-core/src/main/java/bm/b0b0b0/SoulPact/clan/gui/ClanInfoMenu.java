@@ -64,6 +64,10 @@ public final class ClanInfoMenu implements InventoryHolder {
         return guiInfoConfig.declareWarSlot();
     }
 
+    public int slotInviteCoalition() {
+        return guiInfoConfig.inviteCoalitionSlot();
+    }
+
     public int slotMembers() {
         return guiInfoConfig.membersSlot();
     }

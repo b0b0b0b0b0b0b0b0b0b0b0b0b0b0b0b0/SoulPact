@@ -18,6 +18,10 @@ public final class WarConfig {
     private final int pendingAcceptSlot;
     private final int pendingRansomSlot;
     private final int pendingBackSlot;
+    private final int hubRows;
+    private final int hubEnemyFlagSlot;
+    private final int hubPendingSlot;
+    private final int hubBackSlot;
     private final BarColor pendingColor;
     private final BarColor activeColor;
     private final BarColor captureDefendingColor;
@@ -38,6 +42,10 @@ public final class WarConfig {
             int pendingAcceptSlot,
             int pendingRansomSlot,
             int pendingBackSlot,
+            int hubRows,
+            int hubEnemyFlagSlot,
+            int hubPendingSlot,
+            int hubBackSlot,
             BarColor pendingColor,
             BarColor activeColor,
             BarColor captureDefendingColor,
@@ -57,6 +65,10 @@ public final class WarConfig {
         this.pendingAcceptSlot = pendingAcceptSlot;
         this.pendingRansomSlot = pendingRansomSlot;
         this.pendingBackSlot = pendingBackSlot;
+        this.hubRows = hubRows;
+        this.hubEnemyFlagSlot = hubEnemyFlagSlot;
+        this.hubPendingSlot = hubPendingSlot;
+        this.hubBackSlot = hubBackSlot;
         this.pendingColor = pendingColor;
         this.activeColor = activeColor;
         this.captureDefendingColor = captureDefendingColor;
@@ -129,6 +141,26 @@ public final class WarConfig {
 
     public int pendingBackSlot() {
         return pendingBackSlot;
+    }
+
+    public int hubRows() {
+        return hubRows;
+    }
+
+    public int hubSize() {
+        return hubRows * 9;
+    }
+
+    public int hubEnemyFlagSlot() {
+        return hubEnemyFlagSlot;
+    }
+
+    public int hubPendingSlot() {
+        return hubPendingSlot;
+    }
+
+    public int hubBackSlot() {
+        return hubBackSlot;
     }
 
     public BarColor pendingColor() {

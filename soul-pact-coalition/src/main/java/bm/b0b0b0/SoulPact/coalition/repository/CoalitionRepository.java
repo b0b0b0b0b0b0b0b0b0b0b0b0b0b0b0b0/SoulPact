@@ -39,4 +39,8 @@ public interface CoalitionRepository {
     void updateInviteStatus(long inviteId, String status);
 
     void deleteInvitesForClan(long clanId);
+
+    boolean isInviteBlocked(long targetClanId, long inviterClanId);
+
+    void blockInviter(long targetClanId, long inviterClanId, long blockedAt);
 }

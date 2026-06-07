@@ -40,6 +40,15 @@ clan:
     not-enough-money: "<#F87171>Not enough money. Required: <#E9D5FF>{amount}"
     payment-failed: "<#F87171>Failed to charge clan creation cost."
     failed: "<#F87171>Failed to create clan. Try again later."
+  description:
+    usage: "<#9CA3AF>Format: <#D8B4FE>/clan description <text> <#9CA3AF>(up to {max} characters)"
+    missing-text: "<#F87171>Enter a description. <#9CA3AF>Example: <#D8B4FE>/clan description Best clan on the server"
+    updated: "<#86EFAC>Description updated: <white>{description}"
+    failed: "<#F87171>Failed to save description."
+    invalid-empty: "<#F87171>Description cannot be empty."
+    invalid-length: "<#F87171>Description is too long. Maximum <white>{max}</white> characters."
+    prompt-suggest: "<#86EFAC><bold>▸ Description</bold></> <#9CA3AF>— click and type (max <white>{max}</white> chars)"
+    prompt-cancel: "<#F87171><bold>[Cancel]</bold>"
   list:
     header: "<#C084FC><bold>Clans</bold> <#9CA3AF>({count})"
     empty: "<#9CA3AF>No clans on this server yet."
@@ -53,7 +62,7 @@ clan:
     header: "<#C084FC><bold>[{tag}] {name}</bold>"
     line-leader: "<#9CA3AF>Leader: <white>{leader}"
     line-members: "<#9CA3AF>Members: <white>{count}/{max}"
-    line-points: "<#9CA3AF>Points: <white>{points}"
+    line-wars-won: "<#9CA3AF>Wars won: <white>{wars_won}"
     line-verified: "<#9CA3AF>Verified: {verified}"
     line-ff: "<#9CA3AF>Friendly fire: {ff}"
     line-created: "<#9CA3AF>Created: <white>{created}"
@@ -293,6 +302,14 @@ clan:
           lore:
             - "<#9CA3AF>Standard editor"
             - "<#D8B4FE>Click — open"
+        description:
+          name: "<#D8B4FE>Clan description"
+          lore:
+            - "<#9CA3AF>Short tagline for clan card"
+            - "<#9CA3AF>Current: <white>{description}"
+            - "<#9CA3AF>Maximum: <white>{max}</white> characters"
+            - ""
+            - "<#D8B4FE>Click — edit in chat"
         back:
           name: "<#F87171>Back"
           lore:
@@ -540,7 +557,7 @@ clan:
           name: "<#C084FC><bold>[{tag}] {name}</bold>"
           lore:
             - "<#9CA3AF>ID: <white>#{id}"
-            - "<#9CA3AF>Points: <white>{points}"
+            - "<#9CA3AF>Wars won: <white>{wars_won}"
             - "<#9CA3AF>Members: <white>{count}/{max}"
             - "<#9CA3AF>Created: <white>{created}"
             - "<#9CA3AF>Verified: {verified}"
@@ -565,6 +582,11 @@ clan:
           name: "<#F87171><bold>Leave clan</bold>"
           lore:
             - "<#9CA3AF>Leave <white>[{tag}]</white>"
+        war:
+          name: "<#F87171><bold>War</bold>"
+          lore:
+            - "<#9CA3AF>Enemy base coordinates"
+            - "<#D8B4FE>Click — war menu"
         back:
           name: "<#F87171>Back"
           lore:
@@ -649,7 +671,7 @@ clan:
           name: "<#C084FC><bold>[{tag}] {name}</bold>"
           lore:
             - "<#9CA3AF>ID: <white>#{id}"
-            - "<#9CA3AF>Points: <white>{points}"
+            - "<#9CA3AF>Wars won: <white>{wars_won}"
             - "<#9CA3AF>Members: <white>{count}/{max}"
             - "<#9CA3AF>Created: <white>{created}"
             - "<#9CA3AF>Verified: {verified}"
@@ -684,6 +706,51 @@ clan:
           name: "<#F87171><bold>Declare war</bold>"
           lore:
             - "<#9CA3AF>Send declaration to leader"
+            - "<#9CA3AF>Clan: <white>[{tag}]</white> <#6B7280>(#{id})"
+        declare-war-blocked:
+          name: "<#F87171><bold>War unavailable</bold>"
+          chat:
+            generic: "<#F87171>Cannot declare war on this clan."
+            attacker-no-base: "<#F87171>Your clan has no base — place the standard in the world."
+            defender-no-base: "<#F87171>This clan has no base — war is not possible."
+            lands-required: "<#F87171>Bases module required (SoulPact-Lands)."
+            already-pending: "<#F87171>A declaration to this clan is already pending."
+            active-war: "<#F87171>Your clan is already at war."
+            target-in-war: "<#F87171>This clan is already at war."
+            coalition-ally: "<#F87171>This clan is in your coalition — war is not allowed."
+            cannot-declare: "<#F87171>Cannot declare war on this clan."
+          reason:
+            generic:
+              - "<#F87171>Cannot declare war"
+              - "<#9CA3AF>Clan: <white>[{tag}]</white>"
+            attacker-no-base:
+              - "<#F87171>Your clan has no base"
+              - "<#9CA3AF>Place the standard in the world"
+              - "<#9CA3AF>Base menu → standard"
+            defender-no-base:
+              - "<#F87171>Clan <white>[{tag}]</white> has no base"
+              - "<#9CA3AF>A placed flag is required"
+            lands-required:
+              - "<#F87171>Bases module is missing"
+              - "<#9CA3AF>SoulPact-Lands required"
+            already-pending:
+              - "<#F87171>Declaration already sent"
+              - "<#9CA3AF>Waiting for the leader's response"
+            active-war:
+              - "<#F87171>Your clan is already at war"
+              - "<#9CA3AF>Finish the current war first"
+            target-in-war:
+              - "<#F87171>Clan <white>[{tag}]</white> is already at war"
+            coalition-ally:
+              - "<#F87171>Clan is in your coalition"
+              - "<#9CA3AF>Allies cannot be attacked"
+            cannot-declare:
+              - "<#F87171>Cannot declare war"
+              - "<#9CA3AF>Clan: <white>[{tag}]</white>"
+        invite-coalition:
+          name: "<#86EFAC><bold>Invite to coalition</bold>"
+          lore:
+            - "<#9CA3AF>Send invite to leader"
             - "<#9CA3AF>Clan: <white>[{tag}]</white> <#6B7280>(#{id})"
         ally:
           name: "<#D8B4FE>[{tag}] {name}"
@@ -773,9 +840,6 @@ clan:
             - "<#9CA3AF>Treasury: <white>{treasury}"
             - "<#9CA3AF>Coalition: <white>{coalition}"
             - "<#9CA3AF>Recruitment open: {recruitment}"
-      value:
-        treasury-unknown: "—"
-        coalition-none: "—"
         empty:
           name: "<#6B7280>No clans yet"
           lore:
@@ -793,6 +857,9 @@ clan:
           name: "<#F87171>Back"
           lore:
             - "<#9CA3AF>To main menu"
+      value:
+        treasury-unknown: "—"
+        coalition-none: "—"
     extensions:
       title: "<#581C87><bold>SoulPact modules</bold> <#374151>({page}/{pages})"
       item:

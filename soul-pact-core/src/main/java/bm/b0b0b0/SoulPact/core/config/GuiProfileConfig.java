@@ -15,6 +15,7 @@ public final class GuiProfileConfig {
     private final int emptyListSlot;
     private final int backSlot;
     private final int bannerSlot;
+    private final int warSlot;
     private final Material clanInfoMaterial;
     private final Material membersMaterial;
     private final Material requestsMaterial;
@@ -24,6 +25,7 @@ public final class GuiProfileConfig {
     private final Material emptyListMaterial;
     private final Material backMaterial;
     private final Material fillerMaterial;
+    private final Material warMaterial;
 
     public GuiProfileConfig(ProfileGuiSettings settings) {
         this.rows = settings.rows;
@@ -36,6 +38,7 @@ public final class GuiProfileConfig {
         this.emptyListSlot = settings.slots.emptyList;
         this.backSlot = settings.slots.back;
         this.bannerSlot = settings.slots.banner;
+        this.warSlot = settings.slots.war;
         this.clanInfoMaterial = parseMaterial(settings.materials.clanInfo, Material.LEATHER);
         this.membersMaterial = parseMaterial(settings.materials.members, Material.PLAYER_HEAD);
         this.requestsMaterial = parseMaterial(settings.materials.requests, Material.WRITABLE_BOOK);
@@ -45,6 +48,7 @@ public final class GuiProfileConfig {
         this.emptyListMaterial = parseMaterial(settings.materials.emptyList, Material.NETHER_STAR);
         this.backMaterial = parseMaterial(settings.materials.back, Material.ARROW);
         this.fillerMaterial = parseMaterial(settings.materials.filler, Material.GRAY_STAINED_GLASS_PANE);
+        this.warMaterial = parseMaterial(settings.materials.war, Material.IRON_SWORD);
     }
 
     public int rows() {
@@ -91,6 +95,10 @@ public final class GuiProfileConfig {
         return bannerSlot;
     }
 
+    public int warSlot() {
+        return warSlot;
+    }
+
     public Material clanInfoMaterial() {
         return clanInfoMaterial;
     }
@@ -125,6 +133,10 @@ public final class GuiProfileConfig {
 
     public Material fillerMaterial() {
         return fillerMaterial;
+    }
+
+    public Material warMaterial() {
+        return warMaterial;
     }
 
     private static Material parseMaterial(String rawValue, Material fallback) {

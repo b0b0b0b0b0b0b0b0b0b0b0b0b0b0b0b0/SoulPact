@@ -40,6 +40,15 @@ clan:
     not-enough-money: "<#F87171>Недостаточно средств. Нужно: <#E9D5FF>{amount}"
     payment-failed: "<#F87171>Не удалось списать оплату за создание клана."
     failed: "<#F87171>Не удалось создать клан. Попробуйте позже."
+  description:
+    usage: "<#9CA3AF>Формат: <#D8B4FE>/clan description <текст> <#9CA3AF>(до {max} символов)"
+    missing-text: "<#F87171>Укажите описание. <#9CA3AF>Пример: <#D8B4FE>/clan description Лучший клан сервера"
+    updated: "<#86EFAC>Описание обновлено: <white>{description}"
+    failed: "<#F87171>Не удалось сохранить описание."
+    invalid-empty: "<#F87171>Описание не может быть пустым."
+    invalid-length: "<#F87171>Описание слишком длинное. Максимум <white>{max}</white> символов."
+    prompt-suggest: "<#86EFAC><bold>▸ Описание</bold></> <#9CA3AF>— нажми и допиши текст (до <white>{max}</white> симв.)"
+    prompt-cancel: "<#F87171><bold>[Отмена]</bold>"
   list:
     header: "<#C084FC><bold>Кланы</bold> <#9CA3AF>({count})"
     empty: "<#9CA3AF>На сервере пока нет кланов."
@@ -53,7 +62,7 @@ clan:
     header: "<#C084FC><bold>[{tag}] {name}</bold>"
     line-leader: "<#9CA3AF>Лидер: <white>{leader}"
     line-members: "<#9CA3AF>Участники: <white>{count}/{max}"
-    line-points: "<#9CA3AF>Очки: <white>{points}"
+    line-wars-won: "<#9CA3AF>Выиграно войн: <white>{wars_won}"
     line-verified: "<#9CA3AF>Верификация: {verified}"
     line-ff: "<#9CA3AF>Дружественный огонь: {ff}"
     line-created: "<#9CA3AF>Создан: <white>{created}"
@@ -293,6 +302,14 @@ clan:
           lore:
             - "<#9CA3AF>Редактор знамени"
             - "<#D8B4FE>Нажмите — открыть"
+        description:
+          name: "<#D8B4FE>Описание клана"
+          lore:
+            - "<#9CA3AF>Краткий слоган для карточки"
+            - "<#9CA3AF>Сейчас: <white>{description}"
+            - "<#9CA3AF>Максимум: <white>{max}</white> символов"
+            - ""
+            - "<#D8B4FE>Нажмите — изменить в чате"
         back:
           name: "<#F87171>Назад"
           lore:
@@ -540,7 +557,7 @@ clan:
           name: "<#C084FC><bold>[{tag}] {name}</bold>"
           lore:
             - "<#9CA3AF>ID: <white>#{id}"
-            - "<#9CA3AF>Очки: <white>{points}"
+            - "<#9CA3AF>Выиграно войн: <white>{wars_won}"
             - "<#9CA3AF>Участники: <white>{count}/{max}"
             - "<#9CA3AF>Создан: <white>{created}"
             - "<#9CA3AF>Верификация: {verified}"
@@ -565,6 +582,11 @@ clan:
           name: "<#F87171><bold>Покинуть клан</bold>"
           lore:
             - "<#9CA3AF>Выйти из <white>[{tag}]</white>"
+        war:
+          name: "<#F87171><bold>Война</bold>"
+          lore:
+            - "<#9CA3AF>Координаты базы противника"
+            - "<#D8B4FE>Нажмите — меню войны"
         back:
           name: "<#F87171>Назад"
           lore:
@@ -648,7 +670,7 @@ clan:
           name: "<#C084FC><bold>[{tag}] {name}</bold>"
           lore:
             - "<#9CA3AF>ID: <white>#{id}"
-            - "<#9CA3AF>Очки: <white>{points}"
+            - "<#9CA3AF>Выиграно войн: <white>{wars_won}"
             - "<#9CA3AF>Участники: <white>{count}/{max}"
             - "<#9CA3AF>Создан: <white>{created}"
             - "<#9CA3AF>Верификация: {verified}"
@@ -683,6 +705,51 @@ clan:
           name: "<#F87171><bold>Объявить войну</bold>"
           lore:
             - "<#9CA3AF>Отправить объявление лидеру"
+            - "<#9CA3AF>Клан: <white>[{tag}]</white> <#6B7280>(#{id})"
+        declare-war-blocked:
+          name: "<#F87171><bold>Война недоступна</bold>"
+          chat:
+            generic: "<#F87171>Нельзя объявить войну этому клану."
+            attacker-no-base: "<#F87171>У вашего клана нет базы — поставьте знамя в мире."
+            defender-no-base: "<#F87171>У этого клана нет базы — войну объявить нельзя."
+            lands-required: "<#F87171>Для войны нужен модуль баз (SoulPact-Lands)."
+            already-pending: "<#F87171>Объявление этому клану уже отправлено."
+            active-war: "<#F87171>Ваш клан уже в состоянии войны."
+            target-in-war: "<#F87171>Этот клан уже в состоянии войны."
+            coalition-ally: "<#F87171>Клан в вашей коалиции — война невозможна."
+            cannot-declare: "<#F87171>Нельзя объявить войну этому клану."
+          reason:
+            generic:
+              - "<#F87171>Нельзя объявить войну"
+              - "<#9CA3AF>Клан: <white>[{tag}]</white>"
+            attacker-no-base:
+              - "<#F87171>У вашего клана нет базы"
+              - "<#9CA3AF>Поставьте знамя в мире"
+              - "<#9CA3AF>Меню базы → знамя"
+            defender-no-base:
+              - "<#F87171>У клана <white>[{tag}]</white> нет базы"
+              - "<#9CA3AF>Нужен установленный флаг"
+            lands-required:
+              - "<#F87171>Модуль баз не подключён"
+              - "<#9CA3AF>Нужен SoulPact-Lands"
+            already-pending:
+              - "<#F87171>Объявление уже отправлено"
+              - "<#9CA3AF>Ожидайте ответа лидера"
+            active-war:
+              - "<#F87171>Ваш клан уже в войне"
+              - "<#9CA3AF>Завершите текущую войну"
+            target-in-war:
+              - "<#F87171>Клан <white>[{tag}]</white> уже в войне"
+            coalition-ally:
+              - "<#F87171>Клан в вашей коалиции"
+              - "<#9CA3AF>Союзникам войну не объявляют"
+            cannot-declare:
+              - "<#F87171>Нельзя объявить войну"
+              - "<#9CA3AF>Клан: <white>[{tag}]</white>"
+        invite-coalition:
+          name: "<#86EFAC><bold>Пригласить в коалицию</bold>"
+          lore:
+            - "<#9CA3AF>Отправить приглашение лидеру"
             - "<#9CA3AF>Клан: <white>[{tag}]</white> <#6B7280>(#{id})"
         ally:
           name: "<#D8B4FE>[{tag}] {name}"
@@ -772,9 +839,6 @@ clan:
             - "<#9CA3AF>Казна: <white>{treasury}"
             - "<#9CA3AF>Коалиция: <white>{coalition}"
             - "<#9CA3AF>Набор открыт: {recruitment}"
-      value:
-        treasury-unknown: "—"
-        coalition-none: "—"
         empty:
           name: "<#6B7280>Кланов пока нет"
           lore:
@@ -792,6 +856,9 @@ clan:
           name: "<#F87171>Назад"
           lore:
             - "<#9CA3AF>В главное меню"
+      value:
+        treasury-unknown: "—"
+        coalition-none: "—"
     extensions:
       title: "<#581C87><bold>Модули SoulPact</bold> <#374151>({page}/{pages})"
       item:

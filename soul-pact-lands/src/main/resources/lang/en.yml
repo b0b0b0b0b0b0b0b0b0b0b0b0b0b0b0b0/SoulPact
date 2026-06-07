@@ -13,6 +13,8 @@ land:
     worldguard-missing: "<#F87171>WorldGuard is not installed."
     too-close: "<#F87171>Too close to another region. Buffer required: {buffer} blocks."
     border-protected: "<#F87171>Base border is protected."
+    flag-creative-blocked: "<#F87171>Cannot break the standard in creative — switch to survival."
+    flag-war-handled: "<#F87171>This standard is in an active war — use war rules to capture it."
     failed: "<#F87171>Failed to create base."
   base:
     created: "<#86EFAC>Clan base <white>[{tag}]</white> created. Region: <white>{region}</white>"
@@ -46,9 +48,9 @@ land:
       info-empty:
         name: "<#9CA3AF>No base yet"
         lore:
-          - "<#9CA3AF>Leader takes the clan standard"
-          - "<#9CA3AF>from the banner menu"
-          - "<#9CA3AF>and places it in the world"
+          - "<#9CA3AF>Click — standard and setup"
+          - "<#9CA3AF>Take the standard and place"
+          - "<#9CA3AF>it in the world"
           - "<#F87171>Breaking the standard removes the base"
       info-active:
         name: "<#FCD34D><bold>Base active</bold>"
@@ -56,6 +58,7 @@ land:
           - "<#9CA3AF>Region: <white>{region}"
           - "<#9CA3AF>World: <white>{world}"
           - "<#9CA3AF>Standard: <white>{x} {y} {z}"
+          - "<#86EFAC>Click — standard and editing"
       pvp-on:
         name: "<#F87171><bold>PvP: on</bold>"
         lore:

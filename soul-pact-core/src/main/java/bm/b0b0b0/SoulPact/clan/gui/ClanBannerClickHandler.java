@@ -20,6 +20,7 @@ public final class ClanBannerClickHandler {
     private final ClanBannerMenuPopulator populator;
     private final ClanGuiOpenService guiOpenService;
     private final AsyncDatabaseExecutor asyncDatabaseExecutor;
+    private final ClanBannerReturnService bannerReturnService;
 
     public ClanBannerClickHandler(
             MessageService messageService,
@@ -27,7 +28,8 @@ public final class ClanBannerClickHandler {
             ClanStandardService clanStandardService,
             ClanBannerMenuPopulator populator,
             ClanGuiOpenService guiOpenService,
-            AsyncDatabaseExecutor asyncDatabaseExecutor
+            AsyncDatabaseExecutor asyncDatabaseExecutor,
+            ClanBannerReturnService bannerReturnService
     ) {
         this.messageService = messageService;
         this.clanBannerService = clanBannerService;
@@ -35,11 +37,12 @@ public final class ClanBannerClickHandler {
         this.populator = populator;
         this.guiOpenService = guiOpenService;
         this.asyncDatabaseExecutor = asyncDatabaseExecutor;
+        this.bannerReturnService = bannerReturnService;
     }
 
     public void handle(ClanBannerMenu menu, Player player, int slot) {
         if (slot == menu.config().backSlot()) {
-            guiOpenService.openHub(player);
+            bannerReturnService.openAfterBanner(player, guiOpenService);
             return;
         }
         if (!menu.clanLeader()) {
@@ -151,7 +154,7 @@ public final class ClanBannerClickHandler {
                             menu.workingBanner()
                     );
                     messageService.send(player, "clan.banner.saved");
-                    guiOpenService.openHub(player);
+                    bannerReturnService.openAfterBanner(player, guiOpenService);
                 })
         );
     }

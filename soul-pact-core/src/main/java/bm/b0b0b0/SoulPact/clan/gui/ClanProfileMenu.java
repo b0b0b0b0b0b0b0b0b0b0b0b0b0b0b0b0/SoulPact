@@ -112,6 +112,10 @@ public final class ClanProfileMenu implements InventoryHolder {
         return guiProfileConfig.bannerSlot();
     }
 
+    public int slotWar() {
+        return guiProfileConfig.warSlot();
+    }
+
     public boolean viewerIsLeader() {
         return !empty && snapshot.viewerIsLeader();
     }

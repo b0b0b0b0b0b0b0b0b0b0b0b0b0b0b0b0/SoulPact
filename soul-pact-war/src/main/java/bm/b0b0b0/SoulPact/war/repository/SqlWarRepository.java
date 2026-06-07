@@ -4,6 +4,7 @@ import bm.b0b0b0.SoulPact.api.SoulPactApi;
 import bm.b0b0b0.SoulPact.war.model.ActiveWarRecord;
 import bm.b0b0b0.SoulPact.war.model.WarCaptureRecord;
 import bm.b0b0b0.SoulPact.war.model.WarDeclarationRecord;
+import bm.b0b0b0.SoulPact.war.model.WarFlagSnapshot;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -84,6 +85,29 @@ public final class SqlWarRepository implements WarRepository {
             return records;
         } catch (SQLException exception) {
             throw new IllegalStateException("Failed to list war declarations", exception);
+        }
+    }
+
+    @Override
+    public List<WarDeclarationRecord> listAllPendingDeclarations() {
+        String sql = """
+                SELECT id, attacker_clan_id, defender_clan_id, declared_by_uuid, created_at, status
+                FROM clan_war_declarations
+                WHERE status = ?
+                ORDER BY created_at ASC
+                """;
+        List<WarDeclarationRecord> records = new ArrayList<>();
+        try (Connection connection = api.dataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, STATUS_PENDING);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    records.add(mapDeclaration(resultSet));
+                }
+            }
+            return records;
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Failed to list pending war declarations", exception);
         }
     }
 
@@ -199,10 +223,29 @@ public final class SqlWarRepository implements WarRepository {
     }
 
     @Override
-    public long createActiveWar(long attackerClanId, long defenderClanId, long startedAt) {
+    public long createActiveWar(
+            long attackerClanId,
+            long defenderClanId,
+            long startedAt,
+            WarFlagSnapshot attackerFlag,
+            WarFlagSnapshot defenderFlag
+    ) {
         String sql = """
-                INSERT INTO clan_wars(attacker_clan_id, defender_clan_id, started_at, status)
-                VALUES(?, ?, ?, ?)
+                INSERT INTO clan_wars(
+                    attacker_clan_id,
+                    defender_clan_id,
+                    started_at,
+                    status,
+                    attacker_flag_world,
+                    attacker_flag_x,
+                    attacker_flag_y,
+                    attacker_flag_z,
+                    defender_flag_world,
+                    defender_flag_x,
+                    defender_flag_y,
+                    defender_flag_z
+                )
+                VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         try (Connection connection = api.dataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -210,6 +253,14 @@ public final class SqlWarRepository implements WarRepository {
             statement.setLong(2, defenderClanId);
             statement.setLong(3, startedAt);
             statement.setString(4, STATUS_ACTIVE);
+            statement.setString(5, attackerFlag.world());
+            statement.setInt(6, attackerFlag.x());
+            statement.setInt(7, attackerFlag.y());
+            statement.setInt(8, attackerFlag.z());
+            statement.setString(9, defenderFlag.world());
+            statement.setInt(10, defenderFlag.x());
+            statement.setInt(11, defenderFlag.y());
+            statement.setInt(12, defenderFlag.z());
             statement.executeUpdate();
             try (ResultSet keys = statement.getGeneratedKeys()) {
                 if (!keys.next()) {
@@ -354,7 +405,15 @@ public final class SqlWarRepository implements WarRepository {
                 resultSet.getLong("attacker_clan_id"),
                 resultSet.getLong("defender_clan_id"),
                 resultSet.getLong("started_at"),
-                resultSet.getString("status")
+                resultSet.getString("status"),
+                resultSet.getString("attacker_flag_world"),
+                resultSet.getInt("attacker_flag_x"),
+                resultSet.getInt("attacker_flag_y"),
+                resultSet.getInt("attacker_flag_z"),
+                resultSet.getString("defender_flag_world"),
+                resultSet.getInt("defender_flag_x"),
+                resultSet.getInt("defender_flag_y"),
+                resultSet.getInt("defender_flag_z")
         );
     }
 }

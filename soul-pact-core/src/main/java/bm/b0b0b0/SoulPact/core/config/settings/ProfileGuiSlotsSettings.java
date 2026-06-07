@@ -31,4 +31,7 @@ public final class ProfileGuiSlotsSettings {
 
     @Comment(@CommentValue("Знамя клана (верх, центр)"))
     public int banner = 4;
+
+    @Comment(@CommentValue("Война (модуль SoulPact-War)"))
+    public int war = 17;
 }

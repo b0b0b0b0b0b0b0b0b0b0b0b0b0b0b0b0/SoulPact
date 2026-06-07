@@ -12,6 +12,7 @@ import bm.b0b0b0.SoulPact.clan.message.ClanHelpChatPresenter;
 import bm.b0b0b0.SoulPact.clan.message.ClanListChatPresenter;
 import bm.b0b0b0.SoulPact.clan.role.RoleThemeService;
 import bm.b0b0b0.SoulPact.clan.service.ClanCreateService;
+import bm.b0b0b0.SoulPact.clan.service.ClanDescriptionService;
 import bm.b0b0b0.SoulPact.clan.service.ClanDisbandService;
 import bm.b0b0b0.SoulPact.clan.service.ClanInfoService;
 import bm.b0b0b0.SoulPact.clan.service.ClanLeaveService;
@@ -28,6 +29,7 @@ public final class ClanRuntimeServices {
     private final ClanGuiClickDispatcher guiClickDispatcher;
     private final ClanCreateService createService;
     private final ClanCreateChatPrompt createChatPrompt;
+    private final ClanDescriptionService descriptionService;
     private final ClanHelpChatPresenter helpChatPresenter;
     private final ClanListChatPresenter listChatPresenter;
     private final ClanInfoService infoService;
@@ -46,6 +48,7 @@ public final class ClanRuntimeServices {
             ClanGuiClickDispatcher guiClickDispatcher,
             ClanCreateService createService,
             ClanCreateChatPrompt createChatPrompt,
+            ClanDescriptionService descriptionService,
             ClanHelpChatPresenter helpChatPresenter,
             ClanListChatPresenter listChatPresenter,
             ClanInfoService infoService,
@@ -63,6 +66,7 @@ public final class ClanRuntimeServices {
         this.guiClickDispatcher = guiClickDispatcher;
         this.createService = createService;
         this.createChatPrompt = createChatPrompt;
+        this.descriptionService = descriptionService;
         this.helpChatPresenter = helpChatPresenter;
         this.listChatPresenter = listChatPresenter;
         this.infoService = infoService;
@@ -106,6 +110,10 @@ public final class ClanRuntimeServices {
 
     public ClanCreateChatPrompt createChatPrompt() {
         return createChatPrompt;
+    }
+
+    public ClanDescriptionService descriptionService() {
+        return descriptionService;
     }
 
     public ClanHelpChatPresenter helpChatPresenter() {

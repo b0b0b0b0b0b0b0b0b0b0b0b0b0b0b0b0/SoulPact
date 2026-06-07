@@ -18,11 +18,13 @@ public final class ClanInfoViewSnapshot {
     private final ViewerRole viewerRole;
     private final String treasuryLine;
     private final boolean showDeclareWar;
+    private final String declareWarBlockReasonId;
+    private final boolean showInviteCoalition;
     private final String coalitionLine;
     private final List<CoalitionAllySnapshot> allies;
 
     public ClanInfoViewSnapshot(Clan clan, int memberCount, ViewerRole viewerRole) {
-        this(clan, memberCount, viewerRole, "", false, "", List.of());
+        this(clan, memberCount, viewerRole, "", false, "", false, "", List.of());
     }
 
     public ClanInfoViewSnapshot(
@@ -32,7 +34,7 @@ public final class ClanInfoViewSnapshot {
             String treasuryLine,
             boolean showDeclareWar
     ) {
-        this(clan, memberCount, viewerRole, treasuryLine, showDeclareWar, "", List.of());
+        this(clan, memberCount, viewerRole, treasuryLine, showDeclareWar, "", false, "", List.of());
     }
 
     public ClanInfoViewSnapshot(
@@ -44,13 +46,46 @@ public final class ClanInfoViewSnapshot {
             String coalitionLine,
             List<CoalitionAllySnapshot> allies
     ) {
+        this(clan, memberCount, viewerRole, treasuryLine, showDeclareWar, "", false, coalitionLine, allies);
+    }
+
+    public ClanInfoViewSnapshot(
+            Clan clan,
+            int memberCount,
+            ViewerRole viewerRole,
+            String treasuryLine,
+            boolean showDeclareWar,
+            boolean showInviteCoalition,
+            String coalitionLine,
+            List<CoalitionAllySnapshot> allies
+    ) {
+        this(clan, memberCount, viewerRole, treasuryLine, showDeclareWar, "", showInviteCoalition, coalitionLine, allies);
+    }
+
+    public ClanInfoViewSnapshot(
+            Clan clan,
+            int memberCount,
+            ViewerRole viewerRole,
+            String treasuryLine,
+            boolean showDeclareWar,
+            String declareWarBlockReasonId,
+            boolean showInviteCoalition,
+            String coalitionLine,
+            List<CoalitionAllySnapshot> allies
+    ) {
         this.clan = clan;
         this.memberCount = memberCount;
         this.viewerRole = viewerRole;
         this.treasuryLine = treasuryLine == null ? "" : treasuryLine;
         this.showDeclareWar = showDeclareWar;
+        this.declareWarBlockReasonId = declareWarBlockReasonId == null ? "" : declareWarBlockReasonId;
+        this.showInviteCoalition = showInviteCoalition;
         this.coalitionLine = coalitionLine == null ? "" : coalitionLine;
         this.allies = allies == null ? List.of() : List.copyOf(allies);
+    }
+
+    public boolean showInviteCoalition() {
+        return showInviteCoalition;
     }
 
     public Clan clan() {
@@ -71,6 +106,14 @@ public final class ClanInfoViewSnapshot {
 
     public boolean showDeclareWar() {
         return showDeclareWar;
+    }
+
+    public String declareWarBlockReasonId() {
+        return declareWarBlockReasonId;
+    }
+
+    public boolean showDeclareWarBlocked() {
+        return !showDeclareWar && !declareWarBlockReasonId.isBlank();
     }
 
     public String coalitionLine() {

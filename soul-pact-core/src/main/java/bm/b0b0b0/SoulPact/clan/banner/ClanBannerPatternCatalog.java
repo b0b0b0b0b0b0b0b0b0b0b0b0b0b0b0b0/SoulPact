@@ -43,15 +43,17 @@ public final class ClanBannerPatternCatalog {
     );
 
     private static final List<DyeColor> PATTERN_COLORS = List.of(
+            DyeColor.PURPLE,
             DyeColor.WHITE,
             DyeColor.BLACK,
             DyeColor.RED,
             DyeColor.YELLOW,
-            DyeColor.PURPLE,
             DyeColor.CYAN,
             DyeColor.LIME,
             DyeColor.ORANGE
     );
+
+    private static final DyeColor DEFAULT_PATTERN_COLOR = DyeColor.PURPLE;
 
     private ClanBannerPatternCatalog() {
     }
@@ -66,6 +68,10 @@ public final class ClanBannerPatternCatalog {
 
     public static List<DyeColor> patternColors() {
         return PATTERN_COLORS;
+    }
+
+    public static DyeColor defaultPatternColor() {
+        return DEFAULT_PATTERN_COLOR;
     }
 
     public static PatternOption optionAt(int index) {
@@ -84,16 +90,25 @@ public final class ClanBannerPatternCatalog {
 
     public static DyeColor nextPatternColor(DyeColor current) {
         if (current == null) {
-            return PATTERN_COLORS.getFirst();
+            return DEFAULT_PATTERN_COLOR;
         }
         int index = PATTERN_COLORS.indexOf(current);
         if (index < 0) {
-            return PATTERN_COLORS.getFirst();
+            return DEFAULT_PATTERN_COLOR;
         }
         return PATTERN_COLORS.get((index + 1) % PATTERN_COLORS.size());
     }
 
     public static ItemStack previewPattern(PatternOption option, DyeColor color) {
-        return ClanBannerEditor.createPreview(Material.WHITE_BANNER, new org.bukkit.block.banner.Pattern(color, option.type()));
+        DyeColor patternColor = color == null ? DEFAULT_PATTERN_COLOR : color;
+        Material baseMaterial = contrastingPreviewBase(patternColor);
+        return ClanBannerEditor.createPreview(baseMaterial, new org.bukkit.block.banner.Pattern(patternColor, option.type()));
+    }
+
+    private static Material contrastingPreviewBase(DyeColor patternColor) {
+        return switch (patternColor) {
+            case WHITE, YELLOW, LIME, ORANGE, LIGHT_BLUE, PINK, CYAN, LIGHT_GRAY -> Material.BLACK_BANNER;
+            default -> Material.WHITE_BANNER;
+        };
     }
 }

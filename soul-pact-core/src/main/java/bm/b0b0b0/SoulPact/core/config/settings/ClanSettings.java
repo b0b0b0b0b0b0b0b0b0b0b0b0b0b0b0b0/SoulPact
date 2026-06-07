@@ -21,7 +21,8 @@ public final class ClanSettings {
     public int listChatLimit = 50;
 
     @Comment(@CommentValue("Максимальная длина описания клана"))
-    public int descriptionMaxLength = 128;
+    @Comment(@CommentValue("Макс. длина краткого описания (слоган в карточке клана)"))
+    public int descriptionMaxLength = 32;
 
     @Comment(@CommentValue("Тема названий ролей: файл lang/roles/{theme}.{locale}.yml (military, anime, …)"))
     public String roleTheme = "military";

@@ -36,6 +36,11 @@ public final class WarGuiListener implements Listener {
         if (clickedInventory.getHolder(false) instanceof WarPendingDetailMenu pendingDetailMenu) {
             event.setCancelled(true);
             clickHandler.handlePendingDetail(pendingDetailMenu, player, event.getSlot());
+            return;
+        }
+        if (clickedInventory.getHolder(false) instanceof WarHubMenu warHubMenu) {
+            event.setCancelled(true);
+            clickHandler.handleWarHub(warHubMenu, player, event.getSlot());
         }
     }
 }

@@ -38,7 +38,7 @@ public final class WarExtension implements ClanWarProvider {
 
     @Override
     public void openGui(Player player) {
-        guiService.openPendingList(player);
+        guiService.openWarHub(player);
     }
 
     @Override

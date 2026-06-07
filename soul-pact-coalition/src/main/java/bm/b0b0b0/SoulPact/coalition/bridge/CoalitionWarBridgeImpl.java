@@ -12,6 +12,7 @@ import bm.b0b0b0.SoulPact.coalition.service.CoalitionService;
 import bm.b0b0b0.SoulPact.coalition.service.CoalitionTreasuryDistributor;
 import bm.b0b0b0.SoulPact.coalition.service.CoalitionWarStateTracker;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -68,6 +69,11 @@ public final class CoalitionWarBridgeImpl implements CoalitionWarBridge {
     }
 
     @Override
+    public Set<Long> coalitionClanIds(long clanId) {
+        return membershipCache.membersOf(clanId);
+    }
+
+    @Override
     public void onWarDeclared(long attackerClanId, long defenderClanId) {
         applyAllyPhase(defenderClanId, attackerClanId, CoalitionWarStateTracker.Phase.DECLARED, 0L);
         notifyCoalitionAllies(defenderClanId, "coalition.war.declared-on-ally", attackerClanId);
@@ -79,6 +85,46 @@ public final class CoalitionWarBridgeImpl implements CoalitionWarBridge {
         applyAllyPhase(attackerClanId, defenderClanId, CoalitionWarStateTracker.Phase.ACTIVE, 0L);
         notifyCoalitionAllies(defenderClanId, "coalition.war.started-for-ally", defenderClanId);
         notifyCoalitionAllies(attackerClanId, "coalition.war.started-for-ally", attackerClanId);
+    }
+
+    @Override
+    public void onWarEnemyBaseRevealed(
+            long friendClanId,
+            String enemyTag,
+            String enemyWorld,
+            int enemyX,
+            int enemyY,
+            int enemyZ
+    ) {
+        clanLookup.findClan(friendClanId).thenAccept(friendOptional -> {
+            if (friendOptional.isEmpty()) {
+                return;
+            }
+            String friendTag = friendOptional.get().tag();
+            Map<String, String> placeholders = Map.of(
+                    "friend_tag", friendTag,
+                    "enemy_tag", enemyTag,
+                    "world", enemyWorld,
+                    "x", String.valueOf(enemyX),
+                    "y", String.valueOf(enemyY),
+                    "z", String.valueOf(enemyZ)
+            );
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                api.findClanByPlayer(online.getUniqueId()).thenAccept(viewerClanOptional -> {
+                    if (viewerClanOptional.isEmpty()) {
+                        return;
+                    }
+                    long viewerClanId = viewerClanOptional.get().id();
+                    if (viewerClanId == friendClanId) {
+                        return;
+                    }
+                    if (!membershipCache.sharesCoalition(viewerClanId, friendClanId)) {
+                        return;
+                    }
+                    api.scheduler().runSync(() -> messages.send(online, "coalition.war.enemy-base-revealed", placeholders));
+                });
+            }
+        });
     }
 
     @Override
@@ -112,6 +158,41 @@ public final class CoalitionWarBridgeImpl implements CoalitionWarBridge {
         membershipCache.removeClan(outcome.loserClanId());
         bossBarService.refreshCoalition(outcome.winnerClanId());
         bossBarService.refreshCoalition(outcome.loserClanId());
+    }
+
+    @Override
+    public void onCoalitionWithdrawnFromWar(long warId, long attackerClanId, long defenderClanId, long triggerClanId) {
+        Set<Long> coalitionMembers = membershipCache.membersOf(triggerClanId);
+        for (long clanId : coalitionMembers) {
+            if (clanId == attackerClanId || clanId == defenderClanId) {
+                continue;
+            }
+            warStateTracker.clearForClan(clanId);
+            bossBarService.refreshCoalition(clanId);
+        }
+        clanLookup.findClan(triggerClanId).thenAccept(triggerOptional -> {
+            if (triggerOptional.isEmpty()) {
+                return;
+            }
+            String triggerTag = triggerOptional.get().tag();
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                api.findClanByPlayer(online.getUniqueId()).thenAccept(viewerClanOptional -> {
+                    if (viewerClanOptional.isEmpty()) {
+                        return;
+                    }
+                    long viewerClanId = viewerClanOptional.get().id();
+                    if (viewerClanId == attackerClanId || viewerClanId == defenderClanId) {
+                        return;
+                    }
+                    if (!membershipCache.sharesCoalition(viewerClanId, triggerClanId)) {
+                        return;
+                    }
+                    api.scheduler().runSync(() -> messages.send(online, "coalition.war.withdrawn", Map.of(
+                            "clan_tag", triggerTag
+                    )));
+                });
+            }
+        });
     }
 
     private void broadcastWarEnded(CoalitionWarOutcome outcome, String winnerTag, String loserTag) {
@@ -162,13 +243,20 @@ public final class CoalitionWarBridgeImpl implements CoalitionWarBridge {
                 return;
             }
             String friendTag = subjectOptional.get().tag();
-            for (long allyClanId : membershipCache.otherMembers(friendClanId)) {
-                clanLookup.findClan(allyClanId).thenAccept(allyOptional -> allyOptional.ifPresent(ally -> {
-                    Player leader = Bukkit.getPlayer(ally.leaderId());
-                    if (leader != null && leader.isOnline()) {
-                        messages.send(leader, messageKey, Map.of("friend_tag", friendTag));
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                api.findClanByPlayer(online.getUniqueId()).thenAccept(viewerClanOptional -> {
+                    if (viewerClanOptional.isEmpty()) {
+                        return;
                     }
-                }));
+                    long viewerClanId = viewerClanOptional.get().id();
+                    if (viewerClanId == friendClanId) {
+                        return;
+                    }
+                    if (!membershipCache.sharesCoalition(viewerClanId, friendClanId)) {
+                        return;
+                    }
+                    api.scheduler().runSync(() -> messages.send(online, messageKey, Map.of("friend_tag", friendTag)));
+                });
             }
         });
     }

@@ -11,6 +11,9 @@ public final class InfoGuiSlotsSettings {
     @Comment(@CommentValue("Вступить / покинуть клан"))
     public int action = 15;
 
+    @Comment(@CommentValue("Пригласить в коалицию (лидер, чужой клан)"))
+    public int inviteCoalition = 7;
+
     @Comment(@CommentValue("Объявить войну (лидер, чужой клан)"))
     public int declareWar = 16;
 

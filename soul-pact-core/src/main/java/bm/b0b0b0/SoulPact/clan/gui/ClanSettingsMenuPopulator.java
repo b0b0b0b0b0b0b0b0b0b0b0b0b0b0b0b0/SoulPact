@@ -3,7 +3,9 @@ package bm.b0b0b0.SoulPact.clan.gui;
 import bm.b0b0b0.SoulPact.clan.role.RoleDefinition;
 import bm.b0b0b0.SoulPact.clan.role.RoleThemeService;
 import bm.b0b0b0.SoulPact.clan.service.ClanSettingsSnapshot;
+import bm.b0b0b0.SoulPact.core.config.ClanConfig;
 import bm.b0b0b0.SoulPact.core.config.GuiClanSettingsConfig;
+import bm.b0b0b0.SoulPact.core.message.MessageService;
 import java.util.HashMap;
 import java.util.Map;
 import org.bukkit.entity.Player;
@@ -15,15 +17,21 @@ public final class ClanSettingsMenuPopulator {
     private final GuiClanSettingsConfig config;
     private final GuiItemBuilder guiItemBuilder;
     private final RoleThemeService roleThemeService;
+    private final MessageService messageService;
+    private final ClanConfig clanConfig;
 
     public ClanSettingsMenuPopulator(
             GuiClanSettingsConfig config,
             GuiItemBuilder guiItemBuilder,
-            RoleThemeService roleThemeService
+            RoleThemeService roleThemeService,
+            MessageService messageService,
+            ClanConfig clanConfig
     ) {
         this.config = config;
         this.guiItemBuilder = guiItemBuilder;
         this.roleThemeService = roleThemeService;
+        this.messageService = messageService;
+        this.clanConfig = clanConfig;
     }
 
     public Map<Integer, String> populate(Inventory inventory, Player player, ClanSettingsSnapshot snapshot) {
@@ -47,6 +55,16 @@ public final class ClanSettingsMenuPopulator {
             ));
             roleSlots.put(slot, roleKey);
         }
+        inventory.setItem(config.descriptionSlot(), guiItemBuilder.build(
+                player,
+                config.descriptionMaterial(),
+                "clan.gui.settings.item.description.name",
+                "clan.gui.settings.item.description.lore",
+                Map.of(
+                        "description", resolveDescription(player, snapshot.clan().description()),
+                        "max", String.valueOf(clanConfig.descriptionMaxLength())
+                )
+        ));
         if (snapshot.bannerItem() != null) {
             inventory.setItem(config.bannerSlot(), guiItemBuilder.buildFromStack(
                     player,
@@ -64,10 +82,17 @@ public final class ClanSettingsMenuPopulator {
         return roleSlots;
     }
 
+    private String resolveDescription(Player player, String description) {
+        if (description == null || description.isBlank()) {
+            return messageService.resolve(player, "clan.gui.profile.value-empty-description");
+        }
+        return description;
+    }
+
     private int nextRoleSlot(int startIndex) {
         for (int index = startIndex; index < config.contentSize(); index++) {
             int slot = config.contentSlot(index);
-            if (slot != config.bannerSlot()) {
+            if (slot != config.bannerSlot() && slot != config.descriptionSlot()) {
                 return slot;
             }
         }

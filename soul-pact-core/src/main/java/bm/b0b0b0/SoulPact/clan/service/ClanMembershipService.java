@@ -542,6 +542,7 @@ public final class ClanMembershipService {
                 UUID.randomUUID(),
                 0,
                 0,
+                0,
                 false,
                 false,
                 true,

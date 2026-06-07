@@ -2,8 +2,10 @@ name: SoulPact-War
 version: '${version}'
 main: bm.b0b0b0.SoulPact.war.SoulPactWarPlugin
 api-version: '1.21'
-depend: [SoulPact]
-softdepend: [SoulPact-Bank, SoulPact-Lands, SoulPact-Chest]
+depend: [SoulPact, SoulPact-Lands]
+libraries:
+  - net.elytrium:serializer:1.1.1
+softdepend: [SoulPact-Bank, SoulPact-Chest]
 commands:
   clanwar:
     description: Clan war declarations

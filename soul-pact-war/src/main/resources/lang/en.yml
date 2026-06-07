@@ -1,35 +1,70 @@
 war:
   startup:
-    separator: "&8&m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    registered: "Clan war module registered"
+    separator: "=============================="
+    registered: "Clan war module connected"
     core-missing: "SoulPact not found — war module disabled"
     database-missing: "SoulPact database not ready — war module disabled"
   declare:
     sent: "<#86EFAC>War declaration sent to the clan leader."
     received: "<#F87171>Clan <white>[{attacker_tag}] {attacker_name}</white> declared war on you!"
+    received-member: "<#F87171>Clan <white>[{attacker_tag}] {attacker_name}</white> declared war on your clan!"
     button:
       accept: "<#86EFAC><bold>[Accept war]</bold>"
-      ransom: "<#EAB308><bold>[Pay ransom]</bold>"
+      ransom: "<#EAB308><bold>[Pay ransom {ransom_percent}%]</bold>"
       separator: " <#4B5563>| "
   response:
     accepted: "<#86EFAC>You accepted the war. Treasury unlocked."
     ransomed: "<#EAB308>Ransom <white>{amount}</white> transferred to the attacker. Declaration closed."
+  started:
+    enemy-flag: "<#F87171>War started! Enemy flag <white>[{enemy_tag}]</white>: <white>{world} {x} {y} {z}</white>"
   capture:
-    started: "<#F87171>Standard captured! Defender has <white>{seconds}</white> seconds to recover it."
+    standard-received: "<#86EFAC>You captured the standard of <white>[{target_tag}]</white> — it is in your inventory. Hold the capture until victory!"
+    holder-alert: "<#86EFAC>Capture started! Standard of <white>[{target_tag}]</white> is with your clan. Hold for <white>{seconds}</white> sec. to win!"
+    defender-alert: "<#F87171><bold>Your flag was captured!</bold> Clan <white>[{holder_tag}]</white> holds the capture. You have <white>{seconds}</white> sec. to recover!"
+  own-flag:
+    defeat: "<#F87171>You destroyed your standard — defeat. Treasury, spoils, and the clan go to <white>[{enemy}]</white>."
+    coalition-withdraw: "<#EAB308>Your coalition withdrew from the war after destroying its standard."
+  coalition-withdraw:
+    self-flag: "<#EAB308>Coalition withdrew from war: clan <white>{clan}</white> destroyed its standard."
+    flag-captured: "<#EAB308>Coalition withdrew from war: clan <white>{clan}</white> standard was captured."
   bossbar:
-    pending-defender: "War has been declared on you"
-    active-attacker: "You are at war"
-    active-defender: "War has been declared on your clan"
-    capture-defending: "Enemy captured your flag! {seconds} sec. until clan destruction"
-    capture-attacking: "You captured the enemy flag! {seconds} sec. until victory"
+    pending-attacker: "War declared — awaiting response"
+    pending-defender: "War declared on you — accept or pay ransom"
+    active-attacker: "War in progress — your clan is attacking"
+    active-defender: "War in progress — your clan is under attack"
+    capture-defending: "Enemy captured your flag! {seconds} sec. until defeat"
+    capture-attacking: "Enemy flag captured! {seconds} sec. until victory"
   victory:
-    broadcast: "<#C084FC>Clan <white>{winner}</white> defeated <white>{loser}</white> in war."
+    broadcast:
+      - "<#C084FC><bold>━━━━ War ended ━━━━</bold>"
+      - "<#86EFAC>Winners: <white>[{winner_tag}] {winner_name}</white>"
+      - "<#F87171>Losers: <white>[{loser_tag}] {loser_name}</white>"
+      - "<#9CA3AF>Winner coalition: <white>{winner_coalition}</white>"
+      - "<#9CA3AF>Loser coalition: <white>{loser_coalition}</white>"
+      - "<#9CA3AF>Enemy kills by clan:"
+    loser-alert:
+      - "<#F87171><bold>Your clan lost the war.</bold>"
+      - "<#9CA3AF>War against <white>[{winner_tag}] {winner_name}</white>."
+      - "<#9CA3AF>All clan treasury was given to the winners."
+      - "<#9CA3AF>Your clan will be disbanded — defeat."
+      - ""
+      - "<#9CA3AF>Kill summary:"
+    kill-line: "<#9CA3AF>  [{tag}] {name}: <white>{kills}</white>"
+    kill-empty: "<#6B7280>  No kills in this war"
   error:
     cannot-declare: "<#F87171>Cannot declare war on this clan."
+    lands-required: "<#F87171>Clan bases module (SoulPact-Lands) is required for war."
+    attacker-no-base: "<#F87171>Your clan has no base — place your flag first."
+    defender-no-base: "<#F87171>Target clan has no base — war is impossible."
+    active-war: "<#F87171>Your clan is already at war."
+    target-in-war: "<#F87171>This clan is already at war."
+    coalition-ally: "<#F87171>This clan is in your coalition — war is not allowed."
+    accept-no-base: "<#F87171>One of the clans has no base — war cannot start."
     already-pending: "<#F87171>A declaration is already pending."
     not-leader: "<#F87171>Only the leader can respond to declarations."
     empty-treasury: "<#F87171>Treasury is empty — ransom unavailable."
     ransom-failed: "<#F87171>Failed to transfer ransom."
+    flag-break-blocked: "<#F87171>You cannot break this standard in the current war phase."
   gui:
     declare-confirm:
       title: "<#581C87><bold>Declare war?</bold> <white>[{tag}]"
@@ -77,3 +112,25 @@ war:
           name: "<#F87171>Back"
           lore:
             - "<#9CA3AF>Back to declaration list"
+    hub:
+      title: "<#581C87><bold>War</bold>"
+      item:
+        enemy-flag:
+          name: "<#F87171>Enemy flag <white>[{enemy_tag}]</white>"
+          lore:
+            - "<#9CA3AF>Clan: <white>{enemy_name}"
+            - "<#9CA3AF>World: <white>{world}"
+            - "<#9CA3AF>Coords: <white>{x} {y} {z}"
+        no-war:
+          name: "<#6B7280>No active war"
+          lore:
+            - "<#9CA3AF>Enemy base coordinates"
+            - "<#9CA3AF>appear when war starts"
+        pending:
+          name: "<#FDE047><bold>Declarations</bold> <#374151>({count})"
+          lore:
+            - "<#D8B4FE>Click — accept or ransom"
+        back:
+          name: "<#F87171>Back"
+          lore:
+            - "<#9CA3AF>Back to clan profile"

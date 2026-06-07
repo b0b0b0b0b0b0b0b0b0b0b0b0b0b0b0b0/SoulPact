@@ -70,4 +70,14 @@ public final class WarGuiClickHandler {
             warService.payRansom(player, menu.declaration().id());
         }
     }
+
+    public void handleWarHub(WarHubMenu menu, Player player, int slot) {
+        if (slot == menu.backSlot()) {
+            api.clanGui().openProfile(player);
+            return;
+        }
+        if (slot == menu.pendingSlot() && menu.viewerIsLeader() && menu.pendingCount() > 0) {
+            guiService.openPendingList(player);
+        }
+    }
 }

@@ -5,7 +5,7 @@ import bm.b0b0b0.SoulPact.coalition.bridge.CoalitionDisplayBridgeImpl;
 import bm.b0b0b0.SoulPact.coalition.bridge.CoalitionWarBridgeImpl;
 import bm.b0b0b0.SoulPact.coalition.command.ClanCoalitionCommand;
 import bm.b0b0b0.SoulPact.coalition.config.CoalitionConfig;
-import bm.b0b0b0.SoulPact.coalition.config.CoalitionConfigLoader;
+import bm.b0b0b0.SoulPact.coalition.config.CoalitionConfigurationLoader;
 import bm.b0b0b0.SoulPact.coalition.extension.CoalitionExtension;
 import bm.b0b0b0.SoulPact.coalition.gui.CoalitionGuiService;
 import bm.b0b0b0.SoulPact.coalition.listener.CoalitionPlayerCacheListener;
@@ -36,11 +36,12 @@ public final class SoulPactCoalitionPlugin extends JavaPlugin {
     private CoalitionExtension extension;
     private CoalitionBossBarService bossBarService;
     private CoalitionStartupConsolePresenter startupPresenter;
+    private CoalitionConfigurationLoader configurationLoader;
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
-        CoalitionConfig config = CoalitionConfigLoader.load(this);
+        configurationLoader = new CoalitionConfigurationLoader(this);
+        CoalitionConfig config = configurationLoader.load();
         CoalitionMessages coalitionMessages = new CoalitionMessages(this, config.locale(), config.fallbackLocale());
         coalitionMessages.load();
         startupPresenter = new CoalitionStartupConsolePresenter(this, coalitionMessages);
@@ -92,7 +93,7 @@ public final class SoulPactCoalitionPlugin extends JavaPlugin {
 
     private void finishEnable(SoulPactApi resolvedApi) {
         api = resolvedApi;
-        CoalitionConfig config = CoalitionConfigLoader.load(this);
+        CoalitionConfig config = configurationLoader.load();
         CoalitionMessages coalitionMessages = new CoalitionMessages(this, config.locale(), config.fallbackLocale());
         coalitionMessages.load();
         new CoalitionSchemaMigrator(this, api.dataSource()).migrate();
@@ -114,7 +115,7 @@ public final class SoulPactCoalitionPlugin extends JavaPlugin {
                 warStateTracker,
                 playerClanCache
         );
-        CoalitionInviteChatPresenter inviteChatPresenter = new CoalitionInviteChatPresenter(coalitionMessages, clanLookup);
+        CoalitionInviteChatPresenter inviteChatPresenter = new CoalitionInviteChatPresenter(api, coalitionMessages, clanLookup);
         CoalitionService coalitionService = new CoalitionService(
                 api,
                 config,

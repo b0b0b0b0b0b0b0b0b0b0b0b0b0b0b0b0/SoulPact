@@ -107,6 +107,9 @@ public final class WorldGuardWarEventBridge {
             return false;
         }
         Block block = breakEvent.getBlock();
+        if (!block.getType().name().endsWith("_BANNER")) {
+            return false;
+        }
         Long clanId = clanStandard.readClanIdFromBlock(block.getState());
         if (clanId == null) {
             return false;

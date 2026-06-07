@@ -3,6 +3,7 @@ package bm.b0b0b0.SoulPact.land.service;
 import bm.b0b0b0.SoulPact.api.SoulPactApi;
 import bm.b0b0b0.SoulPact.api.clan.ClanSnapshot;
 import bm.b0b0b0.SoulPact.api.land.ClanBaseSnapshot;
+import bm.b0b0b0.SoulPact.land.config.BorderColorPalette;
 import bm.b0b0b0.SoulPact.land.config.LandConfig;
 import bm.b0b0b0.SoulPact.land.integration.WorldGuardGateway;
 import bm.b0b0b0.SoulPact.land.message.LandMessages;
@@ -38,6 +39,7 @@ public final class ClanBaseService {
     private final BaseBorderService borderService;
     private final BaseExpansionPaymentService paymentService;
     private final BaseFlagIndex flagIndex;
+    private final ClanBaseRecordIndex recordIndex;
 
     public ClanBaseService(
             SoulPactApi api,
@@ -48,7 +50,8 @@ public final class ClanBaseService {
             WorldGuardGateway worldGuardGateway,
             BaseBorderService borderService,
             BaseExpansionPaymentService paymentService,
-            BaseFlagIndex flagIndex
+            BaseFlagIndex flagIndex,
+            ClanBaseRecordIndex recordIndex
     ) {
         this.api = api;
         this.config = config;
@@ -59,6 +62,108 @@ public final class ClanBaseService {
         this.borderService = borderService;
         this.paymentService = paymentService;
         this.flagIndex = flagIndex;
+        this.recordIndex = recordIndex;
+    }
+
+    public Optional<ClanBaseRecord> findBaseRecordAtFlag(Location location) {
+        if (location.getWorld() == null) {
+            return Optional.empty();
+        }
+        return recordIndex.findByFlag(
+                location.getWorld().getName(),
+                location.getBlockX(),
+                location.getBlockY(),
+                location.getBlockZ()
+        );
+    }
+
+    public Optional<ClanBaseRecord> findBaseRecordByClanId(long clanId) {
+        return recordIndex.findByClanId(clanId);
+    }
+
+    public Optional<ClanBaseRecord> resolveBaseForBrokenFlag(org.bukkit.block.Block block) {
+        Long bannerClanId = api.clanStandard().readClanIdFromBlock(block.getState());
+        Optional<ClanBaseRecord> byBanner = bannerClanId == null
+                ? Optional.empty()
+                : recordIndex.findByClanId(bannerClanId);
+        Optional<ClanBaseRecord> byLocation = findBaseRecordAtFlag(block.getLocation());
+        if (byBanner.isPresent()) {
+            if (byLocation.isPresent() && byLocation.get().clanId() != byBanner.get().clanId()) {
+                return byBanner;
+            }
+            return byBanner;
+        }
+        return byLocation;
+    }
+
+    public boolean isKnownFlagBlock(org.bukkit.block.Block block) {
+        if (api.clanStandard().readClanIdFromBlock(block.getState()) != null) {
+            return true;
+        }
+        if (block.getWorld() == null) {
+            return false;
+        }
+        return flagIndex.find(
+                block.getWorld().getName(),
+                block.getX(),
+                block.getY(),
+                block.getZ()
+        ).isPresent();
+    }
+
+    public void clearFlagBlocks(ClanBaseRecord base) {
+        World world = api.plugin().getServer().getWorld(base.world());
+        if (world == null) {
+            return;
+        }
+        clearBannerAt(world, base.flagX(), base.flagY(), base.flagZ());
+        clearBannerAt(world, base.flagX(), base.flagY() + 1, base.flagZ());
+        clearBannerAt(world, base.flagX(), base.flagY() - 1, base.flagZ());
+    }
+
+    private void clearBannerAt(World world, int x, int y, int z) {
+        org.bukkit.block.Block block = world.getBlockAt(x, y, z);
+        if (block.getType().name().endsWith("_BANNER")) {
+            block.setType(Material.AIR);
+        }
+    }
+
+    public void applyWarCombatZone(long clanId) {
+        Optional<ClanBaseRecord> cached = recordIndex.findByClanId(clanId);
+        if (cached.isPresent()) {
+            applyWarCombatZoneSync(cached.get());
+            return;
+        }
+        api.scheduler().supplyAsync(() -> repository.findByClanId(clanId)).thenAccept(baseOptional ->
+                api.scheduler().runSync(() -> baseOptional.ifPresent(this::applyWarCombatZoneSync))
+        );
+    }
+
+    public void restoreCombatZone(long clanId) {
+        Optional<ClanBaseRecord> cached = recordIndex.findByClanId(clanId);
+        if (cached.isPresent()) {
+            restoreCombatZoneSync(cached.get());
+            return;
+        }
+        api.scheduler().supplyAsync(() -> repository.findByClanId(clanId)).thenAccept(baseOptional ->
+                api.scheduler().runSync(() -> baseOptional.ifPresent(this::restoreCombatZoneSync))
+        );
+    }
+
+    private void applyWarCombatZoneSync(ClanBaseRecord base) {
+        World world = api.plugin().getServer().getWorld(base.world());
+        if (world == null) {
+            return;
+        }
+        worldGuardGateway.forcePvpAllow(world, base.regionName());
+    }
+
+    private void restoreCombatZoneSync(ClanBaseRecord base) {
+        World world = api.plugin().getServer().getWorld(base.world());
+        if (world == null) {
+            return;
+        }
+        worldGuardGateway.restorePvp(world, base.regionName(), base.pvpEnabled());
     }
 
     public CompletableFuture<Optional<ClanBaseSnapshot>> findBase(long clanId) {
@@ -161,6 +266,7 @@ public final class ClanBaseService {
         api.scheduler().supplyAsync(() -> repository.findBorderBlocks(base.id()))
                 .thenAccept(borderBlocks -> api.scheduler().runSync(() -> {
                     flagIndex.unregister(base);
+                    recordIndex.unregister(base);
                     World world = api.plugin().getServer().getWorld(base.world());
                     if (world != null) {
                         borderService.unregisterBorder(base.id(), base.world(), borderBlocks);
@@ -274,10 +380,11 @@ public final class ClanBaseService {
             messages.send(player, "land.error.not-leader");
             return;
         }
-        Material current = config.borderColors().resolve(base.borderMaterial());
-        Material next = config.borderColors().next(current);
+        Material currentGui = config.borderColors().resolveGui(base.borderMaterial());
+        Material nextGui = config.borderColors().nextGui(currentGui);
+        Material nextWorld = BorderColorPalette.toWorldMaterial(nextGui);
         api.scheduler().supplyAsync(() -> {
-            repository.updateBorderMaterial(base.id(), next.name());
+            repository.updateBorderMaterial(base.id(), nextWorld.name());
             return repository.findBorderBlocks(base.id());
         }).thenAccept(borderBlocks -> api.scheduler().runSync(() -> {
             if (!player.isOnline()) {
@@ -285,11 +392,11 @@ public final class ClanBaseService {
             }
             World world = api.plugin().getServer().getWorld(base.world());
             if (world != null) {
-                borderService.applyBorderColor(world, borderBlocks, next);
+                borderService.applyBorderColor(world, borderBlocks, nextWorld);
             }
             messages.send(player, "land.settings.border-color-changed", Map.of(
                     "color",
-                    messages.resolve(player, "land.gui.border-colors." + config.borderColors().displayKey(next))
+                    messages.resolve(player, "land.gui.border-colors." + config.borderColors().displayKey(nextGui))
             ));
             if (onComplete != null) {
                 onComplete.run();
@@ -421,6 +528,7 @@ public final class ClanBaseService {
                     return;
                 }
                 flagIndex.register(saved);
+                recordIndex.register(saved);
                 borderService.registerBorder(saved.id(), world.getName(), borderBlocks);
                 api.clanStandard().stampBlock(
                         flagLocation.getBlock().getState(),
@@ -493,7 +601,7 @@ public final class ClanBaseService {
                     if (!player.isOnline()) {
                         return;
                     }
-                    Material material = config.borderColors().resolve(expandedRecord.borderMaterial());
+                    Material material = config.borderColors().resolveWorld(expandedRecord.borderMaterial());
                     try {
                         worldGuardGateway.resizeRegion(world, expandedRecord.regionName(), newBounds);
                         BorderExpansionDelta delta = borderService.expandBorder(

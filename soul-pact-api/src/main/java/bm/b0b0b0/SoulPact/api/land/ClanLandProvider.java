@@ -9,6 +9,12 @@ public interface ClanLandProvider extends SoulPactGuiExtension {
 
     CompletableFuture<Optional<ClanBaseSnapshot>> findBase(long clanId);
 
+    default void applyWarCombatZone(long clanId) {
+    }
+
+    default void restoreCombatZone(long clanId) {
+    }
+
     default void onMemberJoined(long clanId, UUID playerId) {
     }
 

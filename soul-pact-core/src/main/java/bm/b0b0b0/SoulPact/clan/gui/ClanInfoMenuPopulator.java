@@ -89,6 +89,23 @@ public final class ClanInfoMenuPopulator {
                     "clan.gui.info.item.declare-war.lore",
                     placeholders
             ));
+        } else if (snapshot.showDeclareWarBlocked()) {
+            inventory.setItem(guiInfoConfig.declareWarSlot(), guiItemBuilder.build(
+                    player,
+                    guiInfoConfig.declareWarBlockedMaterial(),
+                    "clan.gui.info.item.declare-war-blocked.name",
+                    DeclareWarBlockGuiKeys.loreKey(snapshot.declareWarBlockReasonId()),
+                    placeholders
+            ));
+        }
+        if (snapshot.showInviteCoalition()) {
+            inventory.setItem(guiInfoConfig.inviteCoalitionSlot(), guiItemBuilder.build(
+                    player,
+                    guiInfoConfig.inviteCoalitionMaterial(),
+                    "clan.gui.info.item.invite-coalition.name",
+                    "clan.gui.info.item.invite-coalition.lore",
+                    placeholders
+            ));
         }
         placeAllies(inventory, player, snapshot);
         inventory.setItem(guiInfoConfig.backSlot(), guiItemBuilder.build(

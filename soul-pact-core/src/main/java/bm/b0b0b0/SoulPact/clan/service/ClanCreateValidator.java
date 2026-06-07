@@ -34,6 +34,24 @@ public final class ClanCreateValidator {
         return Optional.empty();
     }
 
+    public Optional<String> validateDescription(String rawDescription, ClanConfig clanConfig) {
+        if (rawDescription == null || rawDescription.isBlank()) {
+            return Optional.of("clan.description.invalid-empty");
+        }
+        String description = normalizeDescription(rawDescription);
+        if (description.isBlank()) {
+            return Optional.of("clan.description.invalid-empty");
+        }
+        if (description.length() > clanConfig.descriptionMaxLength()) {
+            return Optional.of("clan.description.invalid-length");
+        }
+        return Optional.empty();
+    }
+
+    public String normalizeDescription(String rawDescription) {
+        return rawDescription.trim().replace('\n', ' ').replaceAll("\\s+", " ");
+    }
+
     public String normalizeTag(String rawTag) {
         return rawTag.trim().toUpperCase(Locale.ROOT);
     }

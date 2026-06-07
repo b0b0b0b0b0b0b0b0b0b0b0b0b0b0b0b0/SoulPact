@@ -1,6 +1,7 @@
 package bm.b0b0b0.SoulPact.clan.gui;
 
 import bm.b0b0b0.SoulPact.clan.service.ClanLeaveService;
+import bm.b0b0b0.SoulPact.clan.service.ClanWarAccessService;
 import bm.b0b0b0.SoulPact.core.message.MessageService;
 import org.bukkit.entity.Player;
 
@@ -10,17 +11,20 @@ public final class ClanProfileClickHandler {
     private final ClanGuiOpenService guiOpenService;
     private final ClanLeaveService leaveService;
     private final MessageService messageService;
+    private final ClanWarAccessService warAccessService;
 
     public ClanProfileClickHandler(
             ClanCreateChatPrompt createChatPrompt,
             ClanGuiOpenService guiOpenService,
             ClanLeaveService leaveService,
-            MessageService messageService
+            MessageService messageService,
+            ClanWarAccessService warAccessService
     ) {
         this.createChatPrompt = createChatPrompt;
         this.guiOpenService = guiOpenService;
         this.leaveService = leaveService;
         this.messageService = messageService;
+        this.warAccessService = warAccessService;
     }
 
     public void handle(ClanProfileMenu menu, Player player, int slot) {
@@ -47,6 +51,10 @@ public final class ClanProfileClickHandler {
         }
         if (!menu.empty() && slot == menu.slotMembers()) {
             guiOpenService.openMembers(player, ClanMembersNav.fromProfile(menu.clanId()));
+            return;
+        }
+        if (!menu.empty() && warAccessService.available() && slot == menu.slotWar()) {
+            warAccessService.openWarHub(player);
             return;
         }
         if (slot == menu.slotBack()) {

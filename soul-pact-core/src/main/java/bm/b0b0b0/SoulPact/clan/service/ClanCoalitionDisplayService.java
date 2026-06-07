@@ -39,12 +39,12 @@ public final class ClanCoalitionDisplayService {
         return chain;
     }
 
-    public CompletableFuture<CoalitionDisplayExtras> alliesForInfo(long clanId) {
+    public CompletableFuture<CoalitionDisplayExtras> enrichInfoView(Player viewer, long targetClanId) {
         CoalitionDisplayBridge bridge = resolveDisplay();
         if (bridge == null) {
             return CompletableFuture.completedFuture(CoalitionDisplayExtras.empty());
         }
-        return bridge.alliesForInfo(clanId);
+        return bridge.enrichInfoView(viewer, targetClanId);
     }
 
     private CoalitionDisplayBridge resolveDisplay() {

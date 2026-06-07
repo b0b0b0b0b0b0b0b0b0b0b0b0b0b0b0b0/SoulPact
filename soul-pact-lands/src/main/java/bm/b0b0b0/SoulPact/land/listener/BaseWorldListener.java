@@ -4,15 +4,16 @@ import bm.b0b0b0.SoulPact.api.SoulPactApi;
 import bm.b0b0b0.SoulPact.api.clan.ClanSnapshot;
 import bm.b0b0b0.SoulPact.api.clan.SoulPactClanStandard;
 import bm.b0b0b0.SoulPact.api.war.ClanWarProvider;
+import bm.b0b0b0.SoulPact.api.war.FlagBreakWarResult;
 import bm.b0b0b0.SoulPact.api.war.WarFlagBreakGate;
 import bm.b0b0b0.SoulPact.land.message.LandMessages;
 import bm.b0b0b0.SoulPact.land.model.ClanBaseRecord;
 import bm.b0b0b0.SoulPact.land.service.BorderBlockIndex;
 import bm.b0b0b0.SoulPact.land.service.ClanBaseService;
-import bm.b0b0b0.SoulPact.land.service.BaseFlagIndex;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -30,21 +31,18 @@ public final class BaseWorldListener implements Listener {
     private final SoulPactClanStandard clanStandard;
     private final ClanBaseService baseService;
     private final BorderBlockIndex borderBlockIndex;
-    private final BaseFlagIndex flagIndex;
     private final LandMessages messages;
 
     public BaseWorldListener(
             SoulPactApi api,
             ClanBaseService baseService,
             BorderBlockIndex borderBlockIndex,
-            BaseFlagIndex flagIndex,
             LandMessages messages
     ) {
         this.api = api;
         this.clanStandard = api.clanStandard();
         this.baseService = baseService;
         this.borderBlockIndex = borderBlockIndex;
-        this.flagIndex = flagIndex;
         this.messages = messages;
     }
 
@@ -75,41 +73,45 @@ public final class BaseWorldListener implements Listener {
         );
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
     public void onBaseFlagBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
-        if (flagIndex.find(
-                block.getWorld().getName(),
-                block.getX(),
-                block.getY(),
-                block.getZ()
-        ).isEmpty()) {
+        if (!baseService.isKnownFlagBlock(block)) {
+            return;
+        }
+        Player player = event.getPlayer() instanceof Player resolved ? resolved : null;
+        if (player != null && player.getGameMode() == GameMode.CREATIVE) {
+            event.setCancelled(true);
+            messages.send(player, "land.error.flag-creative-blocked");
             return;
         }
         event.setCancelled(true);
-        Player player = event.getPlayer() instanceof Player resolved ? resolved : null;
         Location location = block.getLocation();
+        Optional<ClanBaseRecord> baseOptional = baseService.resolveBaseForBrokenFlag(block);
+        if (baseOptional.isEmpty()) {
+            breakFlagWithoutBase(player, block);
+            return;
+        }
+        ClanBaseRecord base = baseOptional.get();
+        Long bannerClanId = clanStandard.readClanIdFromBlock(block.getState());
+        if (bannerClanId != null && bannerClanId != base.clanId()) {
+            base = baseService.findBaseRecordByClanId(bannerClanId).orElse(base);
+        }
+        final ClanBaseRecord targetBase = base;
+        long flagOwnerClanId = bannerClanId != null ? bannerClanId : targetBase.clanId();
         Optional<WarFlagBreakGate> warGateOptional = resolveWarGate();
-        baseService.findBaseAtFlag(location).thenAccept(baseOptional -> {
-            if (baseOptional.isEmpty()) {
-                api.scheduler().runSync(() -> breakFlagWithoutBase(player, block));
+        if (player != null && warGateOptional.isPresent()) {
+            FlagBreakWarResult warResult = warGateOptional.get().handleBrokenFlag(
+                    player,
+                    flagOwnerClanId,
+                    location,
+                    () -> destroyBaseForWar(targetBase)
+            );
+            if (warResult != FlagBreakWarResult.PEACEFUL) {
                 return;
             }
-            ClanBaseRecord base = baseOptional.get();
-            if (player != null && warGateOptional.isPresent()) {
-                WarFlagBreakGate warGate = warGateOptional.get();
-                if (warGate.allowsEnemyStandardBreak(player.getUniqueId(), base.clanId())) {
-                    api.scheduler().runSync(() -> warGate.onEnemyStandardBreak(
-                            player,
-                            base.clanId(),
-                            location,
-                            () -> destroyBaseForWar(player, block, base)
-                    ));
-                    return;
-                }
-            }
-            api.scheduler().runSync(() -> destroyBaseProtected(player, block, base));
-        });
+        }
+        destroyBaseProtected(player, block, targetBase);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -149,7 +151,7 @@ public final class BaseWorldListener implements Listener {
         if (clanTag == null || clanTag.isBlank()) {
             clanTag = String.valueOf(base.clanId());
         }
-        block.setType(Material.AIR);
+        baseService.clearFlagBlocks(base);
         baseService.destroyBase(base);
         if (player != null) {
             clanStandard.restoreToPlayer(player, base.clanId(), clanTag);
@@ -158,17 +160,9 @@ public final class BaseWorldListener implements Listener {
         }
     }
 
-    private void destroyBaseForWar(Player player, Block block, ClanBaseRecord base) {
-        String clanTag = clanStandard.readClanTagFromBlock(block.getState());
-        if (clanTag == null || clanTag.isBlank()) {
-            clanTag = String.valueOf(base.clanId());
-        }
-        block.setType(Material.AIR);
+    private void destroyBaseForWar(ClanBaseRecord base) {
+        baseService.clearFlagBlocks(base);
         baseService.destroyBase(base);
-        if (player != null) {
-            clanStandard.restoreToPlayer(player, base.clanId(), clanTag);
-            clanStandard.trackInventory(base.clanId(), player.getUniqueId());
-        }
     }
 
     private void completeStandardPlacement(

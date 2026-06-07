@@ -48,7 +48,7 @@ public final class ClanInfoViewDataService {
             ClanInfoViewSnapshot baseSnapshot
     ) {
         CompletableFuture<ClanInfoViewSnapshot> warFuture = enrichWar(viewer, clanId, baseSnapshot);
-        return warFuture.thenCompose(warSnapshot -> coalitionDisplayService.alliesForInfo(clanId)
+        return warFuture.thenCompose(warSnapshot -> coalitionDisplayService.enrichInfoView(viewer, clanId)
                 .thenApply(extras -> Optional.of(mergeCoalitionExtras(warSnapshot, extras))));
     }
 
@@ -59,17 +59,19 @@ public final class ClanInfoViewDataService {
                     mergeWarExtras(baseSnapshot, extras)
             );
         }
-        return treasuryDisplayService.formatBalance(clanId).thenApply(treasury ->
-                new ClanInfoViewSnapshot(
-                        baseSnapshot.clan(),
-                        baseSnapshot.memberCount(),
-                        baseSnapshot.viewerRole(),
-                        treasury,
-                        false,
-                        "",
-                        List.of()
-                )
-        );
+                return treasuryDisplayService.formatBalance(clanId).thenApply(treasury ->
+                        new ClanInfoViewSnapshot(
+                                baseSnapshot.clan(),
+                                baseSnapshot.memberCount(),
+                                baseSnapshot.viewerRole(),
+                                treasury,
+                                false,
+                                "",
+                                false,
+                                "",
+                                List.of()
+                        )
+                );
     }
 
     private ClanInfoViewSnapshot mergeWarExtras(ClanInfoViewSnapshot base, ClanWarInfoExtras extras) {
@@ -79,6 +81,8 @@ public final class ClanInfoViewDataService {
                 base.viewerRole(),
                 extras.treasuryLine(),
                 extras.showDeclareWar(),
+                extras.declareWarBlockReasonId(),
+                false,
                 "",
                 List.of()
         );
@@ -91,6 +95,8 @@ public final class ClanInfoViewDataService {
                 base.viewerRole(),
                 base.treasuryLine(),
                 base.showDeclareWar(),
+                base.declareWarBlockReasonId(),
+                extras.showInviteCoalition(),
                 extras.coalitionLine(),
                 extras.allies()
         );

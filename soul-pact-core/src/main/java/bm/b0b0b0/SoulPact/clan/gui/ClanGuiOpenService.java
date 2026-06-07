@@ -75,6 +75,7 @@ public final class ClanGuiOpenService {
     private final ClanRoleSettingsDataService roleSettingsDataService;
     private final ClanBannerDataService bannerDataService;
     private final AsyncDatabaseExecutor asyncDatabaseExecutor;
+    private final ClanBannerReturnService bannerReturnService;
 
     public ClanGuiOpenService(
             GuiHubConfig guiHubConfig,
@@ -117,7 +118,8 @@ public final class ClanGuiOpenService {
             ClanSettingsDataService settingsDataService,
             ClanRoleSettingsDataService roleSettingsDataService,
             ClanBannerDataService bannerDataService,
-            AsyncDatabaseExecutor asyncDatabaseExecutor
+            AsyncDatabaseExecutor asyncDatabaseExecutor,
+            ClanBannerReturnService bannerReturnService
     ) {
         this.guiHubConfig = guiHubConfig;
         this.guiProfileConfig = guiProfileConfig;
@@ -160,6 +162,7 @@ public final class ClanGuiOpenService {
         this.roleSettingsDataService = roleSettingsDataService;
         this.bannerDataService = bannerDataService;
         this.asyncDatabaseExecutor = asyncDatabaseExecutor;
+        this.bannerReturnService = bannerReturnService;
     }
 
     public void openHub(Player player) {
@@ -404,6 +407,15 @@ public final class ClanGuiOpenService {
     }
 
     public void openBanner(Player player) {
+        openBanner(player, ClanBannerReturnService.ReturnTarget.CLAN_HUB);
+    }
+
+    public void openBannerFromLand(Player player) {
+        openBanner(player, ClanBannerReturnService.ReturnTarget.LAND_MENU);
+    }
+
+    private void openBanner(Player player, ClanBannerReturnService.ReturnTarget returnTarget) {
+        bannerReturnService.setReturnTarget(player, returnTarget);
         bannerDataService.load(player).thenAccept(snapshotOptional -> asyncDatabaseExecutor.runSync(() -> {
             if (!player.isOnline()) {
                 return;

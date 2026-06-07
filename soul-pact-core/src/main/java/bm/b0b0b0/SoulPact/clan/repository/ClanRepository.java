@@ -36,6 +36,8 @@ public interface ClanRepository {
 
     CompletableFuture<Boolean> updateJoinRequestsOpen(long clanId, boolean open);
 
+    CompletableFuture<Boolean> updateDescription(long clanId, String description);
+
     CompletableFuture<Boolean> updateMemberRole(long clanId, UUID playerId, String role);
 
     CompletableFuture<Boolean> transferLeadership(

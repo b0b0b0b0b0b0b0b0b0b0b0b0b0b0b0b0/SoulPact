@@ -43,7 +43,7 @@ public final class GuiClanBannerConfig {
         this.takeStandardSlot = settings.slots.takeStandard;
         this.backSlot = settings.slots.back;
         this.clearPatternsMaterial = parseMaterial(settings.materials.clearPatterns, Material.BARRIER);
-        this.patternColorMaterial = parseMaterial(settings.materials.patternColor, Material.WHITE_DYE);
+        this.patternColorMaterial = parseMaterial(settings.materials.patternColor, Material.PURPLE_DYE);
         this.fromHandMaterial = parseMaterial(settings.materials.fromHand, Material.HOPPER);
         this.undoPatternMaterial = parseMaterial(settings.materials.undoPattern, Material.SHEARS);
         this.saveMaterial = parseMaterial(settings.materials.save, Material.LIME_DYE);

@@ -2,7 +2,7 @@ package bm.b0b0b0.SoulPact.chest;
 
 import bm.b0b0b0.SoulPact.api.SoulPactApi;
 import bm.b0b0b0.SoulPact.chest.config.ChestConfig;
-import bm.b0b0b0.SoulPact.chest.config.ChestConfigLoader;
+import bm.b0b0b0.SoulPact.chest.config.ChestConfigurationLoader;
 import bm.b0b0b0.SoulPact.chest.economy.ChestVaultGateway;
 import bm.b0b0b0.SoulPact.chest.extension.ChestExtension;
 import bm.b0b0b0.SoulPact.chest.gui.ChestGuiListener;
@@ -33,12 +33,13 @@ public final class SoulPactChestPlugin extends JavaPlugin {
     private ChestGuiService guiService;
     private ChestMessages chestMessages;
     private ChestStartupConsolePresenter startupPresenter;
+    private ChestConfigurationLoader configurationLoader;
     private ChestConfig config;
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
-        config = ChestConfigLoader.load(this);
+        configurationLoader = new ChestConfigurationLoader(this);
+        config = configurationLoader.load();
         chestMessages = new ChestMessages(this, config.locale(), config.fallbackLocale());
         chestMessages.load();
         startupPresenter = new ChestStartupConsolePresenter(this, chestMessages);

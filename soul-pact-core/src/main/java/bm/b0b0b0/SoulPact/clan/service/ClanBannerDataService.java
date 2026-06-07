@@ -37,7 +37,7 @@ public final class ClanBannerDataService {
                         clan.id(),
                         clan.tag(),
                         banner,
-                        ClanBannerPatternCatalog.patternColors().getFirst(),
+                        ClanBannerPatternCatalog.defaultPatternColor(),
                         clanBannerService.canEdit(player, clan),
                         standardOut,
                         canDepositStandard

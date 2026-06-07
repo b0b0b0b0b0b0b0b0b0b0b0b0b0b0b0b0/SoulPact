@@ -35,6 +35,7 @@ public final class ClanCommandRegistrar {
                 .requires(source -> source.getExecutor() instanceof Player player && player.hasPermission(permissionsConfig.clanUse()))
                 .executes(context -> executeOpenMenu(context.getSource()))
                 .then(Commands.literal("profile").executes(context -> executeProfile(context.getSource())))
+                .then(Commands.literal("settings").executes(context -> executeSettings(context.getSource())))
                 .then(Commands.literal("help").executes(context -> executeHelpChat(context.getSource())))
                 .then(Commands.literal("list").executes(context -> executeList(context.getSource())))
                 .then(Commands.literal("info")
@@ -98,6 +99,13 @@ public final class ClanCommandRegistrar {
                                 .executes(context -> executeCreateFromArgs(
                                         context.getSource(),
                                         StringArgumentType.getString(context, "args")
+                                ))))
+                .then(Commands.literal("description")
+                        .executes(context -> executeDescriptionUsage(context.getSource()))
+                        .then(Commands.argument("text", StringArgumentType.greedyString())
+                                .executes(context -> executeDescriptionFromArgs(
+                                        context.getSource(),
+                                        StringArgumentType.getString(context, "text")
                                 ))))
                 .build();
         registrar.register(clanRoot, "Clan menu and commands");
@@ -178,6 +186,49 @@ public final class ClanCommandRegistrar {
             return Command.SINGLE_SUCCESS;
         }
         runtimeHolder.services().guiOpenService().openProfile(player);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int executeSettings(CommandSourceStack source) {
+        if (!(source.getExecutor() instanceof Player player)) {
+            messageService.send(source.getSender(), "general.players-only");
+            return Command.SINGLE_SUCCESS;
+        }
+        if (!dataSourceProvider.isReady() || runtimeHolder.services() == null) {
+            messageService.send(player, "startup.loading");
+            return Command.SINGLE_SUCCESS;
+        }
+        runtimeHolder.services().guiOpenService().openSettings(player);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int executeDescriptionUsage(CommandSourceStack source) {
+        if (!(source.getExecutor() instanceof Player player)) {
+            messageService.send(source.getSender(), "general.players-only");
+            return Command.SINGLE_SUCCESS;
+        }
+        if (!dataSourceProvider.isReady() || runtimeHolder.services() == null) {
+            messageService.send(player, "startup.loading");
+            return Command.SINGLE_SUCCESS;
+        }
+        runtimeHolder.services().descriptionService().sendUsageHint(player);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int executeDescriptionFromArgs(CommandSourceStack source, String text) {
+        if (!(source.getExecutor() instanceof Player player)) {
+            messageService.send(source.getSender(), "general.players-only");
+            return Command.SINGLE_SUCCESS;
+        }
+        if (!dataSourceProvider.isReady() || runtimeHolder.services() == null) {
+            messageService.send(player, "startup.loading");
+            return Command.SINGLE_SUCCESS;
+        }
+        if (text == null || text.isBlank()) {
+            runtimeHolder.services().descriptionService().sendMissingTextHint(player);
+            return Command.SINGLE_SUCCESS;
+        }
+        runtimeHolder.services().descriptionService().update(player, text);
         return Command.SINGLE_SUCCESS;
     }
 

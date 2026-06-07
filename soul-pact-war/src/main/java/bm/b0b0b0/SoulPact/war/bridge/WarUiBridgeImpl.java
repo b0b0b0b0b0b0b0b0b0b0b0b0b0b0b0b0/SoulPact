@@ -47,4 +47,14 @@ public final class WarUiBridgeImpl implements ClanWarUiBridge {
     public void openPendingWars(Player player) {
         guiService.openPendingList(player);
     }
+
+    @Override
+    public void openWarHub(Player player) {
+        guiService.openWarHub(player);
+    }
+
+    @Override
+    public boolean available() {
+        return true;
+    }
 }

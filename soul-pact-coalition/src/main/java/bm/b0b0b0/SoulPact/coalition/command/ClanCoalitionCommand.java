@@ -37,6 +37,7 @@ public final class ClanCoalitionCommand implements CommandExecutor {
             case "invite" -> handleInvite(player, args);
             case "accept" -> handleAccept(player, args);
             case "deny" -> handleAcceptDeny(player, args, true);
+            case "block" -> handleBlock(player, args);
             case "leave" -> {
                 coalitionService.leave(player);
                 yield true;
@@ -73,6 +74,19 @@ public final class ClanCoalitionCommand implements CommandExecutor {
             } else {
                 coalitionService.acceptInvite(player, inviteId);
             }
+        } catch (NumberFormatException exception) {
+            messages.send(player, "coalition.error.invalid-id");
+        }
+        return true;
+    }
+
+    private boolean handleBlock(Player player, String[] args) {
+        if (args.length < 2) {
+            messages.send(player, "coalition.command.block-usage");
+            return true;
+        }
+        try {
+            coalitionService.blockInvite(player, Long.parseLong(args[1]));
         } catch (NumberFormatException exception) {
             messages.send(player, "coalition.error.invalid-id");
         }

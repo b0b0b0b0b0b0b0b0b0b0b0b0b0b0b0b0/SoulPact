@@ -55,7 +55,11 @@ public final class MessageService implements SoulPactMessages {
             return values;
         }
         LangBundle fallback = bundle(localeConfig.fallbackLocale());
-        return fallback == null ? List.of() : fallback.list(key);
+        if (fallback == null) {
+            return List.of();
+        }
+        List<String> fallbackValues = fallback.list(key);
+        return fallbackValues == null ? List.of() : fallbackValues;
     }
 
     public List<String> resolveList(Player player, String key, Map<String, String> placeholders) {
@@ -126,10 +130,28 @@ public final class MessageService implements SoulPactMessages {
     }
 
     public void sendCreatePrompt(Player player, String suggestCommand, String reopenCommand) {
-        Component suggest = parse(resolve(player, "clan.gui.hub.create.prompt-suggest"))
+        sendCommandPrompt(
+                player,
+                "clan.gui.hub.create.prompt-suggest",
+                Map.of(),
+                "clan.gui.hub.create.prompt-cancel",
+                suggestCommand,
+                reopenCommand
+        );
+    }
+
+    public void sendCommandPrompt(
+            Player player,
+            String suggestKey,
+            Map<String, String> placeholders,
+            String cancelKey,
+            String suggestCommand,
+            String reopenCommand
+    ) {
+        Component suggest = parse(resolve(player, suggestKey, placeholders))
                 .clickEvent(ClickEvent.suggestCommand(suggestCommand));
         Component separator = parse(resolve(player, "clan.gui.hub.create.prompt-separator"));
-        Component cancel = parse(resolve(player, "clan.gui.hub.create.prompt-cancel"))
+        Component cancel = parse(resolve(player, cancelKey))
                 .clickEvent(ClickEvent.runCommand(reopenCommand));
         player.sendMessage(suggest.append(separator).append(cancel));
     }

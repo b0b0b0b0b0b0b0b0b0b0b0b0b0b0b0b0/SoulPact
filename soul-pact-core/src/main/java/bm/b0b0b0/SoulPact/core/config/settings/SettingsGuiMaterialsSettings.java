@@ -8,6 +8,9 @@ public final class SettingsGuiMaterialsSettings {
     @Comment(@CommentValue("Роль"))
     public String role = "WRITABLE_BOOK";
 
+    @Comment(@CommentValue("Описание клана"))
+    public String description = "BOOK";
+
     @Comment(@CommentValue("Назад"))
     public String back = "ARROW";
 

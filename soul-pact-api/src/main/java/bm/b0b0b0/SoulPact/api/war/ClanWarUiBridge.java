@@ -16,4 +16,8 @@ public interface ClanWarUiBridge {
     CompletableFuture<Integer> pendingCountForLeader(long defenderClanId);
 
     void openPendingWars(Player player);
+
+    void openWarHub(Player player);
+
+    boolean available();
 }
