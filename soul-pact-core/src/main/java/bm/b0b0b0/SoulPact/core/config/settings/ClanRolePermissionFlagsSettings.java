@@ -19,4 +19,10 @@ public final class ClanRolePermissionFlagsSettings {
 
     @Comment(@CommentValue("Снимать из казны"))
     public boolean bankWithdraw = false;
+
+    @Comment(@CommentValue("Класть в клановый сундук"))
+    public boolean chestDeposit = true;
+
+    @Comment(@CommentValue("Брать из кланового сундука"))
+    public boolean chestWithdraw = false;
 }

@@ -7,4 +7,7 @@ public final class SettingsGuiSlotsSettings {
 
     @Comment(@CommentValue("Назад в главное меню"))
     public int back = 49;
+
+    @Comment(@CommentValue("Редактор баннера (2-я строка, последняя ячейка)"))
+    public int banner = 17;
 }

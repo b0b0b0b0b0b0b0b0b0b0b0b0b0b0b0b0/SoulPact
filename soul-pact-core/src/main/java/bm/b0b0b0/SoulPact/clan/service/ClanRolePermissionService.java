@@ -54,7 +54,9 @@ public final class ClanRolePermissionService {
                 && !ClanPermissionKeys.ACCEPT.equals(permission)
                 && !ClanPermissionKeys.RECRUIT_LOWER.equals(permission)
                 && !ClanPermissionKeys.BANK_DEPOSIT.equals(permission)
-                && !ClanPermissionKeys.BANK_WITHDRAW.equals(permission)) {
+                && !ClanPermissionKeys.BANK_WITHDRAW.equals(permission)
+                && !ClanPermissionKeys.CHEST_DEPOSIT.equals(permission)
+                && !ClanPermissionKeys.CHEST_WITHDRAW.equals(permission)) {
             return CompletableFuture.completedFuture(false);
         }
         return clanRepository.findById(clanId).thenCompose(clanOptional -> {
@@ -95,6 +97,8 @@ public final class ClanRolePermissionService {
             case ClanPermissionKeys.RECRUIT_LOWER -> flags.recruitLower;
             case ClanPermissionKeys.BANK_DEPOSIT -> flags.bankDeposit;
             case ClanPermissionKeys.BANK_WITHDRAW -> flags.bankWithdraw;
+            case ClanPermissionKeys.CHEST_DEPOSIT -> flags.chestDeposit;
+            case ClanPermissionKeys.CHEST_WITHDRAW -> flags.chestWithdraw;
             default -> false;
         };
     }
@@ -147,6 +151,8 @@ public final class ClanRolePermissionService {
         map.put(ClanPermissionKeys.RECRUIT_LOWER, flags.recruitLower);
         map.put(ClanPermissionKeys.BANK_DEPOSIT, flags.bankDeposit);
         map.put(ClanPermissionKeys.BANK_WITHDRAW, flags.bankWithdraw);
+        map.put(ClanPermissionKeys.CHEST_DEPOSIT, flags.chestDeposit);
+        map.put(ClanPermissionKeys.CHEST_WITHDRAW, flags.chestWithdraw);
         return map;
     }
 

@@ -60,10 +60,6 @@ public final class ClanHubMenu implements InventoryHolder {
         return guiHubConfig.settingsSlot();
     }
 
-    public int slotBanner() {
-        return guiHubConfig.bannerSlot();
-    }
-
     public int slotCreate() {
         return guiHubConfig.createSlot();
     }

@@ -1,0 +1,71 @@
+chest:
+  startup:
+    separator: "=============================="
+    registered: "Модуль кланового сундука подключён"
+    treasury-connected: "Оплата ячеек — из казны клана"
+    leader-wallet: "Казны нет — оплата ячеек с кошелька лидера"
+    economy-missing: "Vault не найден — покупка ячеек недоступна без казны"
+    core-missing: "SoulPact не готов — модуль сундука отключён"
+    database-missing: "База данных SoulPact не готова — модуль сундука отключён"
+  error:
+    not-in-clan: "<#F87171>Вы не состоите в клане."
+    not-leader: "<#F87171>Только лидер может покупать ячейки."
+    max-cells: "<#F87171>Все ячейки уже куплены."
+    failed: "<#F87171>Не удалось выполнить операцию."
+    bank-unavailable: "<#F87171>Модуль казны недоступен."
+    no-access: "<#F87171>У вас нет доступа к клановому сундуку."
+    no-deposit: "<#F87171>У вас нет права класть предметы в сундук."
+    no-withdraw: "<#F87171>У вас нет права брать предметы из сундука."
+  payment:
+    source:
+      treasury: "казна"
+      leader: "кошелёк лидера"
+    insufficient-treasury: "<#F87171>В казне недостаточно средств для покупки ячейки."
+    insufficient-leader: "<#F87171>У лидера недостаточно денег для покупки ячейки."
+    treasury-locked: "<#F87171>Казна заморожена — покупка ячеек недоступна."
+    economy-unavailable: "<#F87171>Экономика недоступна. Нужен Vault или модуль казны."
+  cell:
+    purchased: "<#86EFAC>Куплена ячейка <white>#{cell}</white> за <white>{cost}</white> ({source})."
+  gui:
+    title: "<#581C87><bold>Сундук</bold> <#374151>[{tag}] <#6B7280>стр. {page}"
+    item:
+      buy:
+        name: "<#86EFAC><bold>Купить ячейку</bold>"
+        lore:
+          - "<#9CA3AF>Следующая: <white>#{cell}"
+          - "<#9CA3AF>Цена: <white>{cost}"
+          - "<#9CA3AF>Источник: <white>{source}"
+          - "<#D8B4FE>Нажмите — купить"
+      bank:
+        name: "<#FCD34D>Казна клана"
+        lore:
+          - "<#9CA3AF>Клан: <white>[{tag}]"
+          - "<#D8B4FE>Нажмите — открыть"
+      page:
+        name: "<#9CA3AF>Страница {page}"
+        lore:
+          - "<#9CA3AF>Открыто: <white>{unlocked}<#9CA3AF>/<white>{total}"
+          - "<#D8B4FE>Нажмите — перейти"
+      page-active:
+        name: "<#86EFAC>Страница {page}"
+        lore:
+          - "<#9CA3AF>Открыто: <white>{unlocked}<#9CA3AF>/<white>{total}"
+          - "<#6B7280>Вы здесь"
+      locked:
+        name: "<#F87171>Ячейка #{cell}"
+        lore:
+          - "<#9CA3AF>Заблокировано"
+          - "<#9CA3AF>Цена: <white>{cost}"
+          - "<#6B7280>Лидер может купить"
+      back:
+        name: "<#F87171>Назад"
+        lore:
+          - "<#9CA3AF>В главное меню"
+      prev:
+        name: "<#9CA3AF>← Страница {page}"
+        lore:
+          - "<#D8B4FE>Нажмите — назад"
+      next:
+        name: "<#9CA3AF>Страница {page} →"
+        lore:
+          - "<#D8B4FE>Нажмите — вперёд"

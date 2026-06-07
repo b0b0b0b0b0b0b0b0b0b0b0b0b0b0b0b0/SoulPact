@@ -125,17 +125,13 @@ public final class WorldGuardGateway {
         if (existing == null) {
             throw new IllegalStateException("WorldGuard region missing: " + regionId);
         }
-        Set<UUID> ownerIds = new HashSet<>(existing.getOwners().getUniqueIds());
-        Set<UUID> memberIds = new HashSet<>(existing.getMembers().getUniqueIds());
-        memberIds.removeAll(ownerIds);
-        if (ownerIds.isEmpty()) {
-            throw new IllegalStateException("WorldGuard region has no owner: " + regionId);
-        }
-        UUID ownerId = ownerIds.iterator().next();
-        boolean pvpEnabled = existing.getFlag(Flags.PVP) == StateFlag.State.ALLOW;
-        boolean mobSpawnEnabled = existing.getFlag(Flags.MOB_SPAWNING) != StateFlag.State.DENY;
-        manager.removeRegion(regionId);
-        createRegion(world, regionId, newBounds, ownerId, memberIds, pvpEnabled, mobSpawnEnabled);
+        ProtectedCuboidRegion region = toRegion(regionId, newBounds);
+        region.setPriority(existing.getPriority());
+        region.getOwners().addAll(existing.getOwners());
+        region.getMembers().addAll(existing.getMembers());
+        region.setFlag(Flags.PVP, existing.getFlag(Flags.PVP));
+        region.setFlag(Flags.MOB_SPAWNING, existing.getFlag(Flags.MOB_SPAWNING));
+        manager.addRegion(region);
     }
 
     private RegionManager manager(World world) {

@@ -494,16 +494,22 @@ public final class ClanBaseService {
                         return;
                     }
                     Material material = config.borderColors().resolve(expandedRecord.borderMaterial());
-                    BorderExpansionDelta delta = borderService.expandBorder(
-                            world,
-                            newBounds,
-                            expandedRecord.flagY(),
-                            material,
-                            borderBlocks
-                    );
                     try {
-                        borderService.unregisterBorder(expandedRecord.id(), expandedRecord.world(), delta.removed());
                         worldGuardGateway.resizeRegion(world, expandedRecord.regionName(), newBounds);
+                        BorderExpansionDelta delta = borderService.expandBorder(
+                                world,
+                                newBounds,
+                                expandedRecord.flagY(),
+                                material,
+                                borderBlocks
+                        );
+                        borderService.unregisterBorder(expandedRecord.id(), expandedRecord.world(), delta.removed());
+                        borderService.registerBorder(expandedRecord.id(), expandedRecord.world(), borderBlocks);
+                        sendExpansionSuccess(player, expandedRecord, axis, cost);
+                        if (onComplete != null) {
+                            onComplete.run();
+                        }
+                        List<ClanBaseRepository.BorderBlock> blocksToPersist = List.copyOf(borderBlocks);
                         api.scheduler().runAsync(() -> {
                             repository.updateExtents(
                                     expandedRecord.id(),
@@ -512,32 +518,36 @@ public final class ClanBaseService {
                                     expandedRecord.extentZPos(),
                                     expandedRecord.extentZNeg()
                             );
-                            repository.saveBorderBlocks(expandedRecord.id(), expandedRecord.world(), borderBlocks);
-                        }).thenRun(() -> api.scheduler().runSync(() -> {
-                            if (!player.isOnline()) {
-                                return;
-                            }
-                            borderService.registerBorder(expandedRecord.id(), expandedRecord.world(), delta.added());
-                            Map<String, String> placeholders = Map.of(
-                                    "direction", messages.resolve(player, "land.expansion.direction." + axis.messageKey()),
-                                    "size", String.valueOf(axis.resolvedExtent(expandedRecord, config.baseRadius())),
-                                    "cost", MoneyFormat.format(cost),
-                                    "source", messages.resolve(
-                                            player,
-                                            paymentService.usesTreasury()
-                                                    ? "land.expansion.source.treasury"
-                                                    : "land.expansion.source.leader"
-                                    )
+                            repository.saveBorderBlocks(
+                                    expandedRecord.id(),
+                                    expandedRecord.world(),
+                                    blocksToPersist
                             );
-                            messages.send(player, "land.expansion.success", placeholders);
-                            if (onComplete != null) {
-                                onComplete.run();
-                            }
-                        }));
+                        });
                     } catch (RuntimeException exception) {
                         messages.send(player, "land.error.failed");
                     }
                 }));
+    }
+
+    private void sendExpansionSuccess(
+            Player player,
+            ClanBaseRecord expandedRecord,
+            BaseExpansionAxis axis,
+            double cost
+    ) {
+        Map<String, String> placeholders = Map.of(
+                "direction", messages.resolve(player, "land.expansion.direction." + axis.messageKey()),
+                "size", String.valueOf(axis.resolvedExtent(expandedRecord, config.baseRadius())),
+                "cost", MoneyFormat.format(cost),
+                "source", messages.resolve(
+                        player,
+                        paymentService.usesTreasury()
+                                ? "land.expansion.source.treasury"
+                                : "land.expansion.source.leader"
+                )
+        );
+        messages.send(player, "land.expansion.success", placeholders);
     }
 
     private void notifyPaymentFailure(Player player, ExpansionPaymentResult result) {

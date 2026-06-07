@@ -1,0 +1,11 @@
+name: SoulPact-Chest
+version: '${version}'
+main: bm.b0b0b0.SoulPact.chest.SoulPactChestPlugin
+api-version: '1.21'
+depend: [SoulPact]
+softdepend: [SoulPact-Bank, Vault]
+commands:
+  clanchest:
+    description: Clan shared chest
+    usage: /clanchest
+    aliases: [cchest, chest]

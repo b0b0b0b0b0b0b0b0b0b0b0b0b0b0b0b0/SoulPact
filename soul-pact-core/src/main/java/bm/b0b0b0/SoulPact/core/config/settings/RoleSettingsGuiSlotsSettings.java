@@ -20,6 +20,12 @@ public final class RoleSettingsGuiSlotsSettings {
     @Comment(@CommentValue("Снимать из казны"))
     public int bankWithdraw = 22;
 
+    @Comment(@CommentValue("Класть в клановый сундук"))
+    public int chestDeposit = 29;
+
+    @Comment(@CommentValue("Брать из кланового сундука"))
+    public int chestWithdraw = 33;
+
     @Comment(@CommentValue("Назад"))
     public int back = 31;
 }

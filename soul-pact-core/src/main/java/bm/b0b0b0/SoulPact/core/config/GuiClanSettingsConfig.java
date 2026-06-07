@@ -7,6 +7,7 @@ public final class GuiClanSettingsConfig {
 
     private final int rows;
     private final int backSlot;
+    private final int bannerSlot;
     private final int contentStart;
     private final int contentSize;
     private final Material roleMaterial;
@@ -16,6 +17,7 @@ public final class GuiClanSettingsConfig {
     public GuiClanSettingsConfig(SettingsGuiSettings settings) {
         this.rows = settings.rows;
         this.backSlot = settings.slots.back;
+        this.bannerSlot = settings.slots.banner;
         this.contentStart = 10;
         this.contentSize = Math.max(0, (rows - 2) * 9);
         this.roleMaterial = parseMaterial(settings.materials.role, Material.WRITABLE_BOOK);
@@ -33,6 +35,10 @@ public final class GuiClanSettingsConfig {
 
     public int backSlot() {
         return backSlot;
+    }
+
+    public int bannerSlot() {
+        return bannerSlot;
     }
 
     public int contentStart() {

@@ -109,6 +109,8 @@ clan:
       recruit_lower: "Recruit lower"
       bank_deposit: "Deposit to treasury"
       bank_withdraw: "Withdraw from treasury"
+      chest_deposit: "Deposit to chest"
+      chest_withdraw: "Withdraw from chest"
   banner:
     not-in-clan: "<#F87171>You are not in a clan."
     not-leader: "<#F87171>Only the leader can change the clan banner."
@@ -286,6 +288,11 @@ clan:
           lore:
             - "<#9CA3AF>Role permissions"
             - "<#D8B4FE>Click — open"
+        banner:
+          name: "<#F3F4F6>Clan banner"
+          lore:
+            - "<#9CA3AF>Standard editor"
+            - "<#D8B4FE>Click — open"
         back:
           name: "<#F87171>Back"
           lore:
@@ -350,6 +357,28 @@ clan:
                 - "<#D8B4FE>Click — disable"
             disabled:
               name: "<#6B7280>Withdraw from treasury"
+              lore:
+                - "<#9CA3AF>Status: <#F87171>disabled"
+                - "<#D8B4FE>Click — enable"
+          chest_deposit:
+            enabled:
+              name: "<#86EFAC>Deposit to chest"
+              lore:
+                - "<#9CA3AF>Status: <#86EFAC>enabled"
+                - "<#D8B4FE>Click — disable"
+            disabled:
+              name: "<#6B7280>Deposit to chest"
+              lore:
+                - "<#9CA3AF>Status: <#F87171>disabled"
+                - "<#D8B4FE>Click — enable"
+          chest_withdraw:
+            enabled:
+              name: "<#86EFAC>Withdraw from chest"
+              lore:
+                - "<#9CA3AF>Status: <#86EFAC>enabled"
+                - "<#D8B4FE>Click — disable"
+            disabled:
+              name: "<#6B7280>Withdraw from chest"
               lore:
                 - "<#9CA3AF>Status: <#F87171>disabled"
                 - "<#D8B4FE>Click — enable"

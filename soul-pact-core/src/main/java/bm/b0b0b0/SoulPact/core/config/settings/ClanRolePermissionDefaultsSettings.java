@@ -25,6 +25,8 @@ public final class ClanRolePermissionDefaultsSettings {
         settings.recruitLower = true;
         settings.bankDeposit = true;
         settings.bankWithdraw = true;
+        settings.chestDeposit = true;
+        settings.chestWithdraw = true;
         return settings;
     }
 
@@ -32,12 +34,14 @@ public final class ClanRolePermissionDefaultsSettings {
         ClanRolePermissionFlagsSettings settings = new ClanRolePermissionFlagsSettings();
         settings.accept = true;
         settings.bankDeposit = true;
+        settings.chestDeposit = true;
         return settings;
     }
 
     private static ClanRolePermissionFlagsSettings memberDefaults() {
         ClanRolePermissionFlagsSettings settings = new ClanRolePermissionFlagsSettings();
         settings.bankDeposit = true;
+        settings.chestDeposit = true;
         return settings;
     }
 }

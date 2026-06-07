@@ -9,10 +9,11 @@ public final class HubGuiMaterialsSettings {
     @Comment(@CommentValue("Не используется — голова игрока"))
     public String profile = "PLAYER_HEAD";
     public String settings = "COMPARATOR";
-    public String banner = "WHITE_BANNER";
     public String create = "EMERALD";
     public String help = "BOOK";
-    @Comment(@CommentValue("Иконка модулей (bank, chest...)"))
+    @Comment(@CommentValue("Иконка модулей, если для id нет своей"))
     public String module = "GOLD_INGOT";
+    @Comment(@CommentValue("Иконки модулей по id"))
+    public HubGuiModuleMaterialsSettings modules = new HubGuiModuleMaterialsSettings();
     public String filler = "GRAY_STAINED_GLASS_PANE";
 }

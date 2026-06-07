@@ -368,7 +368,6 @@ public final class SoulPactApplication {
         );
         ClanHubDataService hubDataService = new ClanHubDataService(
                 clanRepository,
-                clanBannerService,
                 clanEconomyMessages,
                 messageService,
                 extensionRegistry
@@ -413,7 +412,11 @@ public final class SoulPactApplication {
                 guiItemBuilder,
                 messageService
         );
-        ClanSettingsDataService settingsDataService = new ClanSettingsDataService(clanRepository, roleThemeService);
+        ClanSettingsDataService settingsDataService = new ClanSettingsDataService(
+                clanRepository,
+                roleThemeService,
+                clanBannerService
+        );
         ClanRoleSettingsDataService roleSettingsDataService = new ClanRoleSettingsDataService(
                 clanRepository,
                 roleThemeService,
@@ -575,7 +578,7 @@ public final class SoulPactApplication {
                 guiOpenService,
                 kickService
         );
-        ClanSettingsClickHandler settingsClickHandler = new ClanSettingsClickHandler(guiOpenService);
+        ClanSettingsClickHandler settingsClickHandler = new ClanSettingsClickHandler(guiOpenService, messageService);
         ClanRoleSettingsClickHandler roleSettingsClickHandler = new ClanRoleSettingsClickHandler(
                 guiOpenService,
                 rolePermissionService

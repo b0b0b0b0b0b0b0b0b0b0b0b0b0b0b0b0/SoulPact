@@ -14,15 +14,12 @@ public final class HubGuiSlotsSettings {
     @Comment(@CommentValue("Настройки клана"))
     public int settings = 24;
 
-    @Comment(@CommentValue("Баннер клана (ряд с профилем)"))
-    public int banner = 20;
-
     @Comment(@CommentValue("Создать клан (под головой игрока)"))
     public int create = 31;
 
     @Comment(@CommentValue("Справка (нижний ряд, справа)"))
     public int help = 49;
 
-    @Comment(@CommentValue("Модули: id:slot через запятую (bank:26,land:25)"))
-    public String modules = "bank:26,land:25";
+    @Comment(@CommentValue("Модули: id:slot (chest:10,land:12,bank:14)"))
+    public String modules = "chest:10,land:12,bank:14";
 }

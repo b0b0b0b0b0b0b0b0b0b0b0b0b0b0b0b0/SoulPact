@@ -45,17 +45,6 @@ public final class ClanHubClickHandler {
             guiOpenService.openSettings(player);
             return;
         }
-        if (slot == menu.slotBanner()) {
-            if (!menu.inClan()) {
-                return;
-            }
-            if (!menu.clanLeader()) {
-                messageService.send(player, "clan.banner.view-only");
-                return;
-            }
-            guiOpenService.openBanner(player);
-            return;
-        }
         if (menu.inClan()) {
             var extension = menu.extensionAtSlot(slot);
             if (extension.isPresent()) {

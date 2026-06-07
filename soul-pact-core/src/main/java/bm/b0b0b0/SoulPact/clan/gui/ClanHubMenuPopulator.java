@@ -62,15 +62,6 @@ public final class ClanHubMenuPopulator {
                     placeholders
             ));
         }
-        if (snapshot.inClan() && snapshot.bannerItem() != null) {
-            inventory.setItem(guiHubConfig.bannerSlot(), guiItemBuilder.buildFromStack(
-                    player,
-                    snapshot.bannerItem(),
-                    "clan.gui.hub.item.banner.name",
-                    "clan.gui.hub.item.banner.lore",
-                    placeholders
-            ));
-        }
         if (snapshot.inClan()) {
             populateModules(inventory, player, moduleLayout);
         }
@@ -99,7 +90,7 @@ public final class ClanHubMenuPopulator {
             List<String> lore = extensionDisplayService.lore(player, extension.id(), displayName);
             inventory.setItem(entry.getKey(), guiItemBuilder.buildNamed(
                     player,
-                    guiHubConfig.moduleMaterial(),
+                    guiHubConfig.moduleMaterial(extension.id()),
                     "clan.gui.extensions.item.entry.name",
                     lore,
                     Map.of(

@@ -1,0 +1,71 @@
+chest:
+  startup:
+    separator: "=============================="
+    registered: "Clan chest module enabled"
+    treasury-connected: "Cell purchases charge clan treasury"
+    leader-wallet: "No treasury — cell purchases charge leader wallet"
+    economy-missing: "Vault missing — cell purchases unavailable without treasury"
+    core-missing: "SoulPact not ready — chest module disabled"
+    database-missing: "SoulPact database not ready — chest module disabled"
+  error:
+    not-in-clan: "<#F87171>You are not in a clan."
+    not-leader: "<#F87171>Only the leader can buy cells."
+    max-cells: "<#F87171>All cells are already unlocked."
+    failed: "<#F87171>Operation failed."
+    bank-unavailable: "<#F87171>Treasury module is unavailable."
+    no-access: "<#F87171>You do not have access to the clan chest."
+    no-deposit: "<#F87171>You cannot deposit items into the chest."
+    no-withdraw: "<#F87171>You cannot withdraw items from the chest."
+  payment:
+    source:
+      treasury: "treasury"
+      leader: "leader wallet"
+    insufficient-treasury: "<#F87171>Not enough funds in treasury for this cell."
+    insufficient-leader: "<#F87171>Leader does not have enough money for this cell."
+    treasury-locked: "<#F87171>Treasury is locked — cell purchases unavailable."
+    economy-unavailable: "<#F87171>Economy unavailable. Vault or treasury module required."
+  cell:
+    purchased: "<#86EFAC>Purchased cell <white>#{cell}</white> for <white>{cost}</white> ({source})."
+  gui:
+    title: "<#581C87><bold>Chest</bold> <#374151>[{tag}] <#6B7280>p. {page}"
+    item:
+      buy:
+        name: "<#86EFAC><bold>Buy cell</bold>"
+        lore:
+          - "<#9CA3AF>Next: <white>#{cell}"
+          - "<#9CA3AF>Cost: <white>{cost}"
+          - "<#9CA3AF>Source: <white>{source}"
+          - "<#D8B4FE>Click to buy"
+      bank:
+        name: "<#FCD34D>Clan treasury"
+        lore:
+          - "<#9CA3AF>Clan: <white>[{tag}]"
+          - "<#D8B4FE>Click to open"
+      page:
+        name: "<#9CA3AF>Page {page}"
+        lore:
+          - "<#9CA3AF>Unlocked: <white>{unlocked}<#9CA3AF>/<white>{total}"
+          - "<#D8B4FE>Click to switch"
+      page-active:
+        name: "<#86EFAC>Page {page}"
+        lore:
+          - "<#9CA3AF>Unlocked: <white>{unlocked}<#9CA3AF>/<white>{total}"
+          - "<#6B7280>Current page"
+      locked:
+        name: "<#F87171>Cell #{cell}"
+        lore:
+          - "<#9CA3AF>Locked"
+          - "<#9CA3AF>Cost: <white>{cost}"
+          - "<#6B7280>Leader can purchase"
+      back:
+        name: "<#F87171>Back"
+        lore:
+          - "<#9CA3AF>Main menu"
+      prev:
+        name: "<#9CA3AF>← Page {page}"
+        lore:
+          - "<#D8B4FE>Click — previous"
+      next:
+        name: "<#9CA3AF>Page {page} →"
+        lore:
+          - "<#D8B4FE>Click — next"

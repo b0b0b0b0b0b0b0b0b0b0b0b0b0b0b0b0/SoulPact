@@ -20,10 +20,12 @@ public final class BaseBorderService {
 
     private final LandConfig config;
     private final BorderBlockIndex borderBlockIndex;
+    private final BorderBlockOccupancyGuard occupancyGuard;
 
     public BaseBorderService(LandConfig config, BorderBlockIndex borderBlockIndex) {
         this.config = config;
         this.borderBlockIndex = borderBlockIndex;
+        this.occupancyGuard = new BorderBlockOccupancyGuard();
     }
 
     public List<ClanBaseRepository.BorderBlock> placeBorder(World world, BaseBounds bounds, int flagY, Material material) {
@@ -110,6 +112,9 @@ public final class BaseBorderService {
             return;
         }
         if (border.getType().name().endsWith("_BANNER")) {
+            return;
+        }
+        if (occupancyGuard.blocksBorderPlacement(border)) {
             return;
         }
         String originalMaterial = border.getType().name();

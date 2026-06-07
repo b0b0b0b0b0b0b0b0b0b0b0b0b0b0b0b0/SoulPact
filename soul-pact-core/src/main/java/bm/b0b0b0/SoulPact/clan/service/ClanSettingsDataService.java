@@ -12,20 +12,26 @@ public final class ClanSettingsDataService {
 
     private final ClanRepository clanRepository;
     private final RoleThemeService roleThemeService;
+    private final ClanBannerService clanBannerService;
 
-    public ClanSettingsDataService(ClanRepository clanRepository, RoleThemeService roleThemeService) {
+    public ClanSettingsDataService(
+            ClanRepository clanRepository,
+            RoleThemeService roleThemeService,
+            ClanBannerService clanBannerService
+    ) {
         this.clanRepository = clanRepository;
         this.roleThemeService = roleThemeService;
+        this.clanBannerService = clanBannerService;
     }
 
     public CompletableFuture<Optional<ClanSettingsSnapshot>> load(Player player) {
-        return clanRepository.findByPlayerId(player.getUniqueId()).thenApply(clanOptional -> {
+        return clanRepository.findByPlayerId(player.getUniqueId()).thenCompose(clanOptional -> {
             if (clanOptional.isEmpty()) {
-                return Optional.empty();
+                return CompletableFuture.completedFuture(Optional.empty());
             }
             var clan = clanOptional.get();
             if (!ClanStaffPermissions.isLeader(clan, player.getUniqueId())) {
-                return Optional.empty();
+                return CompletableFuture.completedFuture(Optional.empty());
             }
             List<String> roleKeys = new ArrayList<>();
             for (String roleKey : roleThemeService.theme().order()) {
@@ -34,7 +40,9 @@ public final class ClanSettingsDataService {
                 }
                 roleKeys.add(roleKey);
             }
-            return Optional.of(new ClanSettingsSnapshot(clan, roleKeys));
+            return clanBannerService.loadBanner(clan.id()).thenApply(banner ->
+                    Optional.of(new ClanSettingsSnapshot(clan, roleKeys, banner))
+            );
         });
     }
 }

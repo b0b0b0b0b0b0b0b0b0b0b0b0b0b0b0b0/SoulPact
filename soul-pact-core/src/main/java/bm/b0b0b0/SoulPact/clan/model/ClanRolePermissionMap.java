@@ -13,7 +13,9 @@ public final class ClanRolePermissionMap {
             ClanPermissionKeys.ACCEPT,
             ClanPermissionKeys.RECRUIT_LOWER,
             ClanPermissionKeys.BANK_DEPOSIT,
-            ClanPermissionKeys.BANK_WITHDRAW
+            ClanPermissionKeys.BANK_WITHDRAW,
+            ClanPermissionKeys.CHEST_DEPOSIT,
+            ClanPermissionKeys.CHEST_WITHDRAW
     );
 
     private final Map<String, Map<String, Boolean>> byRole;

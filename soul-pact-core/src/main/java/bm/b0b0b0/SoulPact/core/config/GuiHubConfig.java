@@ -1,5 +1,6 @@
 package bm.b0b0b0.SoulPact.core.config;
 
+import bm.b0b0b0.SoulPact.core.config.settings.HubGuiModuleMaterialsSettings;
 import bm.b0b0b0.SoulPact.core.config.settings.HubGuiSettings;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -13,17 +14,16 @@ public final class GuiHubConfig {
     private final int overviewSlot;
     private final int profileSlot;
     private final int settingsSlot;
-    private final int bannerSlot;
     private final int createSlot;
     private final int helpSlot;
     private final HubModuleSlotMapping moduleSlotMapping;
     private final Material overviewMaterial;
     private final Material profileMaterial;
     private final Material settingsMaterial;
-    private final Material bannerMaterial;
     private final Material createMaterial;
     private final Material helpMaterial;
     private final Material moduleMaterial;
+    private final Map<String, Material> moduleMaterialsById;
     private final Material fillerMaterial;
 
     public GuiHubConfig(HubGuiSettings settings) {
@@ -31,17 +31,16 @@ public final class GuiHubConfig {
         this.overviewSlot = settings.slots.overview;
         this.profileSlot = settings.slots.profile;
         this.settingsSlot = settings.slots.settings;
-        this.bannerSlot = settings.slots.banner;
         this.createSlot = settings.slots.create;
         this.helpSlot = settings.slots.help;
         this.moduleSlotMapping = parseModuleSlots(settings.slots.modules);
         this.overviewMaterial = parseMaterial(settings.materials.overview, Material.NETHER_STAR);
         this.profileMaterial = parseMaterial(settings.materials.profile, Material.PLAYER_HEAD);
         this.settingsMaterial = parseMaterial(settings.materials.settings, Material.COMPARATOR);
-        this.bannerMaterial = parseMaterial(settings.materials.banner, Material.WHITE_BANNER);
         this.createMaterial = parseMaterial(settings.materials.create, Material.EMERALD);
         this.helpMaterial = parseMaterial(settings.materials.help, Material.BOOK);
         this.moduleMaterial = parseMaterial(settings.materials.module, Material.GOLD_INGOT);
+        this.moduleMaterialsById = parseModuleMaterials(settings.materials.modules, settings.materials.module);
         this.fillerMaterial = parseMaterial(settings.materials.filler, Material.GRAY_STAINED_GLASS_PANE);
     }
 
@@ -63,10 +62,6 @@ public final class GuiHubConfig {
 
     public int settingsSlot() {
         return settingsSlot;
-    }
-
-    public int bannerSlot() {
-        return bannerSlot;
     }
 
     public int createSlot() {
@@ -93,10 +88,6 @@ public final class GuiHubConfig {
         return settingsMaterial;
     }
 
-    public Material bannerMaterial() {
-        return bannerMaterial;
-    }
-
     public Material createMaterial() {
         return createMaterial;
     }
@@ -109,13 +100,45 @@ public final class GuiHubConfig {
         return moduleMaterial;
     }
 
+    public Material moduleMaterial(String extensionId) {
+        if (extensionId == null || extensionId.isBlank()) {
+            return moduleMaterial;
+        }
+        Material mapped = moduleMaterialsById.get(extensionId.toLowerCase());
+        return mapped == null ? moduleMaterial : mapped;
+    }
+
     public Material fillerMaterial() {
         return fillerMaterial;
     }
 
+    private static Map<String, Material> parseModuleMaterials(
+            HubGuiModuleMaterialsSettings settings,
+            String fallbackModuleMaterial
+    ) {
+        Map<String, Material> materials = new LinkedHashMap<>();
+        Material fallback = parseMaterial(fallbackModuleMaterial, Material.GOLD_INGOT);
+        if (settings == null) {
+            return materials;
+        }
+        putModuleMaterial(materials, "bank", settings.bank, fallback);
+        putModuleMaterial(materials, "land", settings.land, fallback);
+        putModuleMaterial(materials, "chest", settings.chest, fallback);
+        return Map.copyOf(materials);
+    }
+
+    private static void putModuleMaterial(
+            Map<String, Material> materials,
+            String extensionId,
+            String rawValue,
+            Material fallback
+    ) {
+        materials.put(extensionId, parseMaterial(rawValue, fallback));
+    }
+
     private static HubModuleSlotMapping parseModuleSlots(String rawValue) {
         if (rawValue == null || rawValue.isBlank()) {
-            return new HubModuleSlotMapping(Map.of("bank", 26, "land", 25), List.of());
+            return new HubModuleSlotMapping(Map.of("chest", 10, "land", 12, "bank", 14), List.of());
         }
         Map<String, Integer> byExtensionId = new LinkedHashMap<>();
         List<Integer> legacyOrderSlots = new ArrayList<>();
@@ -139,7 +162,7 @@ public final class GuiHubConfig {
             }
         }
         if (byExtensionId.isEmpty() && legacyOrderSlots.isEmpty()) {
-            return new HubModuleSlotMapping(Map.of("bank", 26, "land", 25), List.of());
+            return new HubModuleSlotMapping(Map.of("chest", 10, "land", 12, "bank", 14), List.of());
         }
         return new HubModuleSlotMapping(byExtensionId, legacyOrderSlots);
     }

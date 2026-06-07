@@ -29,14 +29,15 @@ public final class ClanSettingsMenuPopulator {
     public Map<Integer, String> populate(Inventory inventory, Player player, ClanSettingsSnapshot snapshot) {
         fillBackground(inventory, player);
         Map<Integer, String> roleSlots = new HashMap<>();
-        int index = 0;
+        int slotIndex = 0;
         for (String roleKey : snapshot.roleKeys()) {
-            if (index >= config.contentSize()) {
+            int slot = nextRoleSlot(slotIndex);
+            if (slot < 0) {
                 break;
             }
+            slotIndex = slot - config.contentStart() + 1;
             RoleDefinition roleDefinition = roleThemeService.theme().definition(roleKey);
             String roleTitle = roleDefinition == null ? roleKey : roleDefinition.title();
-            int slot = config.contentSlot(index);
             inventory.setItem(slot, guiItemBuilder.build(
                     player,
                     config.roleMaterial(),
@@ -45,7 +46,14 @@ public final class ClanSettingsMenuPopulator {
                     Map.of("role", roleTitle)
             ));
             roleSlots.put(slot, roleKey);
-            index++;
+        }
+        if (snapshot.bannerItem() != null) {
+            inventory.setItem(config.bannerSlot(), guiItemBuilder.buildFromStack(
+                    player,
+                    snapshot.bannerItem(),
+                    "clan.gui.settings.item.banner.name",
+                    "clan.gui.settings.item.banner.lore"
+            ));
         }
         inventory.setItem(config.backSlot(), guiItemBuilder.build(
                 player,
@@ -54,6 +62,16 @@ public final class ClanSettingsMenuPopulator {
                 "clan.gui.settings.item.back.lore"
         ));
         return roleSlots;
+    }
+
+    private int nextRoleSlot(int startIndex) {
+        for (int index = startIndex; index < config.contentSize(); index++) {
+            int slot = config.contentSlot(index);
+            if (slot != config.bannerSlot()) {
+                return slot;
+            }
+        }
+        return -1;
     }
 
     private void fillBackground(Inventory inventory, Player player) {
