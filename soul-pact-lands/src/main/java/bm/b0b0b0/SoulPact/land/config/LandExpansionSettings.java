@@ -7,7 +7,10 @@ public record LandExpansionSettings(
         double costPerBlock
 ) {
     public double costForExtent(int currentExtent, int defaultRadius) {
-        int bonusLevels = Math.max(0, currentExtent - defaultRadius + step);
-        return baseCost + costPerBlock * bonusLevels;
+        if (currentExtent < defaultRadius) {
+            currentExtent = defaultRadius;
+        }
+        int tier = Math.max(0, (currentExtent - defaultRadius) / step);
+        return baseCost + costPerBlock * tier;
     }
 }

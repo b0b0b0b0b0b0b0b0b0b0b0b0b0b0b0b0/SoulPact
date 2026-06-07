@@ -37,6 +37,7 @@ public final class ClanBaseService {
     private final WorldGuardGateway worldGuardGateway;
     private final BaseBorderService borderService;
     private final BaseExpansionPaymentService paymentService;
+    private final BaseFlagIndex flagIndex;
 
     public ClanBaseService(
             SoulPactApi api,
@@ -46,7 +47,8 @@ public final class ClanBaseService {
             SqlClanMemberUuidRepository memberRepository,
             WorldGuardGateway worldGuardGateway,
             BaseBorderService borderService,
-            BaseExpansionPaymentService paymentService
+            BaseExpansionPaymentService paymentService,
+            BaseFlagIndex flagIndex
     ) {
         this.api = api;
         this.config = config;
@@ -56,198 +58,243 @@ public final class ClanBaseService {
         this.worldGuardGateway = worldGuardGateway;
         this.borderService = borderService;
         this.paymentService = paymentService;
+        this.flagIndex = flagIndex;
     }
 
     public CompletableFuture<Optional<ClanBaseSnapshot>> findBase(long clanId) {
-        return CompletableFuture.supplyAsync(() -> repository.findByClanId(clanId).map(ClanBaseRecord::toSnapshot));
+        return api.scheduler().supplyAsync(() -> repository.findByClanId(clanId).map(ClanBaseRecord::toSnapshot));
     }
 
     public CompletableFuture<Optional<ClanBaseRecord>> findBaseRecord(long clanId) {
-        return CompletableFuture.supplyAsync(() -> repository.findByClanId(clanId));
+        return api.scheduler().supplyAsync(() -> repository.findByClanId(clanId));
     }
 
-    public Optional<BaseSetupFailure> validateFlagPlacement(Player player, ClanSnapshot clan, Location location) {
-        if (!clan.leaderId().equals(player.getUniqueId())) {
-            return Optional.of(BaseSetupFailure.NOT_LEADER);
+    public CompletableFuture<Optional<ClanBaseRecord>> findBaseAtFlag(Location location) {
+        if (location.getWorld() == null) {
+            return CompletableFuture.completedFuture(Optional.empty());
         }
-        if (repository.findByClanId(clan.id()).isPresent()) {
-            return Optional.of(BaseSetupFailure.ALREADY_EXISTS);
+        return api.scheduler().supplyAsync(() -> repository.findByFlag(
+                location.getWorld().getName(),
+                location.getBlockX(),
+                location.getBlockY(),
+                location.getBlockZ()
+        ));
+    }
+
+    public CompletableFuture<Optional<BaseSetupFailure>> validateFlagPlacementAsync(
+            Player player,
+            ClanSnapshot clan,
+            Location location
+    ) {
+        if (!clan.leaderId().equals(player.getUniqueId())) {
+            return CompletableFuture.completedFuture(Optional.of(BaseSetupFailure.NOT_LEADER));
+        }
+        World world = location.getWorld();
+        if (world == null) {
+            return CompletableFuture.completedFuture(Optional.of(BaseSetupFailure.WORLD_BLOCKED));
         }
         if (!worldGuardGateway.available()) {
-            return Optional.of(BaseSetupFailure.WORLDGUARD_MISSING);
+            return CompletableFuture.completedFuture(Optional.of(BaseSetupFailure.WORLDGUARD_MISSING));
         }
+        String worldName = world.getName();
         BaseBounds bounds = boundsAt(location);
-        if (conflictsWithStoredBases(location.getWorld().getName(), bounds, clan.id())) {
-            return Optional.of(BaseSetupFailure.TOO_CLOSE);
-        }
-        String regionName = BaseRegionNames.forClan(clan.id());
-        if (worldGuardGateway.hasConflict(location.getWorld(), bounds, config.regionBuffer(), regionName)) {
-            return Optional.of(BaseSetupFailure.TOO_CLOSE);
-        }
-        return Optional.empty();
+        int minHeight = world.getMinHeight();
+        int maxHeight = world.getMaxHeight();
+        return api.scheduler().supplyAsync(() -> {
+            if (repository.findByClanId(clan.id()).isPresent()) {
+                return Optional.of(BaseSetupFailure.ALREADY_EXISTS);
+            }
+            if (conflictsWithStoredBases(worldName, bounds, clan.id(), minHeight, maxHeight)) {
+                return Optional.of(BaseSetupFailure.TOO_CLOSE);
+            }
+            return Optional.<BaseSetupFailure>empty();
+        }).thenCompose(dbFailure -> {
+            if (dbFailure.isPresent()) {
+                return CompletableFuture.completedFuture(dbFailure);
+            }
+            CompletableFuture<Optional<BaseSetupFailure>> worldGuardCheck = new CompletableFuture<>();
+            api.scheduler().runSync(() -> {
+                String regionName = BaseRegionNames.forClan(clan.id());
+                if (worldGuardGateway.hasConflict(world, bounds, config.regionBuffer(), regionName)) {
+                    worldGuardCheck.complete(Optional.of(BaseSetupFailure.TOO_CLOSE));
+                    return;
+                }
+                worldGuardCheck.complete(Optional.empty());
+            });
+            return worldGuardCheck;
+        });
     }
 
-    public Optional<ClanBaseRecord> createBase(Player player, ClanSnapshot clan, Location flagLocation) {
-        Optional<BaseSetupFailure> failure = validateFlagPlacement(player, clan, flagLocation);
-        if (failure.isPresent()) {
-            notifyFailure(player, failure.get());
-            return Optional.empty();
-        }
-        World world = flagLocation.getWorld();
-        BaseBounds bounds = boundsAt(flagLocation);
-        String regionName = BaseRegionNames.forClan(clan.id());
-        Set<UUID> memberIds = new LinkedHashSet<>(memberRepository.findMemberIds(clan.id()));
-        memberIds.remove(clan.leaderId());
-        try {
-            worldGuardGateway.createRegion(world, regionName, bounds, clan.leaderId(), memberIds, false, true);
-            List<ClanBaseRepository.BorderBlock> borderBlocks = borderService.placeBorder(
-                    world,
-                    bounds,
-                    flagLocation.getBlockY(),
-                    config.borderMaterial()
-            );
-            ClanBaseRecord saved = repository.insert(new ClanBaseRecord(
-                    0L,
-                    clan.id(),
-                    regionName,
-                    world.getName(),
-                    flagLocation.getBlockX(),
-                    flagLocation.getBlockY(),
-                    flagLocation.getBlockZ(),
-                    config.borderMaterial().name(),
-                    config.baseRadius(),
-                    config.baseRadius(),
-                    config.baseRadius(),
-                    config.baseRadius(),
-                    false,
-                    true,
-                    System.currentTimeMillis()
-            ));
-            repository.saveBorderBlocks(saved.id(), world.getName(), borderBlocks);
-            borderService.registerBorder(saved.id(), world.getName(), borderBlocks);
-            messages.send(player, "land.base.created", java.util.Map.of(
-                    "tag", clan.tag(),
-                    "region", regionName
-            ));
-            return Optional.of(saved);
-        } catch (RuntimeException exception) {
-            worldGuardGateway.removeRegion(world, regionName);
-            messages.send(player, "land.error.failed");
-            return Optional.empty();
-        }
-    }
-
-    public boolean destroyBaseAtFlag(org.bukkit.Location location) {
-        Optional<ClanBaseRecord> baseOptional = repository.findByFlag(
-                location.getWorld().getName(),
-                location.getBlockX(),
-                location.getBlockY(),
-                location.getBlockZ()
+    public void createBaseAsync(
+            Player player,
+            ClanSnapshot clan,
+            Location flagLocation,
+            UUID standardUid,
+            Runnable onFailure
+    ) {
+        validateFlagPlacementAsync(player, clan, flagLocation).thenAccept(failureOptional ->
+                api.scheduler().runSync(() -> {
+                    if (!player.isOnline()) {
+                        return;
+                    }
+                    if (failureOptional.isPresent()) {
+                        notifyFailure(player, failureOptional.get());
+                        onFailure.run();
+                        return;
+                    }
+                    api.scheduler().supplyAsync(() -> memberRepository.findMemberIds(clan.id()))
+                            .thenAccept(memberIds -> api.scheduler().runSync(() -> {
+                                if (!player.isOnline()) {
+                                    return;
+                                }
+                                persistNewBase(player, clan, flagLocation, standardUid, memberIds, onFailure);
+                            }));
+                })
         );
-        if (baseOptional.isEmpty()) {
-            return false;
-        }
-        destroyBase(baseOptional.get());
-        return true;
-    }
-
-    public boolean isBaseFlag(org.bukkit.Location location) {
-        return repository.findByFlag(
-                location.getWorld().getName(),
-                location.getBlockX(),
-                location.getBlockY(),
-                location.getBlockZ()
-        ).isPresent();
     }
 
     public void destroyBase(ClanBaseRecord base) {
-        World world = api.plugin().getServer().getWorld(base.world());
-        if (world == null) {
-            repository.delete(base.id());
-            return;
-        }
-        List<ClanBaseRepository.BorderBlock> borderBlocks = repository.findBorderBlocks(base.id());
-        borderService.unregisterBorder(base.id(), base.world(), borderBlocks);
-        borderService.restoreBorder(world, borderBlocks);
-        worldGuardGateway.removeRegion(world, base.regionName());
-        repository.delete(base.id());
+        destroyBase(base, null);
+    }
+
+    public void destroyBase(ClanBaseRecord base, Runnable onComplete) {
+        api.scheduler().supplyAsync(() -> repository.findBorderBlocks(base.id()))
+                .thenAccept(borderBlocks -> api.scheduler().runSync(() -> {
+                    flagIndex.unregister(base);
+                    World world = api.plugin().getServer().getWorld(base.world());
+                    if (world != null) {
+                        borderService.unregisterBorder(base.id(), base.world(), borderBlocks);
+                        borderService.restoreBorder(world, borderBlocks);
+                        worldGuardGateway.removeRegion(world, base.regionName());
+                    }
+                    api.clanStandard().clearDeployed(base.clanId());
+                    api.scheduler().runAsync(() -> repository.delete(base.id()))
+                            .thenRun(() -> {
+                                if (onComplete != null) {
+                                    api.scheduler().runSync(onComplete);
+                                }
+                            });
+                }));
+    }
+
+    public void reconcileDeployedFlags() {
+        api.scheduler().supplyAsync(repository::findAll)
+                .thenAccept(bases -> api.scheduler().runSync(() -> {
+                    for (ClanBaseRecord base : bases) {
+                        reconcileOneBase(base);
+                    }
+                }));
     }
 
     public void addMemberToRegion(long clanId, UUID playerId) {
-        repository.findByClanId(clanId).ifPresent(base -> {
-            World world = api.plugin().getServer().getWorld(base.world());
-            if (world == null) {
-                return;
-            }
-            worldGuardGateway.addMember(world, base.regionName(), playerId);
-        });
+        api.scheduler().supplyAsync(() -> repository.findByClanId(clanId))
+                .thenAccept(baseOptional -> api.scheduler().runSync(() ->
+                        baseOptional.ifPresent(base -> {
+                            World world = api.plugin().getServer().getWorld(base.world());
+                            if (world == null) {
+                                return;
+                            }
+                            worldGuardGateway.addMember(world, base.regionName(), playerId);
+                        })
+                ));
     }
 
     public void removeMemberFromRegion(long clanId, UUID playerId) {
-        repository.findByClanId(clanId).ifPresent(base -> {
-            World world = api.plugin().getServer().getWorld(base.world());
-            if (world == null) {
-                return;
-            }
-            worldGuardGateway.removeMember(world, base.regionName(), playerId);
-        });
+        api.scheduler().supplyAsync(() -> repository.findByClanId(clanId))
+                .thenAccept(baseOptional -> api.scheduler().runSync(() ->
+                        baseOptional.ifPresent(base -> {
+                            World world = api.plugin().getServer().getWorld(base.world());
+                            if (world == null) {
+                                return;
+                            }
+                            worldGuardGateway.removeMember(world, base.regionName(), playerId);
+                        })
+                ));
     }
 
     public void transferRegionOwnership(long clanId, UUID previousLeaderId, UUID newLeaderId) {
-        repository.findByClanId(clanId).ifPresent(base -> {
-            World world = api.plugin().getServer().getWorld(base.world());
-            if (world == null) {
-                return;
-            }
-            worldGuardGateway.transferOwnership(world, base.regionName(), previousLeaderId, newLeaderId);
-        });
+        api.scheduler().supplyAsync(() -> repository.findByClanId(clanId))
+                .thenAccept(baseOptional -> api.scheduler().runSync(() ->
+                        baseOptional.ifPresent(base -> {
+                            World world = api.plugin().getServer().getWorld(base.world());
+                            if (world == null) {
+                                return;
+                            }
+                            worldGuardGateway.transferOwnership(world, base.regionName(), previousLeaderId, newLeaderId);
+                        })
+                ));
     }
 
-    public void togglePvp(Player player, ClanSnapshot clan, ClanBaseRecord base) {
+    public void togglePvp(Player player, ClanSnapshot clan, ClanBaseRecord base, Runnable onComplete) {
         if (!clan.leaderId().equals(player.getUniqueId())) {
             messages.send(player, "land.error.not-leader");
             return;
         }
         boolean next = !base.pvpEnabled();
-        repository.updatePvp(base.id(), next);
-        World world = api.plugin().getServer().getWorld(base.world());
-        if (world != null) {
-            worldGuardGateway.applyFlags(world, base.regionName(), next, base.mobSpawnEnabled());
-        }
-        messages.send(player, next ? "land.settings.pvp-enabled" : "land.settings.pvp-disabled");
+        api.scheduler().runAsync(() -> repository.updatePvp(base.id(), next))
+                .thenRun(() -> api.scheduler().runSync(() -> {
+                    if (!player.isOnline()) {
+                        return;
+                    }
+                    World world = api.plugin().getServer().getWorld(base.world());
+                    if (world != null) {
+                        worldGuardGateway.applyFlags(world, base.regionName(), next, base.mobSpawnEnabled());
+                    }
+                    messages.send(player, next ? "land.settings.pvp-enabled" : "land.settings.pvp-disabled");
+                    if (onComplete != null) {
+                        onComplete.run();
+                    }
+                }));
     }
 
-    public void toggleMobSpawn(Player player, ClanSnapshot clan, ClanBaseRecord base) {
+    public void toggleMobSpawn(Player player, ClanSnapshot clan, ClanBaseRecord base, Runnable onComplete) {
         if (!clan.leaderId().equals(player.getUniqueId())) {
             messages.send(player, "land.error.not-leader");
             return;
         }
         boolean next = !base.mobSpawnEnabled();
-        repository.updateMobSpawn(base.id(), next);
-        World world = api.plugin().getServer().getWorld(base.world());
-        if (world != null) {
-            worldGuardGateway.applyFlags(world, base.regionName(), base.pvpEnabled(), next);
-        }
-        messages.send(player, next ? "land.settings.mob-enabled" : "land.settings.mob-disabled");
+        api.scheduler().runAsync(() -> repository.updateMobSpawn(base.id(), next))
+                .thenRun(() -> api.scheduler().runSync(() -> {
+                    if (!player.isOnline()) {
+                        return;
+                    }
+                    World world = api.plugin().getServer().getWorld(base.world());
+                    if (world != null) {
+                        worldGuardGateway.applyFlags(world, base.regionName(), base.pvpEnabled(), next);
+                    }
+                    messages.send(player, next ? "land.settings.mob-enabled" : "land.settings.mob-disabled");
+                    if (onComplete != null) {
+                        onComplete.run();
+                    }
+                }));
     }
 
-    public void cycleBorderColor(Player player, ClanSnapshot clan, ClanBaseRecord base) {
+    public void cycleBorderColor(Player player, ClanSnapshot clan, ClanBaseRecord base, Runnable onComplete) {
         if (!clan.leaderId().equals(player.getUniqueId())) {
             messages.send(player, "land.error.not-leader");
             return;
         }
         Material current = config.borderColors().resolve(base.borderMaterial());
         Material next = config.borderColors().next(current);
-        repository.updateBorderMaterial(base.id(), next.name());
-        World world = api.plugin().getServer().getWorld(base.world());
-        if (world != null) {
-            List<ClanBaseRepository.BorderBlock> borderBlocks = repository.findBorderBlocks(base.id());
-            borderService.applyBorderColor(world, borderBlocks, next);
-        }
-        messages.send(player, "land.settings.border-color-changed", Map.of(
-                "color",
-                messages.resolve(player, "land.gui.border-colors." + config.borderColors().displayKey(next))
-        ));
+        api.scheduler().supplyAsync(() -> {
+            repository.updateBorderMaterial(base.id(), next.name());
+            return repository.findBorderBlocks(base.id());
+        }).thenAccept(borderBlocks -> api.scheduler().runSync(() -> {
+            if (!player.isOnline()) {
+                return;
+            }
+            World world = api.plugin().getServer().getWorld(base.world());
+            if (world != null) {
+                borderService.applyBorderColor(world, borderBlocks, next);
+            }
+            messages.send(player, "land.settings.border-color-changed", Map.of(
+                    "color",
+                    messages.resolve(player, "land.gui.border-colors." + config.borderColors().displayKey(next))
+            ));
+            if (onComplete != null) {
+                onComplete.run();
+            }
+        }));
     }
 
     public void expandBase(Player player, ClanSnapshot clan, ClanBaseRecord base, BaseExpansionAxis axis, Runnable onComplete) {
@@ -272,24 +319,33 @@ public final class ClanBaseService {
         ClanBaseRecord expandedRecord = axis.withExtent(base, nextExtent, config.baseRadius());
         BaseBounds newBounds = expandedRecord.bounds(config.baseRadius(), world.getMinHeight(), world.getMaxHeight());
         BaseBounds strip = axis.expansionStrip(oldBounds, newBounds);
-        if (conflictsWithStoredBases(base.world(), strip, clan.id())
-                || worldGuardGateway.hasConflict(world, strip, config.regionBuffer(), base.regionName())) {
-            messages.send(player, "land.error.too-close", Map.of("buffer", String.valueOf(config.regionBuffer())));
-            return;
-        }
+        int minHeight = world.getMinHeight();
+        int maxHeight = world.getMaxHeight();
         double cost = config.expansion().costForExtent(currentExtent, config.baseRadius());
-        paymentService.charge(player, clan.id(), cost).thenAccept(paymentResult -> api.scheduler().runSync(() -> {
+        api.scheduler().supplyAsync(() -> conflictsWithStoredBases(
+                base.world(),
+                strip,
+                clan.id(),
+                minHeight,
+                maxHeight
+        )).thenAccept(storedConflict -> api.scheduler().runSync(() -> {
             if (!player.isOnline()) {
                 return;
             }
-            if (paymentResult != ExpansionPaymentResult.SUCCESS) {
-                notifyPaymentFailure(player, paymentResult);
+            if (storedConflict || worldGuardGateway.hasConflict(world, strip, config.regionBuffer(), base.regionName())) {
+                messages.send(player, "land.error.too-close", Map.of("buffer", String.valueOf(config.regionBuffer())));
                 return;
             }
-            applyExpansion(player, expandedRecord, axis, oldBounds, newBounds, world, cost);
-            if (onComplete != null) {
-                onComplete.run();
-            }
+            paymentService.charge(player, clan.id(), cost).thenAccept(paymentResult -> api.scheduler().runSync(() -> {
+                if (!player.isOnline()) {
+                    return;
+                }
+                if (paymentResult != ExpansionPaymentResult.SUCCESS) {
+                    notifyPaymentFailure(player, paymentResult);
+                    return;
+                }
+                applyExpansion(player, expandedRecord, axis, oldBounds, newBounds, world, cost, onComplete);
+            }));
         }));
     }
 
@@ -302,6 +358,126 @@ public final class ClanBaseService {
         return paymentService.usesTreasury();
     }
 
+    public void notifyFailure(Player player, BaseSetupFailure failure) {
+        String key = switch (failure) {
+            case NOT_LEADER -> "land.error.not-leader";
+            case ALREADY_EXISTS -> "land.error.already-exists";
+            case WORLDGUARD_MISSING -> "land.error.worldguard-missing";
+            case WORLD_BLOCKED -> "land.error.failed";
+            case TOO_CLOSE -> "land.error.too-close";
+            case DATABASE_ERROR -> "land.error.failed";
+        };
+        if (failure == BaseSetupFailure.TOO_CLOSE) {
+            messages.send(player, key, Map.of("buffer", String.valueOf(config.regionBuffer())));
+            return;
+        }
+        messages.send(player, key);
+    }
+
+    private void persistNewBase(
+            Player player,
+            ClanSnapshot clan,
+            Location flagLocation,
+            UUID standardUid,
+            List<UUID> memberIds,
+            Runnable onFailure
+    ) {
+        World world = flagLocation.getWorld();
+        BaseBounds bounds = boundsAt(flagLocation);
+        String regionName = BaseRegionNames.forClan(clan.id());
+        Set<UUID> regionMembers = new LinkedHashSet<>(memberIds);
+        regionMembers.remove(clan.leaderId());
+        try {
+            worldGuardGateway.createRegion(world, regionName, bounds, clan.leaderId(), regionMembers, false, true);
+            List<ClanBaseRepository.BorderBlock> borderBlocks = borderService.placeBorder(
+                    world,
+                    bounds,
+                    flagLocation.getBlockY(),
+                    config.borderMaterial()
+            );
+            api.scheduler().supplyAsync(() -> {
+                ClanBaseRecord saved = repository.insert(new ClanBaseRecord(
+                        0L,
+                        clan.id(),
+                        regionName,
+                        world.getName(),
+                        flagLocation.getBlockX(),
+                        flagLocation.getBlockY(),
+                        flagLocation.getBlockZ(),
+                        config.borderMaterial().name(),
+                        config.baseRadius(),
+                        config.baseRadius(),
+                        config.baseRadius(),
+                        config.baseRadius(),
+                        standardUid.toString(),
+                        false,
+                        true,
+                        System.currentTimeMillis()
+                ));
+                repository.saveBorderBlocks(saved.id(), world.getName(), borderBlocks);
+                return saved;
+            }).thenAccept(saved -> api.scheduler().runSync(() -> {
+                if (!player.isOnline()) {
+                    return;
+                }
+                flagIndex.register(saved);
+                borderService.registerBorder(saved.id(), world.getName(), borderBlocks);
+                api.clanStandard().stampBlock(
+                        flagLocation.getBlock().getState(),
+                        clan.id(),
+                        clan.tag(),
+                        standardUid
+                );
+                api.clanStandard().trackDeployedBlock(clan.id(), flagLocation);
+                messages.send(player, "land.base.created", Map.of(
+                        "tag", clan.tag(),
+                        "region", regionName
+                ));
+            })).exceptionally(error -> {
+                api.scheduler().runSync(() -> {
+                    worldGuardGateway.removeRegion(world, regionName);
+                    borderService.restoreBorder(world, borderBlocks);
+                    messages.send(player, "land.error.failed");
+                    onFailure.run();
+                });
+                return null;
+            });
+        } catch (RuntimeException exception) {
+            worldGuardGateway.removeRegion(world, regionName);
+            messages.send(player, "land.error.failed");
+            onFailure.run();
+        }
+    }
+
+    private void reconcileOneBase(ClanBaseRecord base) {
+        World world = api.plugin().getServer().getWorld(base.world());
+        if (world == null) {
+            return;
+        }
+        org.bukkit.block.Block block = world.getBlockAt(base.flagX(), base.flagY(), base.flagZ());
+        if (!block.getType().name().endsWith("_BANNER")) {
+            destroyBase(base);
+            return;
+        }
+        UUID standardUid = base.parsedStandardUid();
+        if (standardUid == null) {
+            standardUid = UUID.randomUUID();
+            UUID resolvedUid = standardUid;
+            api.scheduler().runAsync(() -> repository.updateStandardUid(base.id(), resolvedUid.toString()));
+        }
+        String clanTag = clanStandardTag(base, block);
+        api.clanStandard().stampBlock(block.getState(), base.clanId(), clanTag, standardUid);
+        api.clanStandard().trackDeployedBlock(base.clanId(), block.getLocation());
+    }
+
+    private String clanStandardTag(ClanBaseRecord base, org.bukkit.block.Block block) {
+        String tagFromBlock = api.clanStandard().readClanTagFromBlock(block.getState());
+        if (tagFromBlock != null && !tagFromBlock.isBlank()) {
+            return tagFromBlock;
+        }
+        return String.valueOf(base.clanId());
+    }
+
     private void applyExpansion(
             Player player,
             ClanBaseRecord expandedRecord,
@@ -309,46 +485,59 @@ public final class ClanBaseService {
             BaseBounds oldBounds,
             BaseBounds newBounds,
             World world,
-            double cost
+            double cost,
+            Runnable onComplete
     ) {
-        List<ClanBaseRepository.BorderBlock> borderBlocks = new ArrayList<>(repository.findBorderBlocks(expandedRecord.id()));
-        Material material = config.borderColors().resolve(expandedRecord.borderMaterial());
-        BorderExpansionDelta delta = borderService.expandBorder(
-                world,
-                oldBounds,
-                newBounds,
-                axis,
-                expandedRecord.flagY(),
-                material,
-                borderBlocks
-        );
-        try {
-            borderService.unregisterBorder(expandedRecord.id(), expandedRecord.world(), delta.removed());
-            worldGuardGateway.resizeRegion(world, expandedRecord.regionName(), newBounds);
-            repository.updateExtents(
-                    expandedRecord.id(),
-                    expandedRecord.extentXPos(),
-                    expandedRecord.extentXNeg(),
-                    expandedRecord.extentZPos(),
-                    expandedRecord.extentZNeg()
-            );
-            repository.saveBorderBlocks(expandedRecord.id(), expandedRecord.world(), borderBlocks);
-            borderService.registerBorder(expandedRecord.id(), expandedRecord.world(), delta.added());
-            Map<String, String> placeholders = Map.of(
-                    "direction", messages.resolve(player, "land.expansion.direction." + axis.messageKey()),
-                    "size", String.valueOf(axis.resolvedExtent(expandedRecord, config.baseRadius())),
-                    "cost", MoneyFormat.format(cost),
-                    "source", messages.resolve(
-                            player,
-                            paymentService.usesTreasury()
-                                    ? "land.expansion.source.treasury"
-                                    : "land.expansion.source.leader"
-                    )
-            );
-            messages.send(player, "land.expansion.success", placeholders);
-        } catch (RuntimeException exception) {
-            messages.send(player, "land.error.failed");
-        }
+        api.scheduler().supplyAsync(() -> new ArrayList<>(repository.findBorderBlocks(expandedRecord.id())))
+                .thenAccept(borderBlocks -> api.scheduler().runSync(() -> {
+                    if (!player.isOnline()) {
+                        return;
+                    }
+                    Material material = config.borderColors().resolve(expandedRecord.borderMaterial());
+                    BorderExpansionDelta delta = borderService.expandBorder(
+                            world,
+                            newBounds,
+                            expandedRecord.flagY(),
+                            material,
+                            borderBlocks
+                    );
+                    try {
+                        borderService.unregisterBorder(expandedRecord.id(), expandedRecord.world(), delta.removed());
+                        worldGuardGateway.resizeRegion(world, expandedRecord.regionName(), newBounds);
+                        api.scheduler().runAsync(() -> {
+                            repository.updateExtents(
+                                    expandedRecord.id(),
+                                    expandedRecord.extentXPos(),
+                                    expandedRecord.extentXNeg(),
+                                    expandedRecord.extentZPos(),
+                                    expandedRecord.extentZNeg()
+                            );
+                            repository.saveBorderBlocks(expandedRecord.id(), expandedRecord.world(), borderBlocks);
+                        }).thenRun(() -> api.scheduler().runSync(() -> {
+                            if (!player.isOnline()) {
+                                return;
+                            }
+                            borderService.registerBorder(expandedRecord.id(), expandedRecord.world(), delta.added());
+                            Map<String, String> placeholders = Map.of(
+                                    "direction", messages.resolve(player, "land.expansion.direction." + axis.messageKey()),
+                                    "size", String.valueOf(axis.resolvedExtent(expandedRecord, config.baseRadius())),
+                                    "cost", MoneyFormat.format(cost),
+                                    "source", messages.resolve(
+                                            player,
+                                            paymentService.usesTreasury()
+                                                    ? "land.expansion.source.treasury"
+                                                    : "land.expansion.source.leader"
+                                    )
+                            );
+                            messages.send(player, "land.expansion.success", placeholders);
+                            if (onComplete != null) {
+                                onComplete.run();
+                            }
+                        }));
+                    } catch (RuntimeException exception) {
+                        messages.send(player, "land.error.failed");
+                    }
+                }));
     }
 
     private void notifyPaymentFailure(Player player, ExpansionPaymentResult result) {
@@ -375,16 +564,18 @@ public final class ClanBaseService {
         );
     }
 
-    private boolean conflictsWithStoredBases(String worldName, BaseBounds bounds, long ignoredClanId) {
+    private boolean conflictsWithStoredBases(
+            String worldName,
+            BaseBounds bounds,
+            long ignoredClanId,
+            int minHeight,
+            int maxHeight
+    ) {
         for (ClanBaseRecord existing : repository.findAllInWorld(worldName)) {
             if (existing.clanId() == ignoredClanId) {
                 continue;
             }
-            World world = api.plugin().getServer().getWorld(worldName);
-            if (world == null) {
-                continue;
-            }
-            BaseBounds other = existing.bounds(config.baseRadius(), world.getMinHeight(), world.getMaxHeight());
+            BaseBounds other = existing.bounds(config.baseRadius(), minHeight, maxHeight);
             if (overlapsXZ(bounds, other, config.regionBuffer())) {
                 return true;
             }
@@ -397,21 +588,5 @@ public final class ClanBaseService {
                 && first.maxX() + buffer >= second.minX() - buffer
                 && first.minZ() - buffer <= second.maxZ() + buffer
                 && first.maxZ() + buffer >= second.minZ() - buffer;
-    }
-
-    public void notifyFailure(Player player, BaseSetupFailure failure) {
-        String key = switch (failure) {
-            case NOT_LEADER -> "land.error.not-leader";
-            case ALREADY_EXISTS -> "land.error.already-exists";
-            case WORLDGUARD_MISSING -> "land.error.worldguard-missing";
-            case WORLD_BLOCKED -> "land.error.failed";
-            case TOO_CLOSE -> "land.error.too-close";
-            case DATABASE_ERROR -> "land.error.failed";
-        };
-        if (failure == BaseSetupFailure.TOO_CLOSE) {
-            messages.send(player, key, java.util.Map.of("buffer", String.valueOf(config.regionBuffer())));
-            return;
-        }
-        messages.send(player, key);
     }
 }

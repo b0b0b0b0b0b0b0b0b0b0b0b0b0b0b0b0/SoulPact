@@ -3,11 +3,9 @@ package bm.b0b0b0.SoulPact.land.service;
 import bm.b0b0b0.SoulPact.land.config.BorderColorPalette;
 import bm.b0b0b0.SoulPact.land.config.LandConfig;
 import bm.b0b0b0.SoulPact.land.model.BaseBounds;
-import bm.b0b0b0.SoulPact.land.model.BaseExpansionAxis;
 import bm.b0b0b0.SoulPact.land.repository.ClanBaseRepository;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -77,81 +75,17 @@ public final class BaseBorderService {
 
     public BorderExpansionDelta expandBorder(
             World world,
-            BaseBounds oldBounds,
             BaseBounds newBounds,
-            BaseExpansionAxis axis,
             int flagY,
             Material material,
             List<ClanBaseRepository.BorderBlock> knownBlocks
     ) {
-        List<ClanBaseRepository.BorderBlock> removed = new ArrayList<>();
-        Iterator<ClanBaseRepository.BorderBlock> iterator = knownBlocks.iterator();
-        while (iterator.hasNext()) {
-            ClanBaseRepository.BorderBlock block = iterator.next();
-            if (!isRetiredEdge(block, oldBounds, axis)) {
-                continue;
-            }
-            restoreSingleBlock(world, block);
-            iterator.remove();
-            removed.add(block);
-        }
-        List<ClanBaseRepository.BorderBlock> added = placeExpandedEdge(world, newBounds, axis, flagY, material);
+        List<ClanBaseRepository.BorderBlock> removed = new ArrayList<>(knownBlocks);
+        restoreBorder(world, knownBlocks);
+        knownBlocks.clear();
+        List<ClanBaseRepository.BorderBlock> added = placeBorder(world, newBounds, flagY, material);
         knownBlocks.addAll(added);
         return new BorderExpansionDelta(removed, added);
-    }
-
-    public List<ClanBaseRepository.BorderBlock> placeExpandedEdge(
-            World world,
-            BaseBounds bounds,
-            BaseExpansionAxis axis,
-            int flagY,
-            Material material
-    ) {
-        Set<String> seen = new HashSet<>();
-        List<ClanBaseRepository.BorderBlock> placed = new ArrayList<>();
-        switch (axis) {
-            case EAST -> {
-                for (int z = bounds.minZ(); z <= bounds.maxZ(); z++) {
-                    addBorderBlock(world, bounds.maxX(), z, flagY, material, seen, placed);
-                }
-            }
-            case WEST -> {
-                for (int z = bounds.minZ(); z <= bounds.maxZ(); z++) {
-                    addBorderBlock(world, bounds.minX(), z, flagY, material, seen, placed);
-                }
-            }
-            case SOUTH -> {
-                for (int x = bounds.minX(); x <= bounds.maxX(); x++) {
-                    addBorderBlock(world, x, bounds.maxZ(), flagY, material, seen, placed);
-                }
-            }
-            case NORTH -> {
-                for (int x = bounds.minX(); x <= bounds.maxX(); x++) {
-                    addBorderBlock(world, x, bounds.minZ(), flagY, material, seen, placed);
-                }
-            }
-        }
-        return placed;
-    }
-
-    private boolean isRetiredEdge(ClanBaseRepository.BorderBlock block, BaseBounds oldBounds, BaseExpansionAxis axis) {
-        return switch (axis) {
-            case EAST -> block.x() == oldBounds.maxX();
-            case WEST -> block.x() == oldBounds.minX();
-            case SOUTH -> block.z() == oldBounds.maxZ();
-            case NORTH -> block.z() == oldBounds.minZ();
-        };
-    }
-
-    private void restoreSingleBlock(World world, ClanBaseRepository.BorderBlock block) {
-        Block target = world.getBlockAt(block.x(), block.y(), block.z());
-        Material current = target.getType();
-        BorderColorPalette palette = config.borderColors();
-        if (!palette.isBorderMaterial(current) && !current.isAir()) {
-            return;
-        }
-        Material original = parseMaterial(block.originalMaterial());
-        target.setType(original == null ? Material.AIR : original, false);
     }
 
     private void addBorderBlock(

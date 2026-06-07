@@ -32,6 +32,8 @@ public interface ClanBaseRepository {
 
     void updateExtents(long baseId, int extentXPos, int extentXNeg, int extentZPos, int extentZNeg);
 
+    void updateStandardUid(long baseId, String standardUid);
+
     record BorderBlock(int x, int y, int z, String originalMaterial) {
     }
 }

@@ -12,4 +12,6 @@ public interface ClanBannerRepository {
     CompletableFuture<Boolean> isStandardIssued(long clanId);
 
     CompletableFuture<Boolean> markStandardIssued(long clanId);
+
+    CompletableFuture<Boolean> clearStandardIssued(long clanId);
 }

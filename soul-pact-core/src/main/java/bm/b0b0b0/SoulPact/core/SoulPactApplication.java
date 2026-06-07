@@ -35,6 +35,7 @@ import bm.b0b0b0.SoulPact.clan.gui.ClanBannerClickHandler;
 import bm.b0b0b0.SoulPact.clan.gui.ClanBannerMenuPopulator;
 import bm.b0b0b0.SoulPact.clan.repository.ClanBannerRepository;
 import bm.b0b0b0.SoulPact.clan.repository.SqlClanBannerRepository;
+import bm.b0b0b0.SoulPact.clan.listener.ClanStandardInteractListener;
 import bm.b0b0b0.SoulPact.clan.listener.ClanStandardListener;
 import bm.b0b0b0.SoulPact.clan.standard.ClanStandardItem;
 import bm.b0b0b0.SoulPact.clan.standard.ClanStandardKeys;
@@ -63,6 +64,7 @@ import bm.b0b0b0.SoulPact.clan.service.ClanRequestHistoryLoreBuilder;
 import bm.b0b0b0.SoulPact.clan.service.ClanRolePermissionService;
 import bm.b0b0b0.SoulPact.clan.service.ClanRoleSettingsDataService;
 import bm.b0b0b0.SoulPact.clan.service.ClanSettingsDataService;
+import bm.b0b0b0.SoulPact.clan.service.ClanStandardHubOpenService;
 import bm.b0b0b0.SoulPact.clan.service.ClanRequestsDataService;
 import bm.b0b0b0.SoulPact.clan.repository.ClanMembershipRepository;
 import bm.b0b0b0.SoulPact.clan.repository.SqlClanMembershipRepository;
@@ -222,11 +224,16 @@ public final class SoulPactApplication {
                 new ClanStandardListener(clanStandardItem, standardPresence, clanStandardService),
                 plugin
         );
+        plugin.getServer().getPluginManager().registerEvents(
+                new ClanStandardInteractListener(clanStandardItem, clanStandardHubOpenService),
+                plugin
+        );
     }
 
     private ClanStandardItem clanStandardItem;
     private ClanStandardPresence standardPresence;
     private ClanStandardService clanStandardService;
+    private ClanStandardHubOpenService clanStandardHubOpenService;
 
     private void wireServices() {
         ClanRepository clanRepository = new SqlClanRepository(dataSourceProvider, asyncDatabaseExecutor);
@@ -427,7 +434,8 @@ public final class SoulPactApplication {
                 standardPresence,
                 disbandService,
                 messageService,
-                asyncDatabaseExecutor
+                asyncDatabaseExecutor,
+                extensionRegistry
         );
         this.clanStandardService = clanStandardService;
         ClanBannerDataService bannerDataService = new ClanBannerDataService(
@@ -476,6 +484,13 @@ public final class SoulPactApplication {
                 settingsDataService,
                 roleSettingsDataService,
                 bannerDataService,
+                asyncDatabaseExecutor
+        );
+        this.clanStandardHubOpenService = new ClanStandardHubOpenService(
+                pluginConfig.clan().standard(),
+                clanRepository,
+                guiOpenService,
+                messageService,
                 asyncDatabaseExecutor
         );
         ClanCreateChatPrompt createChatPrompt = new ClanCreateChatPrompt(messageService, asyncDatabaseExecutor);

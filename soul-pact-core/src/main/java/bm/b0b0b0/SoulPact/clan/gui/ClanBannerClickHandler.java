@@ -118,14 +118,20 @@ public final class ClanBannerClickHandler {
     }
 
     private void depositStandard(ClanBannerMenu menu, Player player) {
-        ClanStandardService.DepositStandardResult result = clanStandardService.depositStandard(player, menu.clanId());
-        clanStandardService.sendDepositResult(player, result, Map.of("tag", menu.clanTag()));
-        if (result != ClanStandardService.DepositStandardResult.SUCCESS) {
-            return;
-        }
-        menu.setStandardOut(false);
-        menu.setCanDepositStandard(false);
-        menu.refresh(populator, player);
+        clanStandardService.depositStandard(player, menu.clanId()).thenAccept(result ->
+                asyncDatabaseExecutor.runSync(() -> {
+                    if (!player.isOnline()) {
+                        return;
+                    }
+                    clanStandardService.sendDepositResult(player, result, Map.of("tag", menu.clanTag()));
+                    if (result != ClanStandardService.DepositStandardResult.SUCCESS) {
+                        return;
+                    }
+                    menu.setStandardOut(false);
+                    menu.setCanDepositStandard(false);
+                    menu.refresh(populator, player);
+                })
+        );
     }
 
     private void save(ClanBannerMenu menu, Player player) {

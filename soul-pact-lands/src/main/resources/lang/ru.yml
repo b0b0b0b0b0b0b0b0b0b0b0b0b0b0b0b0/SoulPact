@@ -83,7 +83,7 @@ land:
           - "<#9CA3AF>Размер: <white>{size}</white> / {max}"
           - "<#9CA3AF>Цена: <white>{cost}</white>"
           - "<#9CA3AF>Оплата: <white>{source}"
-          - "<#9CA3AF>Нажмите — +{step} блок"
+          - "<#9CA3AF>Нажмите — +{step} блоков"
       back:
         name: "<#F87171>Назад"
         lore:

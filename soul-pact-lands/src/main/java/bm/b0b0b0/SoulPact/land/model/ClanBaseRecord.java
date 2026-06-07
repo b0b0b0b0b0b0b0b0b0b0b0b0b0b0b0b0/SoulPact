@@ -15,6 +15,7 @@ public record ClanBaseRecord(
         int extentXNeg,
         int extentZPos,
         int extentZNeg,
+        String standardUid,
         boolean pvpEnabled,
         boolean mobSpawnEnabled,
         long createdAt
@@ -75,9 +76,21 @@ public record ClanBaseRecord(
                 extentXNeg,
                 extentZPos,
                 extentZNeg,
+                standardUid,
                 pvpEnabled,
                 mobSpawnEnabled,
                 createdAt
         );
+    }
+
+    public java.util.UUID parsedStandardUid() {
+        if (standardUid == null || standardUid.isBlank()) {
+            return null;
+        }
+        try {
+            return java.util.UUID.fromString(standardUid);
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
     }
 }

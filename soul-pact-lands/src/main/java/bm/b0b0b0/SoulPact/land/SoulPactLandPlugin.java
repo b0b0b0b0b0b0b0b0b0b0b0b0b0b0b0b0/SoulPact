@@ -16,6 +16,7 @@ import bm.b0b0b0.SoulPact.land.repository.SqlClanMemberUuidRepository;
 import bm.b0b0b0.SoulPact.land.integration.WorldGuardGateway;
 import bm.b0b0b0.SoulPact.land.service.BaseBorderService;
 import bm.b0b0b0.SoulPact.land.service.BaseExpansionPaymentService;
+import bm.b0b0b0.SoulPact.land.service.BaseFlagIndex;
 import bm.b0b0b0.SoulPact.land.service.BorderBlockIndex;
 import bm.b0b0b0.SoulPact.land.service.BorderIndexBootstrap;
 import bm.b0b0b0.SoulPact.land.service.ClanBaseService;
@@ -93,7 +94,8 @@ public final class SoulPactLandPlugin extends JavaPlugin {
         WorldGuardGateway worldGuardGateway = new WorldGuardGateway();
         BorderBlockIndex borderBlockIndex = new BorderBlockIndex();
         SqlClanBaseRepository baseRepository = new SqlClanBaseRepository(api);
-        new BorderIndexBootstrap(baseRepository, borderBlockIndex).loadAll();
+        BaseFlagIndex flagIndex = new BaseFlagIndex();
+        new BorderIndexBootstrap(api, baseRepository, borderBlockIndex, flagIndex).loadAll();
         BaseBorderService borderService = new BaseBorderService(config, borderBlockIndex);
         SqlClanMemberUuidRepository memberRepository = new SqlClanMemberUuidRepository(api);
         LandVaultGateway vaultGateway = new LandVaultGateway();
@@ -107,7 +109,8 @@ public final class SoulPactLandPlugin extends JavaPlugin {
                 memberRepository,
                 worldGuardGateway,
                 borderService,
-                paymentService
+                paymentService,
+                flagIndex
         );
         guiService = new LandGuiService(api, config, landMessages, baseService);
         extension = new LandExtension(baseService, guiService);
@@ -118,7 +121,7 @@ public final class SoulPactLandPlugin extends JavaPlugin {
                 this
         );
         Bukkit.getPluginManager().registerEvents(
-                new BaseWorldListener(api, baseService, borderBlockIndex, landMessages),
+                new BaseWorldListener(api, baseService, borderBlockIndex, flagIndex, landMessages),
                 this
         );
         PluginCommand command = getCommand("clanland");
@@ -132,5 +135,6 @@ public final class SoulPactLandPlugin extends JavaPlugin {
             });
         }
         startupPresenter.logRegistered(worldGuardGateway);
+        Bukkit.getScheduler().runTaskLater(this, () -> baseService.reconcileDeployedFlags(), 40L);
     }
 }

@@ -3,6 +3,7 @@ package bm.b0b0b0.SoulPact.clan.listener;
 import bm.b0b0b0.SoulPact.clan.standard.ClanStandardItem;
 import bm.b0b0b0.SoulPact.clan.standard.ClanStandardPresence;
 import bm.b0b0b0.SoulPact.clan.standard.ClanStandardService;
+import java.util.UUID;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
 import org.bukkit.entity.Item;
@@ -87,7 +88,11 @@ public final class ClanStandardListener implements Listener {
         if (clanTag == null) {
             clanTag = String.valueOf(clanId);
         }
-        clanStandardItem.markBlock(tileState, clanId, clanTag);
+        UUID standardUid = clanStandardItem.readStandardUidFromItem(itemStack);
+        if (standardUid == null) {
+            standardUid = UUID.randomUUID();
+        }
+        clanStandardItem.markBlock(tileState, clanId, clanTag, standardUid);
         tileState.update(true);
         presence.trackBlock(clanId, event.getBlockPlaced().getLocation());
     }

@@ -35,6 +35,7 @@ public final class LandSchemaMigrator {
                 ensureColumn(connection, "clan_bases", "extent_x_neg", "INTEGER");
                 ensureColumn(connection, "clan_bases", "extent_z_pos", "INTEGER");
                 ensureColumn(connection, "clan_bases", "extent_z_neg", "INTEGER");
+                ensureColumn(connection, "clan_bases", "standard_uid", "VARCHAR(36)");
             }
         } catch (SQLException | IOException exception) {
             throw new IllegalStateException("Failed to migrate clan lands schema", exception);

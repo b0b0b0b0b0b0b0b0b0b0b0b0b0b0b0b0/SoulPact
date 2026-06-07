@@ -2,6 +2,7 @@ package bm.b0b0b0.SoulPact.core.config;
 
 import bm.b0b0b0.SoulPact.core.config.settings.ClanRolePermissionDefaultsSettings;
 import bm.b0b0b0.SoulPact.core.config.settings.ClanSettings;
+import bm.b0b0b0.SoulPact.core.config.settings.ClanStandardSettings;
 
 public final class ClanConfig {
 
@@ -13,6 +14,7 @@ public final class ClanConfig {
     private final int listChatLimit;
     private final String roleTheme;
     private final ClanRolePermissionDefaultsSettings rolePermissionDefaults;
+    private final ClanStandardConfig standardConfig;
 
     public ClanConfig(ClanSettings settings) {
         this.maxMembersDefault = settings.maxMembersDefault;
@@ -25,6 +27,9 @@ public final class ClanConfig {
                 ? "military"
                 : settings.roleTheme.trim();
         this.rolePermissionDefaults = settings.rolePermissionDefaults;
+        this.standardConfig = new ClanStandardConfig(
+                settings.standard == null ? new ClanStandardSettings() : settings.standard
+        );
     }
 
     public int maxMembersDefault() {
@@ -57,5 +62,9 @@ public final class ClanConfig {
 
     public ClanRolePermissionDefaultsSettings rolePermissionDefaults() {
         return rolePermissionDefaults;
+    }
+
+    public ClanStandardConfig standard() {
+        return standardConfig;
     }
 }

@@ -38,6 +38,22 @@ public final class SqlClanBannerRepository implements ClanBannerRepository {
         return asyncDatabaseExecutor.supply(() -> isStandardIssuedSync(clanId));
     }
 
+    @Override
+    public CompletableFuture<Boolean> clearStandardIssued(long clanId) {
+        return asyncDatabaseExecutor.supply(() -> clearStandardIssuedSync(clanId));
+    }
+
+    private boolean clearStandardIssuedSync(long clanId) {
+        String sql = "UPDATE clans SET standard_issued = 0 WHERE id = ?";
+        try (Connection connection = dataSourceProvider.dataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, clanId);
+            return statement.executeUpdate() > 0;
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to clear clan standard issued flag", exception);
+        }
+    }
+
     private boolean markStandardIssuedSync(long clanId) {
         String sql = "UPDATE clans SET standard_issued = 1 WHERE id = ?";
         try (Connection connection = dataSourceProvider.dataSource().getConnection();

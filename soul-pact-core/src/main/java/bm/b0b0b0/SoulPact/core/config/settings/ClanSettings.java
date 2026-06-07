@@ -28,4 +28,7 @@ public final class ClanSettings {
 
     @Comment(@CommentValue("Права ролей по умолчанию при создании клана"))
     public ClanRolePermissionDefaultsSettings rolePermissionDefaults = new ClanRolePermissionDefaultsSettings();
+
+    @Comment(@CommentValue("Установленное знамя клана в мире"))
+    public ClanStandardSettings standard = new ClanStandardSettings();
 }

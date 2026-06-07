@@ -126,6 +126,8 @@ clan:
     take:
       success: "<#F87171><bold>Standard [{tag}] issued.</bold> <#9CA3AF>If it burns, falls into the void, or is destroyed — <#F87171>the clan disbands in shame<#9CA3AF>. Guard it with your life."
       already-exists: "<#F87171>The standard is already in the world. Deposit it or find it first."
+      base-active: "<#F87171>The standard is deployed at your base. Remove it from the base first."
+      already-issued: "<#F87171>The standard is already issued. Deposit it or find it first."
       failed: "<#F87171>Failed to issue the standard."
     deposit:
       success: "<#86EFAC>Standard [{tag}] stored. You can edit the banner again."
@@ -133,6 +135,8 @@ clan:
       failed: "<#F87171>Failed to store the standard."
     disband:
       broadcast: "<#F87171><bold>Shame!</bold> Clan <white>[{tag}] {name}</white> <#6B7280>(#{id}) <#F87171>— the standard was lost, the clan is no more."
+    interact:
+      not-in-clan: "<#F87171>This standard belongs to another clan."
     item:
       name: "<#FCD34D><bold>Standard [{tag}]</bold>"
       lore:

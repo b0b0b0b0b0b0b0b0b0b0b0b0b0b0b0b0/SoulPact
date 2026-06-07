@@ -83,7 +83,7 @@ land:
           - "<#9CA3AF>Size: <white>{size}</white> / {max}"
           - "<#9CA3AF>Cost: <white>{cost}</white>"
           - "<#9CA3AF>Payment: <white>{source}"
-          - "<#9CA3AF>Click — +{step} block"
+          - "<#9CA3AF>Click — +{step} blocks"
       back:
         name: "<#F87171>Back"
         lore:

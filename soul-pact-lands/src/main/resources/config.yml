@@ -21,8 +21,8 @@ border-colors:
   - BLACK_WOOL
   - BROWN_WOOL
 expansion:
-  step: 1
-  max-extent: 20
+  step: 8
+  max-extent: 32
   base-cost: 1000
   cost-per-block: 250
 gui:

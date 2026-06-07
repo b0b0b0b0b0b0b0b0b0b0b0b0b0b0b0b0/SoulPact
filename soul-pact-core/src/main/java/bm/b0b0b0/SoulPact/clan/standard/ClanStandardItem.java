@@ -4,6 +4,7 @@ import bm.b0b0b0.SoulPact.core.message.AdventureTextParser;
 import bm.b0b0b0.SoulPact.core.message.MessageService;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.TileState;
 import org.bukkit.entity.Player;
@@ -23,9 +24,13 @@ public final class ClanStandardItem {
     }
 
     public ItemStack create(Player player, ItemStack bannerDesign, long clanId, String clanTag) {
+        return create(player, bannerDesign, clanId, clanTag, UUID.randomUUID());
+    }
+
+    public ItemStack create(Player player, ItemStack bannerDesign, long clanId, String clanTag, UUID standardUid) {
         ItemStack itemStack = bannerDesign.clone();
         ItemMeta itemMeta = itemStack.getItemMeta();
-        markContainer(itemMeta.getPersistentDataContainer(), clanId, clanTag);
+        markContainer(itemMeta.getPersistentDataContainer(), clanId, clanTag, standardUid);
         itemMeta.displayName(messageService.component(
                 player,
                 "clan.standard.item.name",
@@ -43,10 +48,17 @@ public final class ClanStandardItem {
 
     public ItemStack refreshAppearance(Player player, ItemStack existing, ItemStack bannerDesign, String clanTag) {
         Long clanId = readClanIdFromItem(existing);
+        UUID standardUid = readStandardUidFromItem(existing);
         if (clanId == null) {
             return existing;
         }
-        ItemStack updated = create(player, bannerDesign, clanId, clanTag);
+        ItemStack updated = create(
+                player,
+                bannerDesign,
+                clanId,
+                clanTag,
+                standardUid == null ? UUID.randomUUID() : standardUid
+        );
         updated.setAmount(existing.getAmount());
         return updated;
     }
@@ -66,6 +78,18 @@ public final class ClanStandardItem {
         return itemMeta.getPersistentDataContainer().get(keys.clanId(), PersistentDataType.LONG);
     }
 
+    public UUID readStandardUidFromItem(ItemStack itemStack) {
+        if (itemStack == null || itemStack.getType().isAir()) {
+            return null;
+        }
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null) {
+            return null;
+        }
+        String rawValue = itemMeta.getPersistentDataContainer().get(keys.standardUid(), PersistentDataType.STRING);
+        return parseUid(rawValue);
+    }
+
     public String readClanTagFromItem(ItemStack itemStack) {
         if (itemStack == null || itemStack.getType().isAir()) {
             return null;
@@ -78,7 +102,11 @@ public final class ClanStandardItem {
     }
 
     public void markBlock(TileState tileState, long clanId, String clanTag) {
-        markContainer(tileState.getPersistentDataContainer(), clanId, clanTag);
+        markBlock(tileState, clanId, clanTag, UUID.randomUUID());
+    }
+
+    public void markBlock(TileState tileState, long clanId, String clanTag, UUID standardUid) {
+        markContainer(tileState.getPersistentDataContainer(), clanId, clanTag, standardUid);
     }
 
     public Long readClanIdFromBlock(BlockState blockState) {
@@ -88,6 +116,14 @@ public final class ClanStandardItem {
         return tileState.getPersistentDataContainer().get(keys.clanId(), PersistentDataType.LONG);
     }
 
+    public UUID readStandardUidFromBlock(BlockState blockState) {
+        if (!(blockState instanceof TileState tileState)) {
+            return null;
+        }
+        String rawValue = tileState.getPersistentDataContainer().get(keys.standardUid(), PersistentDataType.STRING);
+        return parseUid(rawValue);
+    }
+
     public String readClanTagFromBlock(BlockState blockState) {
         if (!(blockState instanceof TileState tileState)) {
             return null;
@@ -95,8 +131,20 @@ public final class ClanStandardItem {
         return tileState.getPersistentDataContainer().get(keys.clanTag(), PersistentDataType.STRING);
     }
 
-    private void markContainer(PersistentDataContainer container, long clanId, String clanTag) {
+    private void markContainer(PersistentDataContainer container, long clanId, String clanTag, UUID standardUid) {
         container.set(keys.clanId(), PersistentDataType.LONG, clanId);
         container.set(keys.clanTag(), PersistentDataType.STRING, clanTag);
+        container.set(keys.standardUid(), PersistentDataType.STRING, standardUid.toString());
+    }
+
+    private UUID parseUid(String rawValue) {
+        if (rawValue == null || rawValue.isBlank()) {
+            return null;
+        }
+        try {
+            return UUID.fromString(rawValue);
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
     }
 }

@@ -36,6 +36,7 @@ public final class LandClickHandler {
             return;
         }
         var base = menu.snapshot().base().get();
+        Runnable refresh = () -> guiService.refresh(player, menu.snapshot().clan());
         BaseExpansionAxis axis = resolveExpansionAxis(slot);
         if (axis != null) {
             baseService.expandBase(
@@ -43,23 +44,20 @@ public final class LandClickHandler {
                     menu.snapshot().clan(),
                     base,
                     axis,
-                    () -> guiService.refresh(player, menu.snapshot().clan())
+                    refresh
             );
             return;
         }
         if (slot == config.pvpSlot()) {
-            baseService.togglePvp(player, menu.snapshot().clan(), base);
-            guiService.refresh(player, menu.snapshot().clan());
+            baseService.togglePvp(player, menu.snapshot().clan(), base, refresh);
             return;
         }
         if (slot == config.mobSpawnSlot()) {
-            baseService.toggleMobSpawn(player, menu.snapshot().clan(), base);
-            guiService.refresh(player, menu.snapshot().clan());
+            baseService.toggleMobSpawn(player, menu.snapshot().clan(), base, refresh);
             return;
         }
         if (slot == config.borderColorSlot()) {
-            baseService.cycleBorderColor(player, menu.snapshot().clan(), base);
-            guiService.refresh(player, menu.snapshot().clan());
+            baseService.cycleBorderColor(player, menu.snapshot().clan(), base, refresh);
         }
     }
 

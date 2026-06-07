@@ -23,7 +23,7 @@ public final class SqlClanBaseRepository implements ClanBaseRepository {
     public Optional<ClanBaseRecord> findByClanId(long clanId) {
         String sql = """
                 SELECT id, clan_id, region_name, world, flag_x, flag_y, flag_z, border_material,
-                       extent_x_pos, extent_x_neg, extent_z_pos, extent_z_neg,
+                       extent_x_pos, extent_x_neg, extent_z_pos, extent_z_neg, standard_uid,
                        pvp_enabled, mob_spawn_enabled, created_at
                 FROM clan_bases WHERE clan_id = ?
                 """;
@@ -45,7 +45,7 @@ public final class SqlClanBaseRepository implements ClanBaseRepository {
     public Optional<ClanBaseRecord> findByFlag(String world, int x, int y, int z) {
         String sql = """
                 SELECT id, clan_id, region_name, world, flag_x, flag_y, flag_z, border_material,
-                       extent_x_pos, extent_x_neg, extent_z_pos, extent_z_neg,
+                       extent_x_pos, extent_x_neg, extent_z_pos, extent_z_neg, standard_uid,
                        pvp_enabled, mob_spawn_enabled, created_at
                 FROM clan_bases WHERE world = ? AND flag_x = ? AND flag_y = ? AND flag_z = ?
                 """;
@@ -70,7 +70,7 @@ public final class SqlClanBaseRepository implements ClanBaseRepository {
     public List<ClanBaseRecord> findAll() {
         String sql = """
                 SELECT id, clan_id, region_name, world, flag_x, flag_y, flag_z, border_material,
-                       extent_x_pos, extent_x_neg, extent_z_pos, extent_z_neg,
+                       extent_x_pos, extent_x_neg, extent_z_pos, extent_z_neg, standard_uid,
                        pvp_enabled, mob_spawn_enabled, created_at
                 FROM clan_bases
                 """;
@@ -91,7 +91,7 @@ public final class SqlClanBaseRepository implements ClanBaseRepository {
     public List<ClanBaseRecord> findAllInWorld(String world) {
         String sql = """
                 SELECT id, clan_id, region_name, world, flag_x, flag_y, flag_z, border_material,
-                       extent_x_pos, extent_x_neg, extent_z_pos, extent_z_neg,
+                       extent_x_pos, extent_x_neg, extent_z_pos, extent_z_neg, standard_uid,
                        pvp_enabled, mob_spawn_enabled, created_at
                 FROM clan_bases WHERE world = ?
                 """;
@@ -115,10 +115,10 @@ public final class SqlClanBaseRepository implements ClanBaseRepository {
         String sql = """
                 INSERT INTO clan_bases(
                     clan_id, world, flag_x, flag_y, flag_z, region_name, border_material,
-                    extent_x_pos, extent_x_neg, extent_z_pos, extent_z_neg,
+                    extent_x_pos, extent_x_neg, extent_z_pos, extent_z_neg, standard_uid,
                     pvp_enabled, mob_spawn_enabled, created_at
                 )
-                VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         try (Connection connection = api.dataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -133,9 +133,10 @@ public final class SqlClanBaseRepository implements ClanBaseRepository {
             statement.setInt(9, record.extentXNeg());
             statement.setInt(10, record.extentZPos());
             statement.setInt(11, record.extentZNeg());
-            statement.setInt(12, record.pvpEnabled() ? 1 : 0);
-            statement.setInt(13, record.mobSpawnEnabled() ? 1 : 0);
-            statement.setLong(14, record.createdAt());
+            statement.setString(12, record.standardUid());
+            statement.setInt(13, record.pvpEnabled() ? 1 : 0);
+            statement.setInt(14, record.mobSpawnEnabled() ? 1 : 0);
+            statement.setLong(15, record.createdAt());
             statement.executeUpdate();
             try (ResultSet keys = statement.getGeneratedKeys()) {
                 if (!keys.next()) {
@@ -154,6 +155,7 @@ public final class SqlClanBaseRepository implements ClanBaseRepository {
                         record.extentXNeg(),
                         record.extentZPos(),
                         record.extentZNeg(),
+                        record.standardUid(),
                         record.pvpEnabled(),
                         record.mobSpawnEnabled(),
                         record.createdAt()
@@ -279,6 +281,19 @@ public final class SqlClanBaseRepository implements ClanBaseRepository {
         }
     }
 
+    @Override
+    public void updateStandardUid(long baseId, String standardUid) {
+        String sql = "UPDATE clan_bases SET standard_uid = ? WHERE id = ?";
+        try (Connection connection = api.dataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, standardUid);
+            statement.setLong(2, baseId);
+            statement.executeUpdate();
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Failed to update standard uid", exception);
+        }
+    }
+
     private void updateToggle(long baseId, String column, boolean enabled) {
         String sql = "UPDATE clan_bases SET " + column + " = ? WHERE id = ?";
         try (Connection connection = api.dataSource().getConnection();
@@ -305,6 +320,7 @@ public final class SqlClanBaseRepository implements ClanBaseRepository {
                 readOptionalInt(resultSet, "extent_x_neg"),
                 readOptionalInt(resultSet, "extent_z_pos"),
                 readOptionalInt(resultSet, "extent_z_neg"),
+                resultSet.getString("standard_uid"),
                 resultSet.getInt("pvp_enabled") == 1,
                 resultSet.getInt("mob_spawn_enabled") == 1,
                 resultSet.getLong("created_at")

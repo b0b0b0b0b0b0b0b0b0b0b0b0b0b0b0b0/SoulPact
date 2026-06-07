@@ -1,5 +1,7 @@
 package bm.b0b0b0.SoulPact.clan.standard;
 
+import bm.b0b0b0.SoulPact.api.extension.ExtensionRegistry;
+import bm.b0b0b0.SoulPact.api.land.ClanLandProvider;
 import bm.b0b0b0.SoulPact.clan.model.Clan;
 import bm.b0b0b0.SoulPact.clan.repository.ClanBannerRepository;
 import bm.b0b0b0.SoulPact.clan.repository.ClanRepository;
@@ -8,9 +10,12 @@ import bm.b0b0b0.SoulPact.clan.service.ClanDisbandService;
 import bm.b0b0b0.SoulPact.core.database.AsyncDatabaseExecutor;
 import bm.b0b0b0.SoulPact.core.message.MessageService;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -24,6 +29,7 @@ public final class ClanStandardService {
     private final ClanDisbandService clanDisbandService;
     private final MessageService messageService;
     private final AsyncDatabaseExecutor asyncDatabaseExecutor;
+    private final ExtensionRegistry extensionRegistry;
     private final Set<Long> disbandInProgress = ConcurrentHashMap.newKeySet();
 
     public ClanStandardService(
@@ -34,7 +40,8 @@ public final class ClanStandardService {
             ClanStandardPresence presence,
             ClanDisbandService clanDisbandService,
             MessageService messageService,
-            AsyncDatabaseExecutor asyncDatabaseExecutor
+            AsyncDatabaseExecutor asyncDatabaseExecutor,
+            ExtensionRegistry extensionRegistry
     ) {
         this.clanRepository = clanRepository;
         this.clanBannerService = clanBannerService;
@@ -44,6 +51,7 @@ public final class ClanStandardService {
         this.clanDisbandService = clanDisbandService;
         this.messageService = messageService;
         this.asyncDatabaseExecutor = asyncDatabaseExecutor;
+        this.extensionRegistry = extensionRegistry;
     }
 
     public ClanStandardItem items() {
@@ -56,6 +64,14 @@ public final class ClanStandardService {
 
     public boolean isStandardOut(long clanId) {
         return presence.isTracked(clanId);
+    }
+
+    public void trackDeployedBlock(long clanId, Location location) {
+        presence.trackBlock(clanId, location);
+    }
+
+    public void clearDeployed(long clanId) {
+        presence.clear(clanId);
     }
 
     public boolean canDepositStandard(Player player, long clanId) {
@@ -78,20 +94,17 @@ public final class ClanStandardService {
         if (presence.isTracked(clan.id()) || containsStandard(player, clan.id())) {
             return CompletableFuture.completedFuture(TakeStandardResult.ALREADY_EXISTS);
         }
-        return clanBannerService.loadBanner(clan.id()).thenCompose(banner ->
-                clanBannerRepository.markStandardIssued(clan.id()).thenApply(marked -> {
-                    if (!marked) {
-                        return TakeStandardResult.FAILED;
-                    }
-                    ItemStack standard = clanStandardItem.create(player, banner, clan.id(), clan.tag());
-                    Map<Integer, ItemStack> leftovers = player.getInventory().addItem(standard);
-                    if (!leftovers.isEmpty()) {
-                        leftovers.values().forEach(leftover -> player.getWorld().dropItemNaturally(player.getLocation(), leftover));
-                    }
-                    presence.trackInventory(clan.id(), player.getUniqueId());
-                    return TakeStandardResult.SUCCESS;
-                })
-        );
+        return findActiveBase(clan.id()).thenCompose(baseActive -> {
+            if (baseActive) {
+                return CompletableFuture.completedFuture(TakeStandardResult.BASE_ACTIVE);
+            }
+            return clanBannerRepository.isStandardIssued(clan.id()).thenCompose(issued -> {
+                if (issued) {
+                    return CompletableFuture.completedFuture(TakeStandardResult.ALREADY_ISSUED);
+                }
+                return issueStandard(player, clan);
+            });
+        });
     }
 
     public void handleStandardDestroyed(long clanId) {
@@ -121,15 +134,16 @@ public final class ClanStandardService {
         replaceInventoryStandard(player, clanId, clanTag, bannerDesign);
     }
 
-    public DepositStandardResult depositStandard(Player player, long clanId) {
+    public CompletableFuture<DepositStandardResult> depositStandard(Player player, long clanId) {
         if (!containsStandard(player, clanId)) {
-            return DepositStandardResult.NOT_IN_INVENTORY;
+            return CompletableFuture.completedFuture(DepositStandardResult.NOT_IN_INVENTORY);
         }
         if (!removeStandardFromInventory(player, clanId)) {
-            return DepositStandardResult.FAILED;
+            return CompletableFuture.completedFuture(DepositStandardResult.FAILED);
         }
         presence.clear(clanId);
-        return DepositStandardResult.SUCCESS;
+        return clanBannerRepository.clearStandardIssued(clanId)
+                .thenApply(cleared -> cleared ? DepositStandardResult.SUCCESS : DepositStandardResult.FAILED);
     }
 
     public void sendDepositResult(Player player, DepositStandardResult result, Map<String, String> placeholders) {
@@ -155,6 +169,8 @@ public final class ClanStandardService {
                 case SUCCESS -> "clan.standard.take.success";
                 case NOT_LEADER -> "clan.banner.not-leader";
                 case ALREADY_EXISTS -> "clan.standard.take.already-exists";
+                case BASE_ACTIVE -> "clan.standard.take.base-active";
+                case ALREADY_ISSUED -> "clan.standard.take.already-issued";
                 case FAILED -> "clan.standard.take.failed";
             };
             messageService.send(player, key, placeholders == null ? Map.of() : placeholders);
@@ -165,6 +181,34 @@ public final class ClanStandardService {
         clanBannerService.loadBanner(clanId).thenAccept(banner ->
                 asyncDatabaseExecutor.runSync(() -> deliverStandard(player, clanId, clanTag, banner))
         );
+    }
+
+    private CompletableFuture<TakeStandardResult> issueStandard(Player player, Clan clan) {
+        return clanBannerService.loadBanner(clan.id()).thenCompose(banner ->
+                clanBannerRepository.markStandardIssued(clan.id()).thenApply(marked -> {
+                    if (!marked) {
+                        return TakeStandardResult.FAILED;
+                    }
+                    UUID standardUid = UUID.randomUUID();
+                    ItemStack standard = clanStandardItem.create(player, banner, clan.id(), clan.tag(), standardUid);
+                    Map<Integer, ItemStack> leftovers = player.getInventory().addItem(standard);
+                    if (!leftovers.isEmpty()) {
+                        leftovers.values().forEach(leftover -> player.getWorld().dropItemNaturally(player.getLocation(), leftover));
+                    }
+                    presence.trackInventory(clan.id(), player.getUniqueId());
+                    return TakeStandardResult.SUCCESS;
+                })
+        );
+    }
+
+    private CompletableFuture<Boolean> findActiveBase(long clanId) {
+        Optional<ClanLandProvider> landProvider = extensionRegistry.find("land")
+                .filter(ClanLandProvider.class::isInstance)
+                .map(ClanLandProvider.class::cast);
+        if (landProvider.isEmpty()) {
+            return CompletableFuture.completedFuture(false);
+        }
+        return landProvider.get().findBase(clanId).thenApply(Optional::isPresent);
     }
 
     private void deliverStandard(Player player, long clanId, String clanTag, ItemStack banner) {
@@ -221,6 +265,8 @@ public final class ClanStandardService {
         SUCCESS,
         NOT_LEADER,
         ALREADY_EXISTS,
+        BASE_ACTIVE,
+        ALREADY_ISSUED,
         FAILED
     }
 

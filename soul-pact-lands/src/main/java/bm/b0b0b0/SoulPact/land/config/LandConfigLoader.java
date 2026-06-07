@@ -35,8 +35,8 @@ public final class LandConfigLoader {
         Material defaultMaterial = parseMaterial(configuration.getString("border-material"), Material.RED_WOOL);
         BorderColorPalette borderColors = loadPalette(configuration, defaultMaterial);
         LandExpansionSettings expansion = new LandExpansionSettings(
-                configuration.getInt("expansion.step", 1),
-                configuration.getInt("expansion.max-extent", 20),
+                configuration.getInt("expansion.step", configuration.getInt("base-radius", 8)),
+                configuration.getInt("expansion.max-extent", 32),
                 configuration.getDouble("expansion.base-cost", 1000.0D),
                 configuration.getDouble("expansion.cost-per-block", 250.0D)
         );
