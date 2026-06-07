@@ -1,0 +1,18 @@
+locale: ru
+fallback-locale: en
+max-members: 3
+treasury:
+  war-share-percent: 0.25
+  capture-share-percent: 0.25
+  pool-share-percent: 0.50
+gui:
+  hub:
+    rows: 3
+    slots:
+      member-start: 10
+      invite: 16
+      leave: 22
+bossbar:
+  declared-color: YELLOW
+  active-color: RED
+  capture-color: RED

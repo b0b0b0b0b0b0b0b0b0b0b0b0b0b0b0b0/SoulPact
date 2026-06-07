@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+dependencies {
+    compileOnly('io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT')
+    compileOnly project(':soul-pact-api')
+}
+
+tasks.named('jar') {
+    archiveBaseName.set('SoulPact-Coalition')
+}
+
+processResources {
+    def props = [version: project.version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
+
+apply from: rootProject.file('gradle/plugin-jar.gradle')

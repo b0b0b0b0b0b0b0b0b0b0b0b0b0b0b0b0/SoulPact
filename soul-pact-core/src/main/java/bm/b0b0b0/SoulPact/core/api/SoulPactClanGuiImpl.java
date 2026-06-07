@@ -16,4 +16,14 @@ public final class SoulPactClanGuiImpl implements SoulPactClanGui {
     public void openHub(Player player) {
         guiOpenService.openHub(player);
     }
+
+    @Override
+    public void openList(Player player, int page) {
+        guiOpenService.openList(player, page);
+    }
+
+    @Override
+    public void openInfo(Player player, long clanId, int listPage) {
+        guiOpenService.openInfo(player, clanId, listPage);
+    }
 }

@@ -3,6 +3,8 @@ package bm.b0b0b0.SoulPact.land.listener;
 import bm.b0b0b0.SoulPact.api.SoulPactApi;
 import bm.b0b0b0.SoulPact.api.clan.ClanSnapshot;
 import bm.b0b0b0.SoulPact.api.clan.SoulPactClanStandard;
+import bm.b0b0b0.SoulPact.api.war.ClanWarProvider;
+import bm.b0b0b0.SoulPact.api.war.WarFlagBreakGate;
 import bm.b0b0b0.SoulPact.land.message.LandMessages;
 import bm.b0b0b0.SoulPact.land.model.ClanBaseRecord;
 import bm.b0b0b0.SoulPact.land.service.BorderBlockIndex;
@@ -87,29 +89,27 @@ public final class BaseWorldListener implements Listener {
         event.setCancelled(true);
         Player player = event.getPlayer() instanceof Player resolved ? resolved : null;
         Location location = block.getLocation();
-        baseService.findBaseAtFlag(location).thenAccept(baseOptional -> api.scheduler().runSync(() -> {
+        Optional<WarFlagBreakGate> warGateOptional = resolveWarGate();
+        baseService.findBaseAtFlag(location).thenAccept(baseOptional -> {
             if (baseOptional.isEmpty()) {
-                if (player != null) {
-                    block.breakNaturally(player.getInventory().getItemInMainHand());
-                } else {
-                    block.setType(Material.AIR);
-                }
+                api.scheduler().runSync(() -> breakFlagWithoutBase(player, block));
                 return;
             }
-            block.setType(Material.AIR);
             ClanBaseRecord base = baseOptional.get();
-            String clanTag = clanStandard.readClanTagFromBlock(block.getState());
-            if (clanTag == null || clanTag.isBlank()) {
-                clanTag = String.valueOf(base.clanId());
+            if (player != null && warGateOptional.isPresent()) {
+                WarFlagBreakGate warGate = warGateOptional.get();
+                if (warGate.allowsEnemyStandardBreak(player.getUniqueId(), base.clanId())) {
+                    api.scheduler().runSync(() -> warGate.onEnemyStandardBreak(
+                            player,
+                            base.clanId(),
+                            location,
+                            () -> destroyBaseForWar(player, block, base)
+                    ));
+                    return;
+                }
             }
-            block.setType(Material.AIR);
-            baseService.destroyBase(base);
-            if (player != null) {
-                clanStandard.restoreToPlayer(player, base.clanId(), clanTag);
-                clanStandard.trackInventory(base.clanId(), player.getUniqueId());
-                messages.send(player, "land.base.destroyed");
-            }
-        }));
+            api.scheduler().runSync(() -> destroyBaseProtected(player, block, base));
+        });
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -126,6 +126,48 @@ public final class BaseWorldListener implements Listener {
         event.setCancelled(true);
         if (event.getPlayer() instanceof Player player) {
             messages.send(player, "land.error.border-protected");
+        }
+    }
+
+    private Optional<WarFlagBreakGate> resolveWarGate() {
+        return api.extensions().find("war")
+                .filter(ClanWarProvider.class::isInstance)
+                .map(ClanWarProvider.class::cast)
+                .map(ClanWarProvider::flagBreak);
+    }
+
+    private void breakFlagWithoutBase(Player player, Block block) {
+        if (player != null) {
+            block.breakNaturally(player.getInventory().getItemInMainHand());
+        } else {
+            block.setType(Material.AIR);
+        }
+    }
+
+    private void destroyBaseProtected(Player player, Block block, ClanBaseRecord base) {
+        String clanTag = clanStandard.readClanTagFromBlock(block.getState());
+        if (clanTag == null || clanTag.isBlank()) {
+            clanTag = String.valueOf(base.clanId());
+        }
+        block.setType(Material.AIR);
+        baseService.destroyBase(base);
+        if (player != null) {
+            clanStandard.restoreToPlayer(player, base.clanId(), clanTag);
+            clanStandard.trackInventory(base.clanId(), player.getUniqueId());
+            messages.send(player, "land.base.destroyed");
+        }
+    }
+
+    private void destroyBaseForWar(Player player, Block block, ClanBaseRecord base) {
+        String clanTag = clanStandard.readClanTagFromBlock(block.getState());
+        if (clanTag == null || clanTag.isBlank()) {
+            clanTag = String.valueOf(base.clanId());
+        }
+        block.setType(Material.AIR);
+        baseService.destroyBase(base);
+        if (player != null) {
+            clanStandard.restoreToPlayer(player, base.clanId(), clanTag);
+            clanStandard.trackInventory(base.clanId(), player.getUniqueId());
         }
     }
 

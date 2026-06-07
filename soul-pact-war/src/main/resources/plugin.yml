@@ -1,0 +1,11 @@
+name: SoulPact-War
+version: '${version}'
+main: bm.b0b0b0.SoulPact.war.SoulPactWarPlugin
+api-version: '1.21'
+depend: [SoulPact]
+softdepend: [SoulPact-Bank, SoulPact-Lands, SoulPact-Chest]
+commands:
+  clanwar:
+    description: Clan war declarations
+    usage: /clanwar
+    aliases: [cwar, war]

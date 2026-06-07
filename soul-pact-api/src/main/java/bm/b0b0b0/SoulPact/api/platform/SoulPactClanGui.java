@@ -5,4 +5,8 @@ import org.bukkit.entity.Player;
 public interface SoulPactClanGui {
 
     void openHub(Player player);
+
+    void openList(Player player, int page);
+
+    void openInfo(Player player, long clanId, int listPage);
 }

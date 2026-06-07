@@ -20,6 +20,8 @@ public interface ClanTreasuryApi {
 
     CompletableFuture<TreasuryOperationResult> transferAll(long fromClanId, long toClanId, String note);
 
+    CompletableFuture<TreasuryOperationResult> seize(long fromClanId, long toClanId, double amount, String note);
+
     CompletableFuture<List<ClanTreasuryEntrySnapshot>> recentEntries(long clanId, int limit);
 
     CompletableFuture<List<ClanTreasuryContributorSnapshot>> topContributors(long clanId, int limit);

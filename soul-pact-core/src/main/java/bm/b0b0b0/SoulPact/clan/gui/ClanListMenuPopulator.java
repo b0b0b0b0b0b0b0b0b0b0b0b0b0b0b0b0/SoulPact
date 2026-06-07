@@ -64,6 +64,12 @@ public final class ClanListMenuPopulator {
                 messageService
         ));
         placeholders.put("leader", resolveLeaderName(entry.clan().leaderId()));
+        placeholders.put("treasury", entry.treasuryLine().isBlank()
+                ? messageService.resolve(player, "clan.gui.list.value.treasury-unknown")
+                : entry.treasuryLine());
+        placeholders.put("coalition", entry.coalitionLine().isBlank()
+                ? messageService.resolve(player, "clan.gui.list.value.coalition-none")
+                : entry.coalitionLine());
         String leaderName = resolveLeaderName(entry.clan().leaderId());
         return guiItemBuilder.buildPlayerHead(
                 player,

@@ -1,6 +1,7 @@
 package bm.b0b0b0.SoulPact.api;
 
 import bm.b0b0b0.SoulPact.api.clan.ClanSnapshot;
+import bm.b0b0b0.SoulPact.api.clan.SoulPactClanLifecycle;
 import bm.b0b0b0.SoulPact.api.clan.SoulPactClanStandard;
 import bm.b0b0b0.SoulPact.api.extension.ExtensionRegistry;
 import bm.b0b0b0.SoulPact.api.message.SoulPactMessages;
@@ -28,6 +29,8 @@ public interface SoulPactApi {
     SoulPactClanGui clanGui();
 
     SoulPactClanStandard clanStandard();
+
+    SoulPactClanLifecycle clanLifecycle();
 
     DataSource dataSource();
 

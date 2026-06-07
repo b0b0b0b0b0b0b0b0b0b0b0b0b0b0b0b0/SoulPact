@@ -1,0 +1,26 @@
+locale: ru
+fallback-locale: en
+ransom-percent: 0.8
+capture-seconds: 60
+bossbar:
+  pending-color: YELLOW
+  active-color: RED
+  capture-defending-color: RED
+  capture-attacking-color: GREEN
+gui:
+  declare-confirm:
+    rows: 3
+    slots:
+      confirm: 11
+      deny: 15
+  pending-list:
+    rows: 6
+    page-size: 45
+    slots:
+      back: 49
+  pending-detail:
+    rows: 3
+    slots:
+      accept: 11
+      ransom: 13
+      back: 22

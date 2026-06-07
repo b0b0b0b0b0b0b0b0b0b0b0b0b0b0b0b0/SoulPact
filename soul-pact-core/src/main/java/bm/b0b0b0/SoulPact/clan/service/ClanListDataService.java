@@ -8,10 +8,19 @@ public final class ClanListDataService {
 
     private final ClanRepository clanRepository;
     private final GuiListConfig guiListConfig;
+    private final ClanTreasuryDisplayService treasuryDisplayService;
+    private final ClanCoalitionDisplayService coalitionDisplayService;
 
-    public ClanListDataService(ClanRepository clanRepository, GuiListConfig guiListConfig) {
+    public ClanListDataService(
+            ClanRepository clanRepository,
+            GuiListConfig guiListConfig,
+            ClanTreasuryDisplayService treasuryDisplayService,
+            ClanCoalitionDisplayService coalitionDisplayService
+    ) {
         this.clanRepository = clanRepository;
         this.guiListConfig = guiListConfig;
+        this.treasuryDisplayService = treasuryDisplayService;
+        this.coalitionDisplayService = coalitionDisplayService;
     }
 
     public CompletableFuture<ClanListPage> loadPage(int page) {
@@ -24,9 +33,10 @@ public final class ClanListDataService {
             int totalPages = totalClans == 0 ? 0 : (int) Math.ceil((double) totalClans / pageSize);
             int clampedPage = totalPages == 0 ? 0 : Math.min(safePage, totalPages - 1);
             int offset = clampedPage * pageSize;
-            return clanRepository.findPageEntries(offset, pageSize).thenApply(entries ->
-                    new ClanListPage(entries, clampedPage, totalPages, totalClans)
-            );
+            return clanRepository.findPageEntries(offset, pageSize)
+                    .thenCompose(treasuryDisplayService::enrichEntries)
+                    .thenCompose(coalitionDisplayService::enrichEntries)
+                    .thenApply(entries -> new ClanListPage(entries, clampedPage, totalPages, totalClans));
         });
     }
 }

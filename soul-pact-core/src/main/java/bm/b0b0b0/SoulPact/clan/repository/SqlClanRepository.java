@@ -195,7 +195,8 @@ public final class SqlClanRepository implements ClanRepository {
                 while (resultSet.next()) {
                     entries.add(new ClanListEntry(
                             mapRow(resultSet),
-                            resultSet.getInt("member_count")
+                            resultSet.getInt("member_count"),
+                            ""
                     ));
                 }
             }

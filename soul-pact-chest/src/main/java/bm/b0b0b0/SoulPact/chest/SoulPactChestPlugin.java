@@ -11,6 +11,8 @@ import bm.b0b0b0.SoulPact.chest.message.ChestMessages;
 import bm.b0b0b0.SoulPact.chest.message.ChestStartupConsolePresenter;
 import bm.b0b0b0.SoulPact.chest.migration.ChestSchemaMigrator;
 import bm.b0b0b0.SoulPact.chest.repository.SqlClanChestRepository;
+import bm.b0b0b0.SoulPact.chest.repository.SqlClanChestSpoilsRepository;
+import bm.b0b0b0.SoulPact.chest.service.ClanChestSpoilsService;
 import bm.b0b0b0.SoulPact.chest.service.ChestAccessService;
 import bm.b0b0b0.SoulPact.chest.service.ChestGuiLayout;
 import bm.b0b0b0.SoulPact.chest.service.ChestPaymentService;
@@ -89,6 +91,8 @@ public final class SoulPactChestPlugin extends JavaPlugin {
         ChestVaultGateway vaultGateway = new ChestVaultGateway();
         vaultGateway.hook();
         SqlClanChestRepository repository = new SqlClanChestRepository(api);
+        SqlClanChestSpoilsRepository spoilsRepository = new SqlClanChestSpoilsRepository(api, repository);
+        ClanChestSpoilsService spoilsService = new ClanChestSpoilsService(api, spoilsRepository);
         ChestAccessService accessService = new ChestAccessService(api);
         ChestPaymentService paymentService = new ChestPaymentService(api, vaultGateway);
         ClanChestService chestService = new ClanChestService(
@@ -101,7 +105,7 @@ public final class SoulPactChestPlugin extends JavaPlugin {
         );
         ChestGuiLayout layout = new ChestGuiLayout(config);
         guiService = new ChestGuiService(api, config, chestMessages, chestService, layout);
-        extension = new ChestExtension(guiService);
+        extension = new ChestExtension(guiService, spoilsService);
         api.extensions().register(extension);
         extension.enable(api);
         Bukkit.getPluginManager().registerEvents(

@@ -60,11 +60,40 @@ public final class ClanInfoMenu implements InventoryHolder {
         return guiInfoConfig.actionSlot();
     }
 
+    public int slotDeclareWar() {
+        return guiInfoConfig.declareWarSlot();
+    }
+
     public int slotMembers() {
         return guiInfoConfig.membersSlot();
     }
 
     public int slotBack() {
         return guiInfoConfig.backSlot();
+    }
+
+    public int slotAllyFirst() {
+        return guiInfoConfig.allyFirstSlot();
+    }
+
+    public int slotAllySecond() {
+        return guiInfoConfig.allySecondSlot();
+    }
+
+    public int slotAllyThird() {
+        return guiInfoConfig.allyThirdSlot();
+    }
+
+    public int allySlotIndex(int slot) {
+        if (slot == slotAllyFirst()) {
+            return 0;
+        }
+        if (slot == slotAllySecond()) {
+            return 1;
+        }
+        if (slot == slotAllyThird()) {
+            return 2;
+        }
+        return -1;
     }
 }

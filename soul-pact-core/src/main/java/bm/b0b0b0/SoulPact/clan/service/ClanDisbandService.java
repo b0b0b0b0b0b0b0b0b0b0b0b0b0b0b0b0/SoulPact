@@ -57,6 +57,15 @@ public final class ClanDisbandService {
         });
     }
 
+    public java.util.concurrent.CompletableFuture<Boolean> disbandByWarDefeat(long clanId) {
+        return clanRepository.findById(clanId).thenCompose(clanOptional -> {
+            if (clanOptional.isEmpty()) {
+                return java.util.concurrent.CompletableFuture.completedFuture(false);
+            }
+            return executeDisband(clanOptional.get(), null, false);
+        });
+    }
+
     private java.util.concurrent.CompletableFuture<Boolean> executeDisband(Clan clan, Player initiator, boolean standardLoss) {
         long disbandedAt = System.currentTimeMillis();
         return clanRepository.findMembersByClanId(clan.id()).thenCompose(members -> {

@@ -11,8 +11,18 @@ public final class InfoGuiSlotsSettings {
     @Comment(@CommentValue("Вступить / покинуть клан"))
     public int action = 15;
 
+    @Comment(@CommentValue("Объявить войну (лидер, чужой клан)"))
+    public int declareWar = 16;
+
     @Comment(@CommentValue("Состав клана"))
     public int members = 13;
+
+    @Comment(@CommentValue("Союзники (голова лидера, клик — инфо)"))
+    public int allyFirst = 8;
+
+    public int allySecond = 17;
+
+    public int allyThird = 26;
 
     @Comment(@CommentValue("Назад к списку"))
     public int back = 22;

@@ -26,6 +26,7 @@ public final class ChestSchemaMigrator {
     public void migrate() {
         try {
             runScript("database/001_chest.sql");
+            runScript("database/002_spoils.sql");
         } catch (SQLException | IOException exception) {
             throw new IllegalStateException("Failed to migrate clan chest schema", exception);
         }

@@ -102,6 +102,14 @@ public final class ClanTreasuryService implements ClanTreasuryApi {
     }
 
     @Override
+    public CompletableFuture<TreasuryOperationResult> seize(long fromClanId, long toClanId, double amount, String note) {
+        if (!isValidAmount(amount)) {
+            return CompletableFuture.completedFuture(TreasuryOperationResult.INVALID_AMOUNT);
+        }
+        return api.scheduler().supplyAsync(() -> executeSeize(fromClanId, toClanId, amount, note));
+    }
+
+    @Override
     public CompletableFuture<List<ClanTreasuryEntrySnapshot>> recentEntries(long clanId, int limit) {
         return api.scheduler().supplyAsync(() -> repository.recentEntries(clanId, limit));
     }
@@ -315,6 +323,54 @@ public final class ClanTreasuryService implements ClanTreasuryApi {
                     ENTRY_TRANSFER_IN,
                     amount,
                     "rollback",
+                    false,
+                    timestamp
+            ));
+            return TreasuryOperationResult.FAILED;
+        }
+        return TreasuryOperationResult.SUCCESS;
+    }
+
+    private TreasuryOperationResult executeSeize(long fromClanId, long toClanId, double amount, String note) {
+        if (fromClanId == toClanId) {
+            return TreasuryOperationResult.FAILED;
+        }
+        repository.ensureAccount(fromClanId);
+        repository.ensureAccount(toClanId);
+        UUID systemActor = UUID.fromString("00000000-0000-0000-0000-000000000000");
+        long timestamp = System.currentTimeMillis();
+        ClanTreasuryRepository.TreasuryMutationResult withdrawResult = repository.applyMutation(
+                new ClanTreasuryRepository.TreasuryMutation(
+                        fromClanId,
+                        systemActor,
+                        ENTRY_TRANSFER_OUT,
+                        -amount,
+                        note,
+                        false,
+                        timestamp
+                )
+        );
+        if (!withdrawResult.success()) {
+            return TreasuryOperationResult.INSUFFICIENT_TREASURY_FUNDS;
+        }
+        ClanTreasuryRepository.TreasuryMutationResult depositResult = repository.applyMutation(
+                new ClanTreasuryRepository.TreasuryMutation(
+                        toClanId,
+                        systemActor,
+                        ENTRY_TRANSFER_IN,
+                        amount,
+                        note,
+                        false,
+                        timestamp
+                )
+        );
+        if (!depositResult.success()) {
+            repository.applyMutation(new ClanTreasuryRepository.TreasuryMutation(
+                    fromClanId,
+                    systemActor,
+                    ENTRY_TRANSFER_IN,
+                    amount,
+                    "seize-rollback",
                     false,
                     timestamp
             ));

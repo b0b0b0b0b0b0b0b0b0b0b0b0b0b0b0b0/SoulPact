@@ -654,6 +654,8 @@ clan:
             - "<#9CA3AF>Верификация: {verified}"
             - "<#9CA3AF>Дружественный огонь: {ff}"
             - "<#9CA3AF>Набор открыт: {recruitment}"
+            - "<#9CA3AF>Казна: <white>{treasury}"
+            - "<#9CA3AF>Коалиция: <white>{coalition}"
             - ""
             - "<#9CA3AF>Описание:"
             - "<white>{description}"
@@ -677,6 +679,16 @@ clan:
           name: "<#F87171><bold>Покинуть клан</bold>"
           lore:
             - "<#9CA3AF>Выйти из <white>[{tag}]</white>"
+        declare-war:
+          name: "<#F87171><bold>Объявить войну</bold>"
+          lore:
+            - "<#9CA3AF>Отправить объявление лидеру"
+            - "<#9CA3AF>Клан: <white>[{tag}]</white> <#6B7280>(#{id})"
+        ally:
+          name: "<#D8B4FE>[{tag}] {name}"
+          lore:
+            - "<#9CA3AF>ID: <white>#{id}"
+            - "<#D8B4FE>Нажмите — информация о союзнике"
         back:
           name: "<#F87171>Назад"
           lore:
@@ -757,7 +769,12 @@ clan:
             - "<#9CA3AF>Лидер: <white>{leader}"
             - "<#9CA3AF>Участники: <white>{count}/{max}"
             - "<#9CA3AF>Репутация: <white>{points}"
+            - "<#9CA3AF>Казна: <white>{treasury}"
+            - "<#9CA3AF>Коалиция: <white>{coalition}"
             - "<#9CA3AF>Набор открыт: {recruitment}"
+      value:
+        treasury-unknown: "—"
+        coalition-none: "—"
         empty:
           name: "<#6B7280>Кланов пока нет"
           lore:
@@ -823,6 +840,11 @@ clan:
           display-name: "<#D8B4FE>База"
           lore:
             - "<#9CA3AF>Флаг, регион и настройки"
+            - "<#D8B4FE>Нажмите — открыть"
+        coalition:
+          display-name: "<#D8B4FE>Коалиция"
+          lore:
+            - "<#9CA3AF>Союз до 3 кланов"
             - "<#D8B4FE>Нажмите — открыть"
         gladiator:
           display-name: "<#D8B4FE>Гладиатор"

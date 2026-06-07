@@ -1,5 +1,6 @@
 package bm.b0b0b0.SoulPact.clan.gui;
 
+import bm.b0b0b0.SoulPact.api.coalition.CoalitionAllySnapshot;
 import bm.b0b0b0.SoulPact.clan.service.ClanInfoViewSnapshot;
 import bm.b0b0b0.SoulPact.clan.service.ClanPlayerNames;
 import bm.b0b0b0.SoulPact.clan.service.ClanProfilePlaceholders;
@@ -33,6 +34,12 @@ public final class ClanInfoMenuPopulator {
                 snapshot.memberCount(),
                 messageService
         );
+        placeholders.put("treasury", snapshot.treasuryLine().isBlank()
+                ? messageService.resolve(player, "clan.gui.list.value.treasury-unknown")
+                : snapshot.treasuryLine());
+        placeholders.put("coalition", snapshot.coalitionLine().isBlank()
+                ? messageService.resolve(player, "clan.gui.list.value.coalition-none")
+                : snapshot.coalitionLine());
         inventory.setItem(guiInfoConfig.clanCardSlot(), guiItemBuilder.build(
                 player,
                 guiInfoConfig.clanCardMaterial(),
@@ -74,12 +81,46 @@ public final class ClanInfoMenuPopulator {
                     placeholders
             ));
         }
+        if (snapshot.showDeclareWar()) {
+            inventory.setItem(guiInfoConfig.declareWarSlot(), guiItemBuilder.build(
+                    player,
+                    guiInfoConfig.declareWarMaterial(),
+                    "clan.gui.info.item.declare-war.name",
+                    "clan.gui.info.item.declare-war.lore",
+                    placeholders
+            ));
+        }
+        placeAllies(inventory, player, snapshot);
         inventory.setItem(guiInfoConfig.backSlot(), guiItemBuilder.build(
                 player,
                 guiInfoConfig.backMaterial(),
                 "clan.gui.info.item.back.name",
                 "clan.gui.info.item.back.lore"
         ));
+    }
+
+    private void placeAllies(Inventory inventory, Player player, ClanInfoViewSnapshot snapshot) {
+        int[] slots = {
+                guiInfoConfig.allyFirstSlot(),
+                guiInfoConfig.allySecondSlot(),
+                guiInfoConfig.allyThirdSlot()
+        };
+        java.util.List<CoalitionAllySnapshot> allies = snapshot.allies();
+        for (int index = 0; index < slots.length && index < allies.size(); index++) {
+            CoalitionAllySnapshot ally = allies.get(index);
+            inventory.setItem(slots[index], guiItemBuilder.buildPlayerHead(
+                    player,
+                    ally.leaderId(),
+                    ClanPlayerNames.displayName(ally.leaderId()),
+                    "clan.gui.info.item.ally.name",
+                    "clan.gui.info.item.ally.lore",
+                    java.util.Map.of(
+                            "tag", ally.tag(),
+                            "name", ally.name(),
+                            "id", String.valueOf(ally.clanId())
+                    )
+            ));
+        }
     }
 
     private void fillBackground(Inventory inventory, Player player) {

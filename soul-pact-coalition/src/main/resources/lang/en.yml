@@ -1,0 +1,47 @@
+coalition:
+  startup:
+    separator: "&8&m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    registered: "Coalition module registered"
+    core-missing: "SoulPact not found — coalition module disabled"
+    database-missing: "SoulPact database not ready — coalition module disabled"
+  invite:
+    sent: "<#86EFAC>Coalition invite sent to clan <white>[{tag}]</white>."
+    received: "<#D8B4FE>Clan <white>[{inviter_tag}] {inviter_name}</white> invites you to a coalition!"
+    accepted: "<#86EFAC>You joined the coalition."
+    denied: "<#9CA3AF>Coalition invite denied."
+    button:
+      accept: "<#86EFAC><bold>[Accept]</bold>"
+      deny: "<#F87171><bold>[Deny]</bold>"
+      separator: " <#4B5563>| "
+  leave:
+    success: "<#9CA3AF>You left the coalition."
+  war:
+    declared-on-ally: "<#EAB308>War declared on your ally <white>[{friend_tag}]</white>!"
+    started-for-ally: "<#F87171>Coalition war started for clan <white>[{friend_tag}]</white>!"
+    ally-victory: "<#86EFAC>Allies won! <white>[{winner_tag}]</white> defeated <white>[{loser_tag}]</white>."
+    ally-defeat: "<#F87171>Ally <white>[{loser_tag}]</white> lost the war."
+  bossbar:
+    declared-on-ally: "War declared on ally [{friend_tag}]"
+    active-for-ally: "Coalition war: [{friend_tag}]"
+    capture-for-ally: "Ally flag capture [{friend_tag}] · {seconds}s"
+  error:
+    not-in-clan: "<#F87171>You are not in a clan."
+    not-leader: "<#F87171>Only the leader can manage the coalition."
+    target-not-found: "<#F87171>Clan not found."
+    self: "<#F87171>You cannot invite your own clan."
+    already-allied: "<#F87171>Clans are already allied."
+    coalition-full: "<#F87171>Coalition already has 3 clans."
+    already-sent: "<#F87171>Invite already pending."
+    invite-not-found: "<#F87171>Invite not found."
+    not-in-coalition: "<#F87171>Your clan is not in a coalition."
+    invalid-id: "<#F87171>Invalid invite id."
+  command:
+    usage: "<#9CA3AF>/clancoalition · invite <tag> · accept <id> · deny <id> · leave"
+    invite-usage: "<#9CA3AF>/clancoalition invite <tag>"
+    accept-usage: "<#9CA3AF>/clancoalition accept <id>"
+    deny-usage: "<#9CA3AF>/clancoalition deny <id>"
+  gui:
+    hub:
+      header: "<#C084FC><bold>Coalition</bold> <#374151>({count}/3)"
+      member-line: "<#D8B4FE>{index}. <white>[{tag}] {name}</white>"
+      footer: "<#9CA3AF>/clancoalition invite <tag> · leave"

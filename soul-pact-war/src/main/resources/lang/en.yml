@@ -1,0 +1,79 @@
+war:
+  startup:
+    separator: "&8&m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    registered: "Clan war module registered"
+    core-missing: "SoulPact not found — war module disabled"
+    database-missing: "SoulPact database not ready — war module disabled"
+  declare:
+    sent: "<#86EFAC>War declaration sent to the clan leader."
+    received: "<#F87171>Clan <white>[{attacker_tag}] {attacker_name}</white> declared war on you!"
+    button:
+      accept: "<#86EFAC><bold>[Accept war]</bold>"
+      ransom: "<#EAB308><bold>[Pay ransom]</bold>"
+      separator: " <#4B5563>| "
+  response:
+    accepted: "<#86EFAC>You accepted the war. Treasury unlocked."
+    ransomed: "<#EAB308>Ransom <white>{amount}</white> transferred to the attacker. Declaration closed."
+  capture:
+    started: "<#F87171>Standard captured! Defender has <white>{seconds}</white> seconds to recover it."
+  bossbar:
+    pending-defender: "War has been declared on you"
+    active-attacker: "You are at war"
+    active-defender: "War has been declared on your clan"
+    capture-defending: "Enemy captured your flag! {seconds} sec. until clan destruction"
+    capture-attacking: "You captured the enemy flag! {seconds} sec. until victory"
+  victory:
+    broadcast: "<#C084FC>Clan <white>{winner}</white> defeated <white>{loser}</white> in war."
+  error:
+    cannot-declare: "<#F87171>Cannot declare war on this clan."
+    already-pending: "<#F87171>A declaration is already pending."
+    not-leader: "<#F87171>Only the leader can respond to declarations."
+    empty-treasury: "<#F87171>Treasury is empty — ransom unavailable."
+    ransom-failed: "<#F87171>Failed to transfer ransom."
+  gui:
+    declare-confirm:
+      title: "<#581C87><bold>Declare war?</bold> <white>[{tag}]"
+      item:
+        confirm:
+          name: "<#86EFAC><bold>Yes, declare</bold>"
+          lore:
+            - "<#9CA3AF>Clan: <white>[{tag}] {name}"
+            - "<#9CA3AF>ID: <white>#{id}"
+            - "<#F87171>Cannot be cancelled"
+        deny:
+          name: "<#F87171><bold>No</bold>"
+          lore:
+            - "<#9CA3AF>Back to clan info"
+    pending-list:
+      title: "<#581C87><bold>War declarations</bold> <#374151>({count})"
+      item:
+        empty:
+          name: "<#6B7280>No declarations"
+          lore:
+            - "<#9CA3AF>No clan has declared war on you"
+        entry:
+          name: "<#F87171>[{attacker_tag}] {attacker_name}"
+          lore:
+            - "<#9CA3AF>Declaration ID: <white>#{id}"
+            - "<#D8B4FE>Click — accept or ransom"
+        back:
+          name: "<#F87171>Close"
+          lore:
+            - "<#9CA3AF>Close menu"
+    pending-detail:
+      title: "<#581C87><bold>[{tag}] {name}</bold>"
+      item:
+        accept:
+          name: "<#86EFAC><bold>Accept war</bold>"
+          lore:
+            - "<#9CA3AF>Start active war"
+            - "<#9CA3AF>Treasury will be unlocked"
+        ransom:
+          name: "<#EAB308><bold>Pay ransom</bold>"
+          lore:
+            - "<#9CA3AF>{ransom_percent}% of treasury: <white>{ransom_amount}"
+            - "<#9CA3AF>Declaration will be removed"
+        back:
+          name: "<#F87171>Back"
+          lore:
+            - "<#9CA3AF>Back to declaration list"

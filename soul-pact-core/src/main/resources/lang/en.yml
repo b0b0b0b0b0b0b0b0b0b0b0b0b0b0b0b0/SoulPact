@@ -655,6 +655,8 @@ clan:
             - "<#9CA3AF>Verified: {verified}"
             - "<#9CA3AF>Friendly fire: {ff}"
             - "<#9CA3AF>Recruitment open: {recruitment}"
+            - "<#9CA3AF>Treasury: <white>{treasury}"
+            - "<#9CA3AF>Coalition: <white>{coalition}"
             - ""
             - "<#9CA3AF>Description:"
             - "<white>{description}"
@@ -678,6 +680,16 @@ clan:
           name: "<#F87171><bold>Leave clan</bold>"
           lore:
             - "<#9CA3AF>Leave <white>[{tag}]</white>"
+        declare-war:
+          name: "<#F87171><bold>Declare war</bold>"
+          lore:
+            - "<#9CA3AF>Send declaration to leader"
+            - "<#9CA3AF>Clan: <white>[{tag}]</white> <#6B7280>(#{id})"
+        ally:
+          name: "<#D8B4FE>[{tag}] {name}"
+          lore:
+            - "<#9CA3AF>ID: <white>#{id}"
+            - "<#D8B4FE>Click — ally clan info"
         back:
           name: "<#F87171>Back"
           lore:
@@ -758,7 +770,12 @@ clan:
             - "<#9CA3AF>Leader: <white>{leader}"
             - "<#9CA3AF>Members: <white>{count}/{max}"
             - "<#9CA3AF>Reputation: <white>{points}"
+            - "<#9CA3AF>Treasury: <white>{treasury}"
+            - "<#9CA3AF>Coalition: <white>{coalition}"
             - "<#9CA3AF>Recruitment open: {recruitment}"
+      value:
+        treasury-unknown: "—"
+        coalition-none: "—"
         empty:
           name: "<#6B7280>No clans yet"
           lore:
@@ -824,6 +841,11 @@ clan:
           display-name: "<#D8B4FE>Base"
           lore:
             - "<#9CA3AF>Flag, region and settings"
+            - "<#D8B4FE>Click — open"
+        coalition:
+          display-name: "<#D8B4FE>Coalition"
+          lore:
+            - "<#9CA3AF>Alliance up to 3 clans"
             - "<#D8B4FE>Click — open"
         gladiator:
           display-name: "<#D8B4FE>Gladiator"
