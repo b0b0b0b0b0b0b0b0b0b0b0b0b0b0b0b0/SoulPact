@@ -1,6 +1,7 @@
 package bm.b0b0b0.SoulPact.core;
 
 import bm.b0b0b0.SoulPact.api.SoulPactApi;
+import bm.b0b0b0.SoulPact.api.platform.SoulPactClanGui;
 import bm.b0b0b0.SoulPact.clan.command.ClanCommandRegistrar;
 import bm.b0b0b0.SoulPact.clan.gui.ClanCreateChatPrompt;
 import bm.b0b0b0.SoulPact.clan.gui.ClanGuiClickDispatcher;
@@ -86,6 +87,7 @@ import bm.b0b0b0.SoulPact.clan.service.ClanKickService;
 import bm.b0b0b0.SoulPact.clan.service.ClanLeaveService;
 import bm.b0b0b0.SoulPact.clan.service.ClanMemberHistoryLoreBuilder;
 import bm.b0b0b0.SoulPact.clan.service.ClanExtensionsDataService;
+import bm.b0b0b0.SoulPact.clan.service.ClanHubModuleSlotService;
 import bm.b0b0b0.SoulPact.clan.service.ExtensionDisplayService;
 import bm.b0b0b0.SoulPact.clan.service.ClanListDataService;
 import bm.b0b0b0.SoulPact.clan.service.ClanProfileDataService;
@@ -93,6 +95,9 @@ import bm.b0b0b0.SoulPact.clan.service.ClanProfileMembersLoreBuilder;
 import bm.b0b0b0.SoulPact.clan.service.ClanQueryService;
 import bm.b0b0b0.SoulPact.clan.role.RoleThemeService;
 import bm.b0b0b0.SoulPact.core.api.SoulPactApiImpl;
+import bm.b0b0b0.SoulPact.core.api.SoulPactClanAccessImpl;
+import bm.b0b0b0.SoulPact.core.api.SoulPactClanGuiImpl;
+import bm.b0b0b0.SoulPact.core.api.SoulPactSchedulerImpl;
 import bm.b0b0b0.SoulPact.core.config.ConfigurationLoader;
 import bm.b0b0b0.SoulPact.core.config.PluginConfig;
 import bm.b0b0b0.SoulPact.core.database.AsyncDatabaseExecutor;
@@ -106,6 +111,7 @@ import bm.b0b0b0.SoulPact.core.message.StartupConsolePresenter;
 import bm.b0b0b0.SoulPact.core.module.ExtensionRegistryImpl;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class SoulPactApplication {
@@ -156,6 +162,7 @@ public final class SoulPactApplication {
     }
 
     public void disable() {
+        plugin.getServer().getServicesManager().unregisterAll(plugin);
         if (databaseBootstrap != null) {
             databaseBootstrap.shutdown();
         }
@@ -228,10 +235,19 @@ public final class SoulPactApplication {
                 integrationBootstrap.skinRestorerIntegration()
         );
         GuiItemBuilder guiItemBuilder = new GuiItemBuilder(messageService, playerHeadSkinApplier);
+        ExtensionDisplayService extensionDisplayService = new ExtensionDisplayService(messageService);
+        ClanHubModuleSlotService hubModuleSlotService = new ClanHubModuleSlotService(
+                extensionRegistry,
+                pluginConfig.guiHub()
+        );
         ClanStandardKeys standardKeys = new ClanStandardKeys(plugin);
         this.clanStandardItem = new ClanStandardItem(standardKeys, messageService);
         this.standardPresence = new ClanStandardPresence();
-        ClanHubMenuPopulator hubMenuPopulator = new ClanHubMenuPopulator(pluginConfig.guiHub(), guiItemBuilder);
+        ClanHubMenuPopulator hubMenuPopulator = new ClanHubMenuPopulator(
+                pluginConfig.guiHub(),
+                guiItemBuilder,
+                extensionDisplayService
+        );
         ClanProfileMembersLoreBuilder profileMembersLoreBuilder = new ClanProfileMembersLoreBuilder(
                 messageService,
                 roleThemeService
@@ -329,7 +345,6 @@ public final class SoulPactApplication {
                 asyncDatabaseExecutor,
                 rolePermissionService
         );
-        ExtensionDisplayService extensionDisplayService = new ExtensionDisplayService(messageService);
         ClanExtensionsDataService extensionsDataService = new ClanExtensionsDataService(
                 extensionRegistry,
                 pluginConfig.guiExtensions()
@@ -444,6 +459,7 @@ public final class SoulPactApplication {
                 extensionsMenuPopulator,
                 messageService,
                 hubDataService,
+                hubModuleSlotService,
                 profileDataService,
                 requestsDataService,
                 requestDetailDataService,
@@ -594,6 +610,28 @@ public final class SoulPactApplication {
                 membershipService,
                 roleThemeService
         ));
-        soulPactApi = new SoulPactApiImpl(plugin, messageService, extensionRegistry, dataSourceProvider, clanQueryService);
+        SoulPactClanGui clanGui = new SoulPactClanGuiImpl(guiOpenService);
+        soulPactApi = new SoulPactApiImpl(
+                plugin,
+                messageService,
+                extensionRegistry,
+                new SoulPactSchedulerImpl(asyncDatabaseExecutor),
+                new SoulPactClanAccessImpl(clanRepository, rolePermissionService),
+                clanGui,
+                dataSourceProvider,
+                clanQueryService
+        );
+        plugin.getServer().getServicesManager().register(
+                SoulPactApi.class,
+                soulPactApi,
+                plugin,
+                ServicePriority.Normal
+        );
+        plugin.getServer().getServicesManager().register(
+                SoulPactClanGui.class,
+                clanGui,
+                plugin,
+                ServicePriority.Normal
+        );
     }
 }

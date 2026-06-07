@@ -118,7 +118,7 @@ public final class ClanKickService {
         }
         if (actorOptional.isPresent()
                 && !ClanStaffPermissions.isLeader(clan, actor.getUniqueId())
-                && !permissions.isEnabled(actorOptional.get().role(), bm.b0b0b0.SoulPact.clan.model.ClanPermissionKeys.KICK, false)) {
+                && !permissions.isEnabled(actorOptional.get().role(), bm.b0b0b0.SoulPact.api.clan.ClanPermissionKeys.KICK, false)) {
             notify(actor, "clan.kick.not-allowed");
         }
     }

@@ -12,5 +12,7 @@ public final class HubGuiMaterialsSettings {
     public String banner = "WHITE_BANNER";
     public String create = "EMERALD";
     public String help = "BOOK";
+    @Comment(@CommentValue("Иконка модулей (bank, chest...)"))
+    public String module = "GOLD_INGOT";
     public String filler = "GRAY_STAINED_GLASS_PANE";
 }

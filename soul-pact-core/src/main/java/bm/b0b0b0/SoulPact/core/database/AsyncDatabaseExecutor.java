@@ -34,4 +34,8 @@ public final class AsyncDatabaseExecutor {
     public void runSync(Runnable runnable) {
         plugin.getServer().getScheduler().runTask(plugin, runnable);
     }
+
+    public void runSyncLater(long delayTicks, Runnable runnable) {
+        plugin.getServer().getScheduler().runTaskLater(plugin, runnable, delayTicks);
+    }
 }

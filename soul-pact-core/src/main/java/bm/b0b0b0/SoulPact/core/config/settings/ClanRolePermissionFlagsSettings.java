@@ -13,4 +13,10 @@ public final class ClanRolePermissionFlagsSettings {
 
     @Comment(@CommentValue("Нанимать участников ниже по рангу"))
     public boolean recruitLower = false;
+
+    @Comment(@CommentValue("Вносить в казну"))
+    public boolean bankDeposit = true;
+
+    @Comment(@CommentValue("Снимать из казны"))
+    public boolean bankWithdraw = false;
 }

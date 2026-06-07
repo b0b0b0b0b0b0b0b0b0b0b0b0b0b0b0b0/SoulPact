@@ -23,16 +23,21 @@ public final class ClanRolePermissionDefaultsSettings {
         settings.kick = true;
         settings.accept = true;
         settings.recruitLower = true;
+        settings.bankDeposit = true;
+        settings.bankWithdraw = true;
         return settings;
     }
 
     private static ClanRolePermissionFlagsSettings officerDefaults() {
         ClanRolePermissionFlagsSettings settings = new ClanRolePermissionFlagsSettings();
         settings.accept = true;
+        settings.bankDeposit = true;
         return settings;
     }
 
     private static ClanRolePermissionFlagsSettings memberDefaults() {
-        return new ClanRolePermissionFlagsSettings();
+        ClanRolePermissionFlagsSettings settings = new ClanRolePermissionFlagsSettings();
+        settings.bankDeposit = true;
+        return settings;
     }
 }

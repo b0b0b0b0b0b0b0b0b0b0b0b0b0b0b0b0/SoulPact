@@ -14,6 +14,12 @@ public final class RoleSettingsGuiSlotsSettings {
     @Comment(@CommentValue("Нанимать нижних чинов"))
     public int recruitLower = 15;
 
+    @Comment(@CommentValue("Вносить в казну"))
+    public int bankDeposit = 20;
+
+    @Comment(@CommentValue("Снимать из казны"))
+    public int bankWithdraw = 22;
+
     @Comment(@CommentValue("Назад"))
     public int back = 31;
 }

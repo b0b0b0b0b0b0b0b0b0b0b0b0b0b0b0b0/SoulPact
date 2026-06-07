@@ -2,7 +2,7 @@ package bm.b0b0b0.SoulPact.clan.service;
 
 import bm.b0b0b0.SoulPact.clan.model.Clan;
 import bm.b0b0b0.SoulPact.clan.model.ClanMember;
-import bm.b0b0b0.SoulPact.clan.model.ClanPermissionKeys;
+import bm.b0b0b0.SoulPact.api.clan.ClanPermissionKeys;
 import bm.b0b0b0.SoulPact.clan.model.ClanRolePermissionMap;
 import bm.b0b0b0.SoulPact.clan.role.RoleTheme;
 import java.util.List;

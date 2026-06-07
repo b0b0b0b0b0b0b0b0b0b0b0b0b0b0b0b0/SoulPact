@@ -3,6 +3,7 @@ package bm.b0b0b0.SoulPact.clan.gui;
 import bm.b0b0b0.SoulPact.clan.service.ClanInfoViewDataService;
 import bm.b0b0b0.SoulPact.clan.service.ClanExtensionsDataService;
 import bm.b0b0b0.SoulPact.clan.service.ClanHubDataService;
+import bm.b0b0b0.SoulPact.clan.service.ClanHubModuleSlotService;
 import bm.b0b0b0.SoulPact.clan.service.ClanListDataService;
 import bm.b0b0b0.SoulPact.clan.service.ClanProfileDataService;
 import bm.b0b0b0.SoulPact.clan.service.ClanMemberDetailDataService;
@@ -61,6 +62,7 @@ public final class ClanGuiOpenService {
     private final ClanExtensionsMenuPopulator extensionsMenuPopulator;
     private final MessageService messageService;
     private final ClanHubDataService hubDataService;
+    private final ClanHubModuleSlotService hubModuleSlotService;
     private final ClanProfileDataService profileDataService;
     private final ClanRequestsDataService requestsDataService;
     private final ClanRequestDetailDataService requestDetailDataService;
@@ -103,6 +105,7 @@ public final class ClanGuiOpenService {
             ClanExtensionsMenuPopulator extensionsMenuPopulator,
             MessageService messageService,
             ClanHubDataService hubDataService,
+            ClanHubModuleSlotService hubModuleSlotService,
             ClanProfileDataService profileDataService,
             ClanRequestsDataService requestsDataService,
             ClanRequestDetailDataService requestDetailDataService,
@@ -144,6 +147,7 @@ public final class ClanGuiOpenService {
         this.extensionsMenuPopulator = extensionsMenuPopulator;
         this.messageService = messageService;
         this.hubDataService = hubDataService;
+        this.hubModuleSlotService = hubModuleSlotService;
         this.profileDataService = profileDataService;
         this.requestsDataService = requestsDataService;
         this.requestDetailDataService = requestDetailDataService;
@@ -163,7 +167,14 @@ public final class ClanGuiOpenService {
             if (!player.isOnline()) {
                 return;
             }
-            ClanHubMenu menu = new ClanHubMenu(guiHubConfig, hubMenuPopulator, messageService, player, snapshot);
+            ClanHubMenu menu = new ClanHubMenu(
+                    guiHubConfig,
+                    hubMenuPopulator,
+                    messageService,
+                    player,
+                    snapshot,
+                    hubModuleSlotService.resolve()
+            );
             player.openInventory(menu.getInventory());
         }));
     }

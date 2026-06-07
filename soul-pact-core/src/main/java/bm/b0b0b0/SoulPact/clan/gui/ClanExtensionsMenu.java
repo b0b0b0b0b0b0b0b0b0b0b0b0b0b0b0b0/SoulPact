@@ -1,8 +1,11 @@
 package bm.b0b0b0.SoulPact.clan.gui;
 
+import bm.b0b0b0.SoulPact.api.SoulPactExtension;
+import bm.b0b0b0.SoulPact.api.SoulPactGuiExtension;
 import bm.b0b0b0.SoulPact.clan.service.ClanExtensionsPage;
 import bm.b0b0b0.SoulPact.core.config.GuiExtensionsConfig;
 import bm.b0b0b0.SoulPact.core.message.MessageService;
+import java.util.Optional;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -42,6 +45,20 @@ public final class ClanExtensionsMenu implements InventoryHolder {
 
     public ClanExtensionsPage extensionsPage() {
         return extensionsPage;
+    }
+
+    public Optional<SoulPactExtension> extensionAtSlot(int slot) {
+        int index = 0;
+        for (SoulPactExtension extension : extensionsPage.extensions()) {
+            if (index >= guiExtensionsConfig.pageSize()) {
+                break;
+            }
+            if (slot == guiExtensionsConfig.contentSlot(index)) {
+                return Optional.of(extension);
+            }
+            index++;
+        }
+        return Optional.empty();
     }
 
     public int slotPrevious() {

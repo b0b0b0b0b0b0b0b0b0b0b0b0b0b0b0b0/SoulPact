@@ -1,5 +1,6 @@
 package bm.b0b0b0.SoulPact.clan.model;
 
+import bm.b0b0b0.SoulPact.api.clan.ClanPermissionKeys;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +11,9 @@ public final class ClanRolePermissionMap {
     public static final List<String> PERMISSION_ORDER = List.of(
             ClanPermissionKeys.KICK,
             ClanPermissionKeys.ACCEPT,
-            ClanPermissionKeys.RECRUIT_LOWER
+            ClanPermissionKeys.RECRUIT_LOWER,
+            ClanPermissionKeys.BANK_DEPOSIT,
+            ClanPermissionKeys.BANK_WITHDRAW
     );
 
     private final Map<String, Map<String, Boolean>> byRole;

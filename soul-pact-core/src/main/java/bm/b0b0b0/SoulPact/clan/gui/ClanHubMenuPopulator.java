@@ -1,7 +1,12 @@
 package bm.b0b0b0.SoulPact.clan.gui;
 
+import bm.b0b0b0.SoulPact.api.SoulPactGuiExtension;
+import bm.b0b0b0.SoulPact.clan.service.ClanHubModuleSlotLayout;
 import bm.b0b0b0.SoulPact.clan.service.ClanHubSnapshot;
+import bm.b0b0b0.SoulPact.clan.service.ExtensionDisplayService;
 import bm.b0b0b0.SoulPact.core.config.GuiHubConfig;
+import java.util.List;
+import java.util.Map;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -10,13 +15,24 @@ public final class ClanHubMenuPopulator {
 
     private final GuiHubConfig guiHubConfig;
     private final GuiItemBuilder guiItemBuilder;
+    private final ExtensionDisplayService extensionDisplayService;
 
-    public ClanHubMenuPopulator(GuiHubConfig guiHubConfig, GuiItemBuilder guiItemBuilder) {
+    public ClanHubMenuPopulator(
+            GuiHubConfig guiHubConfig,
+            GuiItemBuilder guiItemBuilder,
+            ExtensionDisplayService extensionDisplayService
+    ) {
         this.guiHubConfig = guiHubConfig;
         this.guiItemBuilder = guiItemBuilder;
+        this.extensionDisplayService = extensionDisplayService;
     }
 
-    public void populate(Inventory inventory, Player player, ClanHubSnapshot snapshot) {
+    public void populate(
+            Inventory inventory,
+            Player player,
+            ClanHubSnapshot snapshot,
+            ClanHubModuleSlotLayout moduleLayout
+    ) {
         var placeholders = snapshot.placeholders();
         ItemStack filler = guiItemBuilder.filler(player, guiHubConfig.fillerMaterial(), "clan.gui.hub.item.filler.name");
         for (int slot = 0; slot < inventory.getSize(); slot++) {
@@ -55,6 +71,9 @@ public final class ClanHubMenuPopulator {
                     placeholders
             ));
         }
+        if (snapshot.inClan()) {
+            populateModules(inventory, player, moduleLayout);
+        }
         if (!snapshot.inClan()) {
             inventory.setItem(guiHubConfig.createSlot(), guiItemBuilder.build(
                     player,
@@ -71,5 +90,23 @@ public final class ClanHubMenuPopulator {
                 "clan.gui.hub.item.help.lore",
                 placeholders
         ));
+    }
+
+    private void populateModules(Inventory inventory, Player player, ClanHubModuleSlotLayout moduleLayout) {
+        for (Map.Entry<Integer, SoulPactGuiExtension> entry : moduleLayout.bySlot().entrySet()) {
+            SoulPactGuiExtension extension = entry.getValue();
+            String displayName = extensionDisplayService.displayName(player, extension.id());
+            List<String> lore = extensionDisplayService.lore(player, extension.id(), displayName);
+            inventory.setItem(entry.getKey(), guiItemBuilder.buildNamed(
+                    player,
+                    guiHubConfig.moduleMaterial(),
+                    "clan.gui.extensions.item.entry.name",
+                    lore,
+                    Map.of(
+                            "id", extension.id(),
+                            "display_name", displayName
+                    )
+            ));
+        }
     }
 }

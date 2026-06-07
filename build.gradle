@@ -37,3 +37,9 @@ subprojects {
         }
     }
 }
+
+tasks.register('plugins') {
+    group = 'build'
+    description = 'Build plugin JARs into build/plugins'
+    dependsOn ':soul-pact-core:jar', ':soul-pact-bank:jar'
+}

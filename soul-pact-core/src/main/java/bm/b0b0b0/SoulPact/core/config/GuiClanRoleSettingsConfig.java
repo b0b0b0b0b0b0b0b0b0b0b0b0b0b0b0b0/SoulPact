@@ -9,6 +9,8 @@ public final class GuiClanRoleSettingsConfig {
     private final int kickSlot;
     private final int acceptSlot;
     private final int recruitLowerSlot;
+    private final int bankDepositSlot;
+    private final int bankWithdrawSlot;
     private final int backSlot;
     private final Material toggleOnMaterial;
     private final Material toggleOffMaterial;
@@ -20,6 +22,8 @@ public final class GuiClanRoleSettingsConfig {
         this.kickSlot = settings.slots.kick;
         this.acceptSlot = settings.slots.accept;
         this.recruitLowerSlot = settings.slots.recruitLower;
+        this.bankDepositSlot = settings.slots.bankDeposit;
+        this.bankWithdrawSlot = settings.slots.bankWithdraw;
         this.backSlot = settings.slots.back;
         this.toggleOnMaterial = parseMaterial(settings.materials.toggleOn, Material.LIME_DYE);
         this.toggleOffMaterial = parseMaterial(settings.materials.toggleOff, Material.GRAY_DYE);
@@ -56,6 +60,8 @@ public final class GuiClanRoleSettingsConfig {
             case "kick" -> kickSlot;
             case "accept" -> acceptSlot;
             case "recruit_lower" -> recruitLowerSlot;
+            case "bank_deposit" -> bankDepositSlot;
+            case "bank_withdraw" -> bankWithdrawSlot;
             default -> -1;
         };
     }

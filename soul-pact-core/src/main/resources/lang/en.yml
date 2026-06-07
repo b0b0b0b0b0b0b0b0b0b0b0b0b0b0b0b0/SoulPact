@@ -107,6 +107,8 @@ clan:
       kick: "Kick"
       accept: "Accept"
       recruit_lower: "Recruit lower"
+      bank_deposit: "Deposit to treasury"
+      bank_withdraw: "Withdraw from treasury"
   banner:
     not-in-clan: "<#F87171>You are not in a clan."
     not-leader: "<#F87171>Only the leader can change the clan banner."
@@ -322,6 +324,28 @@ clan:
                 - "<#D8B4FE>Click — disable"
             disabled:
               name: "<#6B7280>Recruit lower ranks"
+              lore:
+                - "<#9CA3AF>Status: <#F87171>disabled"
+                - "<#D8B4FE>Click — enable"
+          bank_deposit:
+            enabled:
+              name: "<#86EFAC>Deposit to treasury"
+              lore:
+                - "<#9CA3AF>Status: <#86EFAC>enabled"
+                - "<#D8B4FE>Click — disable"
+            disabled:
+              name: "<#6B7280>Deposit to treasury"
+              lore:
+                - "<#9CA3AF>Status: <#F87171>disabled"
+                - "<#D8B4FE>Click — enable"
+          bank_withdraw:
+            enabled:
+              name: "<#86EFAC>Withdraw from treasury"
+              lore:
+                - "<#9CA3AF>Status: <#86EFAC>enabled"
+                - "<#D8B4FE>Click — disable"
+            disabled:
+              name: "<#6B7280>Withdraw from treasury"
               lore:
                 - "<#9CA3AF>Status: <#F87171>disabled"
                 - "<#D8B4FE>Click — enable"
@@ -762,6 +786,7 @@ clan:
           display-name: "<#D8B4FE>Clan bank"
           lore:
             - "<#9CA3AF>Treasury and transfers"
+            - "<#D8B4FE>Click — open"
         land:
           display-name: "<#D8B4FE>Land"
           lore:

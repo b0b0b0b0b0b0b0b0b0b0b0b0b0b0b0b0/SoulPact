@@ -33,3 +33,5 @@ processResources {
         expand props
     }
 }
+
+apply from: rootProject.file('gradle/plugin-jar.gradle')

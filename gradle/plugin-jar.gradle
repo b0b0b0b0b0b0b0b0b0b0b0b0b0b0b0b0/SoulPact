@@ -1,0 +1,24 @@
+import org.gradle.api.tasks.bundling.Jar
+
+afterEvaluate {
+    def pluginsDir = rootProject.layout.buildDirectory.dir('plugins')
+
+    tasks.named('jar', Jar) {
+        destinationDirectory.set(pluginsDir)
+        outputs.upToDateWhen { false }
+        doFirst {
+            def target = pluginsDir.get().file(archiveFileName.get()).asFile
+            target.parentFile.mkdirs()
+            if (target.isFile()) {
+                target.delete()
+            }
+        }
+        doLast {
+            logger.lifecycle('Plugin JAR: {}', archiveFile.get().asFile.absolutePath)
+        }
+    }
+
+    tasks.named('classes').configure {
+        finalizedBy tasks.named('jar')
+    }
+}

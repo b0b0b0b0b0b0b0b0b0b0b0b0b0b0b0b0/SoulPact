@@ -56,6 +56,13 @@ public final class ClanHubClickHandler {
             guiOpenService.openBanner(player);
             return;
         }
+        if (menu.inClan()) {
+            var extension = menu.extensionAtSlot(slot);
+            if (extension.isPresent()) {
+                extension.get().openGui(player);
+                return;
+            }
+        }
         messageService.send(player, "general.not-implemented");
     }
 }

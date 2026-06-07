@@ -1,5 +1,7 @@
 package bm.b0b0b0.SoulPact.clan.gui;
 
+import bm.b0b0b0.SoulPact.api.SoulPactExtension;
+import bm.b0b0b0.SoulPact.api.SoulPactGuiExtension;
 import org.bukkit.entity.Player;
 
 public final class ClanExtensionsClickHandler {
@@ -21,6 +23,14 @@ public final class ClanExtensionsClickHandler {
         }
         if (slot == menu.slotNext() && menu.extensionsPage().hasNext()) {
             guiOpenService.openExtensions(player, menu.extensionsPage().page() + 1);
+            return;
+        }
+        menu.extensionAtSlot(slot).ifPresent(extension -> openExtension(player, extension));
+    }
+
+    private void openExtension(Player player, SoulPactExtension extension) {
+        if (extension instanceof SoulPactGuiExtension guiExtension) {
+            guiExtension.openGui(player);
         }
     }
 }

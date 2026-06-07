@@ -1,0 +1,72 @@
+bank:
+  startup:
+    separator: "=============================="
+    registered: "Treasury module connected"
+    economy-connected: "Economy available through Vault"
+    economy-missing: "Vault not found — deposits and withdrawals unavailable"
+    core-missing: "SoulPact is not ready — treasury module disabled"
+    database-missing: "SoulPact database is not ready — treasury module disabled"
+    failed: "Failed to start treasury module"
+  not-in-clan: "<#F87171>You are not in a clan."
+  economy-unavailable: "<#F87171>Economy unavailable. Vault is required."
+  core-missing: "<#F87171>SoulPact not found."
+  database-unavailable: "<#F87171>SoulPact database is not ready."
+  locked: "<#F87171>Clan treasury is frozen."
+  no-permission-deposit: "<#F87171>You cannot deposit to the treasury."
+  no-permission-withdraw: "<#F87171>You cannot withdraw from the treasury."
+  invalid-amount: "<#F87171>Invalid amount."
+  insufficient-personal: "<#F87171>Not enough money: need <white>{amount}</white>."
+  insufficient-treasury: "<#F87171>Not enough funds in the treasury."
+  deposit-success: "<#86EFAC>Deposited <white>{amount}</white> to <white>[{tag}]</white>. Balance: <white>{balance}</white>."
+  deposit-broadcast: "<#D8B4FE><white>{player}</white> deposited <white>{amount}</white> to <white>[{tag}]</white>."
+  withdraw-success: "<#86EFAC>Withdrew <white>{amount}</white> from <white>[{tag}]</white>. Balance: <white>{balance}</white>."
+  withdraw-broadcast: "<#FCD34D><white>{player}</white> withdrew <white>{amount}</white> from <white>[{tag}]</white>."
+  failed: "<#F87171>Treasury operation failed."
+  gui:
+    title: "<#581C87><bold>Treasury</bold> <#374151>[{tag}]"
+    section:
+      contributors: "<#9CA3AF>Top contributors:"
+      ledger: "<#9CA3AF>Recent operations:"
+    item:
+      balance:
+        name: "<#FCD34D><bold>Treasury balance</bold>"
+        lore:
+          - "<#9CA3AF>Clan: <white>[{tag}] {name}"
+          - "<#9CA3AF>Balance: <white>{balance}"
+          - "<#9CA3AF>Status: {lock_state}"
+      lock-frozen: "<#F87171>frozen"
+      lock-open: "<#86EFAC>open"
+      deposit:
+        name: "<#86EFAC>Deposit {amount}"
+        lore:
+          - "<#9CA3AF>From your wallet"
+          - "<#D8B4FE>Click — deposit"
+      deposit-all:
+        name: "<#86EFAC><bold>Deposit all</bold>"
+        lore:
+          - "<#9CA3AF>From your wallet"
+          - "<#9CA3AF>Limit: <white>{max}"
+          - "<#D8B4FE>Click — deposit"
+      withdraw:
+        name: "<#F87171>Withdraw {amount}"
+        lore:
+          - "<#9CA3AF>To your wallet"
+          - "<#D8B4FE>Click — withdraw"
+      withdraw-all:
+        name: "<#FCD34D><bold>Withdraw all</bold>"
+        lore:
+          - "<#9CA3AF>Available: <white>{balance}"
+          - "<#D8B4FE>Click — withdraw"
+      back:
+        name: "<#F87171>Back"
+        lore:
+          - "<#9CA3AF>Back to hub"
+    ledger:
+      empty: "<#6B7280>  Empty"
+      line-deposit: "<#6B7280>  +{amount} <white>{player}</white>"
+      line-withdraw: "<#6B7280>  -{amount} <white>{player}</white>"
+      line-transfer-in: "<#6B7280>  +{amount} <#86EFAC>transfer"
+      line-transfer-out: "<#6B7280>  -{amount} <#F87171>transfer"
+    contributor:
+      empty: "<#6B7280>  Nobody yet"
+      line: "<#6B7280>  {rank}. <white>{player}</white> — <white>{amount}"

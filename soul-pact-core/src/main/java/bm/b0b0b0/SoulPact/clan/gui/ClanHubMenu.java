@@ -1,8 +1,11 @@
 package bm.b0b0b0.SoulPact.clan.gui;
 
+import bm.b0b0b0.SoulPact.api.SoulPactGuiExtension;
+import bm.b0b0b0.SoulPact.clan.service.ClanHubModuleSlotLayout;
 import bm.b0b0b0.SoulPact.clan.service.ClanHubSnapshot;
 import bm.b0b0b0.SoulPact.core.config.GuiHubConfig;
 import bm.b0b0b0.SoulPact.core.message.MessageService;
+import java.util.Optional;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -12,7 +15,7 @@ public final class ClanHubMenu implements InventoryHolder {
 
     private final GuiHubConfig guiHubConfig;
     private final Inventory inventory;
-
+    private final ClanHubModuleSlotLayout moduleLayout;
     private final boolean clanLeader;
     private final boolean inClan;
 
@@ -21,9 +24,11 @@ public final class ClanHubMenu implements InventoryHolder {
             ClanHubMenuPopulator populator,
             MessageService messageService,
             Player player,
-            ClanHubSnapshot snapshot
+            ClanHubSnapshot snapshot,
+            ClanHubModuleSlotLayout moduleLayout
     ) {
         this.guiHubConfig = guiHubConfig;
+        this.moduleLayout = moduleLayout;
         this.inClan = snapshot.inClan();
         this.clanLeader = snapshot.clanLeader();
         this.inventory = Bukkit.createInventory(
@@ -31,7 +36,7 @@ public final class ClanHubMenu implements InventoryHolder {
                 guiHubConfig.size(),
                 messageService.component(player, "clan.gui.hub.title")
         );
-        populator.populate(inventory, player, snapshot);
+        populator.populate(inventory, player, snapshot, moduleLayout);
     }
 
     @Override
@@ -73,5 +78,9 @@ public final class ClanHubMenu implements InventoryHolder {
 
     public boolean inClan() {
         return inClan;
+    }
+
+    public Optional<SoulPactGuiExtension> extensionAtSlot(int slot) {
+        return moduleLayout.extensionAt(slot);
     }
 }

@@ -1,6 +1,6 @@
 package bm.b0b0b0.SoulPact.clan.service;
 
-import bm.b0b0b0.SoulPact.clan.model.ClanPermissionKeys;
+import bm.b0b0b0.SoulPact.api.clan.ClanPermissionKeys;
 import bm.b0b0b0.SoulPact.clan.model.ClanRolePermissionMap;
 import bm.b0b0b0.SoulPact.clan.repository.ClanRepository;
 import bm.b0b0b0.SoulPact.clan.repository.ClanRolePermissionRepository;
@@ -52,7 +52,9 @@ public final class ClanRolePermissionService {
     public CompletableFuture<Boolean> toggle(Player leader, long clanId, String role, String permission) {
         if (!ClanPermissionKeys.KICK.equals(permission)
                 && !ClanPermissionKeys.ACCEPT.equals(permission)
-                && !ClanPermissionKeys.RECRUIT_LOWER.equals(permission)) {
+                && !ClanPermissionKeys.RECRUIT_LOWER.equals(permission)
+                && !ClanPermissionKeys.BANK_DEPOSIT.equals(permission)
+                && !ClanPermissionKeys.BANK_WITHDRAW.equals(permission)) {
             return CompletableFuture.completedFuture(false);
         }
         return clanRepository.findById(clanId).thenCompose(clanOptional -> {
@@ -91,6 +93,8 @@ public final class ClanRolePermissionService {
             case ClanPermissionKeys.KICK -> flags.kick;
             case ClanPermissionKeys.ACCEPT -> flags.accept;
             case ClanPermissionKeys.RECRUIT_LOWER -> flags.recruitLower;
+            case ClanPermissionKeys.BANK_DEPOSIT -> flags.bankDeposit;
+            case ClanPermissionKeys.BANK_WITHDRAW -> flags.bankWithdraw;
             default -> false;
         };
     }
@@ -141,6 +145,8 @@ public final class ClanRolePermissionService {
         map.put(ClanPermissionKeys.KICK, flags.kick);
         map.put(ClanPermissionKeys.ACCEPT, flags.accept);
         map.put(ClanPermissionKeys.RECRUIT_LOWER, flags.recruitLower);
+        map.put(ClanPermissionKeys.BANK_DEPOSIT, flags.bankDeposit);
+        map.put(ClanPermissionKeys.BANK_WITHDRAW, flags.bankWithdraw);
         return map;
     }
 

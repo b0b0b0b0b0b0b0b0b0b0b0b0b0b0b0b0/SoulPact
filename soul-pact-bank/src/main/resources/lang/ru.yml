@@ -1,0 +1,72 @@
+bank:
+  startup:
+    separator: "=============================="
+    registered: "Модуль казны подключён"
+    economy-connected: "Экономика доступна через Vault"
+    economy-missing: "Vault не найден — внесение и снятие недоступны"
+    core-missing: "SoulPact не готов — модуль казны отключён"
+    database-missing: "База данных SoulPact не готова — модуль казны отключён"
+    failed: "Не удалось запустить модуль казны"
+  not-in-clan: "<#F87171>Вы не состоите в клане."
+  economy-unavailable: "<#F87171>Экономика недоступна. Нужен Vault."
+  core-missing: "<#F87171>SoulPact не найден."
+  database-unavailable: "<#F87171>База данных SoulPact не готова."
+  locked: "<#F87171>Казна клана заморожена."
+  no-permission-deposit: "<#F87171>У вас нет права вносить в казну."
+  no-permission-withdraw: "<#F87171>У вас нет права снимать из казны."
+  invalid-amount: "<#F87171>Некорректная сумма."
+  insufficient-personal: "<#F87171>Недостаточно денег: нужно <white>{amount}</white>."
+  insufficient-treasury: "<#F87171>В казне недостаточно средств."
+  deposit-success: "<#86EFAC>Вы внесли <white>{amount}</white> в казну <white>[{tag}]</white>. Баланс: <white>{balance}</white>."
+  deposit-broadcast: "<#D8B4FE><white>{player}</white> внёс <white>{amount}</white> в казну <white>[{tag}]</white>."
+  withdraw-success: "<#86EFAC>Вы сняли <white>{amount}</white> из казны <white>[{tag}]</white>. Баланс: <white>{balance}</white>."
+  withdraw-broadcast: "<#FCD34D><white>{player}</white> снял <white>{amount}</white> из казны <white>[{tag}]</white>."
+  failed: "<#F87171>Операция с казной не удалась."
+  gui:
+    title: "<#581C87><bold>Казна</bold> <#374151>[{tag}]"
+    section:
+      contributors: "<#9CA3AF>Топ вкладчиков:"
+      ledger: "<#9CA3AF>Последние операции:"
+    item:
+      balance:
+        name: "<#FCD34D><bold>Баланс казны</bold>"
+        lore:
+          - "<#9CA3AF>Клан: <white>[{tag}] {name}"
+          - "<#9CA3AF>На счету: <white>{balance}"
+          - "<#9CA3AF>Статус: {lock_state}"
+      lock-frozen: "<#F87171>заморожена"
+      lock-open: "<#86EFAC>открыта"
+      deposit:
+        name: "<#86EFAC>Внести {amount}"
+        lore:
+          - "<#9CA3AF>Перевести из вашего кошелька"
+          - "<#D8B4FE>Нажмите — внести"
+      deposit-all:
+        name: "<#86EFAC><bold>Внести всё</bold>"
+        lore:
+          - "<#9CA3AF>Максимум из кошелька"
+          - "<#9CA3AF>Лимит: <white>{max}"
+          - "<#D8B4FE>Нажмите — внести"
+      withdraw:
+        name: "<#F87171>Снять {amount}"
+        lore:
+          - "<#9CA3AF>На ваш личный счёт"
+          - "<#D8B4FE>Нажмите — снять"
+      withdraw-all:
+        name: "<#FCD34D><bold>Снять всё</bold>"
+        lore:
+          - "<#9CA3AF>Доступно в казне: <white>{balance}"
+          - "<#D8B4FE>Нажмите — снять"
+      back:
+        name: "<#F87171>Назад"
+        lore:
+          - "<#9CA3AF>В главное меню"
+    ledger:
+      empty: "<#6B7280>  Пока пусто"
+      line-deposit: "<#6B7280>  +{amount} <white>{player}</white>"
+      line-withdraw: "<#6B7280>  -{amount} <white>{player}</white>"
+      line-transfer-in: "<#6B7280>  +{amount} <#86EFAC>перевод"
+      line-transfer-out: "<#6B7280>  -{amount} <#F87171>перевод"
+    contributor:
+      empty: "<#6B7280>  Пока никого"
+      line: "<#6B7280>  {rank}. <white>{player}</white> — <white>{amount}"

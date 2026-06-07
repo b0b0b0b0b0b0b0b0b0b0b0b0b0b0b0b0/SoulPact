@@ -1,0 +1,33 @@
+locale: ru
+fallback-locale: en
+min-amount: 1
+max-deposit: 1000000
+max-withdraw: 1000000
+notify-deposit-above: 1000
+contributor-top-size: 5
+ledger-preview-size: 8
+deposit-presets:
+  - 100
+  - 1000
+  - 10000
+withdraw-presets:
+  - 100
+  - 1000
+  - 10000
+gui:
+  rows: 6
+  slots:
+    balance: 4
+    deposit-start: 20
+    withdraw-start: 29
+    deposit-all: 24
+    withdraw-all: 33
+    back: 49
+  materials:
+    filler: GRAY_STAINED_GLASS_PANE
+    balance: GOLD_BLOCK
+    deposit: LIME_DYE
+    withdraw: RED_DYE
+    deposit-all: EMERALD
+    withdraw-all: GOLD_INGOT
+    back: ARROW

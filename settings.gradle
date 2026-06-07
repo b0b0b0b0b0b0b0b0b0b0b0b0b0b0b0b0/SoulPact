@@ -2,3 +2,4 @@ rootProject.name = 'SoulPact'
 
 include 'soul-pact-api'
 include 'soul-pact-core'
+include 'soul-pact-bank'

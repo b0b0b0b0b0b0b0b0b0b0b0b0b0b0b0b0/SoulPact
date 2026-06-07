@@ -1,0 +1,10 @@
+name: SoulPact-Bank
+version: '${version}'
+main: bm.b0b0b0.SoulPact.bank.SoulPactBankPlugin
+api-version: '1.21'
+depend: [SoulPact, Vault]
+commands:
+  clanbank:
+    description: Clan treasury
+    usage: /clanbank
+    aliases: [cbank, bank]

@@ -1,6 +1,6 @@
 package bm.b0b0b0.SoulPact.clan.gui;
 
-import bm.b0b0b0.SoulPact.clan.model.ClanPermissionKeys;
+import bm.b0b0b0.SoulPact.api.clan.ClanPermissionKeys;
 import bm.b0b0b0.SoulPact.clan.model.ClanRolePermissionMap;
 import bm.b0b0b0.SoulPact.clan.service.ClanRoleSettingsSnapshot;
 import bm.b0b0b0.SoulPact.core.config.GuiClanRoleSettingsConfig;
