@@ -1,5 +1,7 @@
 package bm.b0b0b0.SoulPact.clan.service;
 
+import bm.b0b0b0.SoulPact.api.event.ClanDescriptionChangeEvent;
+import bm.b0b0b0.SoulPact.api.event.SoulPactEvents;
 import bm.b0b0b0.SoulPact.clan.gui.ClanDescriptionChatPrompt;
 import bm.b0b0b0.SoulPact.clan.gui.ClanGuiOpenService;
 import bm.b0b0b0.SoulPact.clan.repository.ClanRepository;
@@ -77,6 +79,14 @@ public final class ClanDescriptionService {
                 return;
             }
             clanRepository.updateDescription(clan.id(), description).thenAccept(updated -> asyncDatabaseExecutor.runSync(() -> {
+                if (updated) {
+                    SoulPactEvents.fire(new ClanDescriptionChangeEvent(
+                            clan.id(),
+                            clan.tag(),
+                            description,
+                            player.getName()
+                    ));
+                }
                 if (!player.isOnline()) {
                     return;
                 }

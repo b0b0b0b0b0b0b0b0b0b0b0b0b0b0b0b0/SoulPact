@@ -1,0 +1,59 @@
+leaderboard:
+  startup:
+    separator: "=============================="
+    registered: "Leaderboard module connected. Boards: {count}"
+    core-missing: "SoulPact core not found — module disabled"
+  type:
+    points: "Points"
+    members: "Members"
+    kills: "Kills"
+    deaths: "Deaths"
+    kdr: "K/D"
+    wars: "Wars"
+    bank: "Bank"
+  format:
+    empty-tag: "---"
+    empty-name: "Vacant"
+    sign:
+      lines:
+        - "<blue>--- <yellow>#{num}</yellow> ---</blue>"
+        - "<yellow>{tag}</yellow>"
+        - "<white>{name}</white>"
+        - "<green>{amount}</green> <aqua>{type}</aqua>"
+    stand:
+      name: "<yellow>#{num}</yellow> <gold>[{tag}]</gold> <green>{amount}</green> <aqua>{type}</aqua>"
+    hologram:
+      lines:
+        - "<gradient:#FFD700:#FFA500>★ TOP #{num} — {type} ★</gradient>"
+        - "<yellow>[{tag}]</yellow> <white>{name}</white>"
+        - "<green>{amount}</green>"
+  command:
+    no-permission: "<red>You don't have permission.</red>"
+    players-only: "<red>This command is for players only.</red>"
+    help:
+      - "<gold>===== SoulPact-Leaderboard =====</gold>"
+      - "<yellow>/clanboard create <type> <rank> [sign|stand|hologram]</yellow> <gray>— create a board (look at a block)</gray>"
+      - "<yellow>/clanboard delete <id></yellow> <gray>— delete a board</gray>"
+      - "<yellow>/clanboard list</yellow> <gray>— list boards</gray>"
+      - "<yellow>/clanboard update</yellow> <gray>— refresh all boards</gray>"
+      - "<yellow>/clanboard tp <id></yellow> <gray>— teleport to a board</gray>"
+      - "<yellow>/clanboard reload</yellow> <gray>— reload settings</gray>"
+      - "<gray>Types: POINTS, MEMBERS, KILLS, DEATHS, KDR, WARS, BANK</gray>"
+    reloaded: "<green>Leaderboard settings reloaded.</green>"
+    create-usage: "<red>Usage: /clanboard create <type> <rank> [sign|stand|hologram]. Types: {types}</red>"
+    unknown-type: "<red>Unknown type. Available: {types}</red>"
+    unknown-kind: "<red>Unknown board kind. Available: sign, stand, hologram</red>"
+    invalid-rank: "<red>Rank must be a number from 1 up to the top size.</red>"
+    not-a-sign: "<red>Look at a sign to create a sign board.</red>"
+    no-target: "<red>Look at a block (within 8 blocks); the board appears above it.</red>"
+    created: "<green>Board created: <yellow>{type}</yellow> rank <yellow>#{rank}</yellow> ({kind}).</green>"
+    delete-usage: "<red>Usage: /clanboard delete <id></red>"
+    deleted: "<green>Board <yellow>#{id}</yellow> deleted.</green>"
+    not-found: "<red>No board with that id.</red>"
+    list-empty: "<yellow>No boards yet. Create one: /clanboard create</yellow>"
+    list-header: "<gold>Boards ({count}):</gold>"
+    list-entry: "<yellow>#{id}</yellow> <white>{type}</white> rank <yellow>{rank}</yellow> <gray>[{kind}]</gray> <aqua>{world} {x} {y} {z}</aqua>"
+    updated: "<green>Leaderboard refresh started.</green>"
+    tp-usage: "<red>Usage: /clanboard tp <id></red>"
+    teleported: "<green>Teleported to board <yellow>#{id}</yellow>.</green>"
+    world-missing: "<red>Board world is not loaded.</red>"

@@ -1,5 +1,7 @@
 package bm.b0b0b0.SoulPact.clan.service;
 
+import bm.b0b0b0.SoulPact.api.event.ClanMemberLeaveEvent;
+import bm.b0b0b0.SoulPact.api.event.SoulPactEvents;
 import bm.b0b0b0.SoulPact.clan.model.Clan;
 import bm.b0b0b0.SoulPact.clan.model.ClanMember;
 import bm.b0b0b0.SoulPact.clan.repository.ClanRepository;
@@ -51,6 +53,15 @@ public final class ClanLeaveService {
                     ).orElse(java.util.concurrent.CompletableFuture.completedFuture(false))
             ).thenApply(removed -> {
                 asyncDatabaseExecutor.runSync(() -> {
+                    if (removed) {
+                        SoulPactEvents.fire(new ClanMemberLeaveEvent(
+                                clan.id(),
+                                clan.tag(),
+                                player.getUniqueId(),
+                                player.getName(),
+                                ClanMemberLeaveEvent.Reason.LEAVE
+                        ));
+                    }
                     if (!player.isOnline()) {
                         return;
                     }

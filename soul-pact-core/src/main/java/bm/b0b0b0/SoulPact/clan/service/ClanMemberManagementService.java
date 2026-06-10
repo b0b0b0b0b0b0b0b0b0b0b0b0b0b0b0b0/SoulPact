@@ -1,5 +1,8 @@
 package bm.b0b0b0.SoulPact.clan.service;
 
+import bm.b0b0b0.SoulPact.api.event.ClanLeaderChangeEvent;
+import bm.b0b0b0.SoulPact.api.event.ClanMemberRoleChangeEvent;
+import bm.b0b0b0.SoulPact.api.event.SoulPactEvents;
 import bm.b0b0b0.SoulPact.clan.repository.ClanRepository;
 import bm.b0b0b0.SoulPact.clan.role.RoleDefinition;
 import bm.b0b0b0.SoulPact.clan.role.RoleThemeService;
@@ -60,6 +63,11 @@ public final class ClanMemberManagementService {
                     notify(leader, "clan.role.target-not-found");
                     return CompletableFuture.completedFuture(null);
                 }
+                String oldRoleKey = members.stream()
+                        .filter(member -> member.playerId().equals(targetId))
+                        .map(member -> member.role())
+                        .findFirst()
+                        .orElse("");
                 return clanRepository.updateMemberRole(clan.id(), targetId, roleKey).thenAccept(updated -> {
                     if (!updated) {
                         notify(leader, "clan.role.failed");
@@ -67,6 +75,14 @@ public final class ClanMemberManagementService {
                     }
                     RoleDefinition roleDefinition = roleThemeService.theme().definition(roleKey);
                     String roleTitle = roleDefinition == null ? roleKey : roleDefinition.title();
+                    asyncDatabaseExecutor.runSync(() -> SoulPactEvents.fire(new ClanMemberRoleChangeEvent(
+                            clan.id(),
+                            clan.tag(),
+                            targetId,
+                            ClanPlayerNames.displayName(targetId),
+                            roleTitle(oldRoleKey),
+                            roleTitle
+                    )));
                     notify(leader, "clan.role.assigned", Map.of(
                             "player", ClanPlayerNames.displayName(targetId),
                             "role", roleTitle
@@ -115,6 +131,12 @@ public final class ClanMemberManagementService {
                                     leader.getUniqueId(),
                                     targetId
                             );
+                            asyncDatabaseExecutor.runSync(() -> SoulPactEvents.fire(new ClanLeaderChangeEvent(
+                                    clan.id(),
+                                    clan.tag(),
+                                    leader.getName(),
+                                    ClanPlayerNames.displayName(targetId)
+                            )));
                             notify(leader, "clan.leadership.transferred", Map.of(
                                     "player", ClanPlayerNames.displayName(targetId),
                                     "tag", clan.tag()
@@ -122,6 +144,11 @@ public final class ClanMemberManagementService {
                         });
             });
         });
+    }
+
+    private String roleTitle(String roleKey) {
+        RoleDefinition definition = roleThemeService.theme().definition(roleKey);
+        return definition == null ? roleKey : definition.title();
     }
 
     private void notify(Player player, String key) {

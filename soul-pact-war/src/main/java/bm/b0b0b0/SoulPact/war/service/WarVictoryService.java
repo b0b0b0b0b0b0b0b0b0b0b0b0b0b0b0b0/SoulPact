@@ -3,6 +3,8 @@ package bm.b0b0b0.SoulPact.war.service;
 import bm.b0b0b0.SoulPact.api.SoulPactApi;
 import bm.b0b0b0.SoulPact.api.coalition.CoalitionTreasuryDistribution;
 import bm.b0b0b0.SoulPact.api.coalition.CoalitionWarOutcome;
+import bm.b0b0b0.SoulPact.api.event.ClanWarEndEvent;
+import bm.b0b0b0.SoulPact.api.event.SoulPactEvents;
 import bm.b0b0b0.SoulPact.war.model.ActiveWarRecord;
 import bm.b0b0b0.SoulPact.war.model.WarCaptureState;
 import bm.b0b0b0.SoulPact.war.model.WarStatuses;
@@ -132,6 +134,13 @@ public final class WarVictoryService {
             ActiveWarRecord war = warOptional.orElse(null);
             long attackerClanId = war == null ? winnerClanId : war.attackerClanId();
             long defenderClanId = war == null ? loserClanId : war.defenderClanId();
+            String winnerTag = clanLookup.findClanTagSync(winnerClanId).orElse(String.valueOf(winnerClanId));
+            String loserTag = clanLookup.findClanTagSync(loserClanId).orElse(String.valueOf(loserClanId));
+            String attackerTag = attackerClanId == winnerClanId ? winnerTag : loserTag;
+            String defenderTag = defenderClanId == winnerClanId ? winnerTag : loserTag;
+            api.scheduler().runSync(() -> SoulPactEvents.fire(
+                    new ClanWarEndEvent(attackerTag, defenderTag, winnerTag, loserTag)
+            ));
             CoalitionWarOutcome outcome = new CoalitionWarOutcome(
                     attackerClanId,
                     defenderClanId,

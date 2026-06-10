@@ -1,5 +1,7 @@
 package bm.b0b0b0.SoulPact.clan.service;
 
+import bm.b0b0b0.SoulPact.api.event.ClanDisbandEvent;
+import bm.b0b0b0.SoulPact.api.event.SoulPactEvents;
 import bm.b0b0b0.SoulPact.clan.model.Clan;
 import bm.b0b0b0.SoulPact.clan.model.ClanMember;
 import bm.b0b0b0.SoulPact.clan.repository.ClanRepository;
@@ -85,6 +87,12 @@ public final class ClanDisbandService {
     }
 
     private void finishDisband(Clan clan, Player initiator, boolean standardLoss, boolean deleted) {
+        if (deleted) {
+            String actorName = initiator != null
+                    ? initiator.getName()
+                    : ClanPlayerNames.displayName(clan.leaderId());
+            SoulPactEvents.fire(new ClanDisbandEvent(clan.id(), clan.tag(), clan.name(), actorName));
+        }
         if (standardLoss) {
             broadcastStandardLoss(clan);
             return;

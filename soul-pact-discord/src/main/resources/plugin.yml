@@ -1,0 +1,7 @@
+name: SoulPact-Discord
+version: '${version}'
+main: bm.b0b0b0.SoulPact.discord.SoulPactDiscordPlugin
+api-version: '1.21'
+depend: [SoulPact]
+libraries:
+  - net.elytrium:serializer:1.1.1

@@ -1,0 +1,59 @@
+leaderboard:
+  startup:
+    separator: "=============================="
+    registered: "Модуль топов подключён. Бордов: {count}"
+    core-missing: "Ядро SoulPact не найдено — модуль отключён"
+  type:
+    points: "Очки"
+    members: "Участники"
+    kills: "Убийства"
+    deaths: "Смерти"
+    kdr: "K/D"
+    wars: "Войны"
+    bank: "Казна"
+  format:
+    empty-tag: "---"
+    empty-name: "Свободно"
+    sign:
+      lines:
+        - "<blue>--- <yellow>#{num}</yellow> ---</blue>"
+        - "<yellow>{tag}</yellow>"
+        - "<white>{name}</white>"
+        - "<green>{amount}</green> <aqua>{type}</aqua>"
+    stand:
+      name: "<yellow>#{num}</yellow> <gold>[{tag}]</gold> <green>{amount}</green> <aqua>{type}</aqua>"
+    hologram:
+      lines:
+        - "<gradient:#FFD700:#FFA500>★ ТОП #{num} — {type} ★</gradient>"
+        - "<yellow>[{tag}]</yellow> <white>{name}</white>"
+        - "<green>{amount}</green>"
+  command:
+    no-permission: "<red>Недостаточно прав.</red>"
+    players-only: "<red>Команда доступна только игрокам.</red>"
+    help:
+      - "<gold>===== SoulPact-Leaderboard =====</gold>"
+      - "<yellow>/clanboard create <тип> <место> [sign|stand|hologram]</yellow> <gray>— создать борд (смотрите на блок)</gray>"
+      - "<yellow>/clanboard delete <id></yellow> <gray>— удалить борд</gray>"
+      - "<yellow>/clanboard list</yellow> <gray>— список бордов</gray>"
+      - "<yellow>/clanboard update</yellow> <gray>— обновить все борды</gray>"
+      - "<yellow>/clanboard tp <id></yellow> <gray>— телепорт к борду</gray>"
+      - "<yellow>/clanboard reload</yellow> <gray>— перезагрузить настройки</gray>"
+      - "<gray>Типы: POINTS, MEMBERS, KILLS, DEATHS, KDR, WARS, BANK</gray>"
+    reloaded: "<green>Настройки топов перезагружены.</green>"
+    create-usage: "<red>Использование: /clanboard create <тип> <место> [sign|stand|hologram]. Типы: {types}</red>"
+    unknown-type: "<red>Неизвестный тип. Доступны: {types}</red>"
+    unknown-kind: "<red>Неизвестный вид борда. Доступны: sign, stand, hologram</red>"
+    invalid-rank: "<red>Место в топе — число от 1 до размера топа.</red>"
+    not-a-sign: "<red>Смотрите на табличку, чтобы создать sign-борд.</red>"
+    no-target: "<red>Смотрите на блок (до 8 блоков), над ним появится борд.</red>"
+    created: "<green>Борд создан: <yellow>{type}</yellow> место <yellow>#{rank}</yellow> ({kind}).</green>"
+    delete-usage: "<red>Использование: /clanboard delete <id></red>"
+    deleted: "<green>Борд <yellow>#{id}</yellow> удалён.</green>"
+    not-found: "<red>Борд с таким id не найден.</red>"
+    list-empty: "<yellow>Бордов пока нет. Создайте: /clanboard create</yellow>"
+    list-header: "<gold>Борды ({count}):</gold>"
+    list-entry: "<yellow>#{id}</yellow> <white>{type}</white> место <yellow>{rank}</yellow> <gray>[{kind}]</gray> <aqua>{world} {x} {y} {z}</aqua>"
+    updated: "<green>Обновление топов запущено.</green>"
+    tp-usage: "<red>Использование: /clanboard tp <id></red>"
+    teleported: "<green>Телепорт к борду <yellow>#{id}</yellow>.</green>"
+    world-missing: "<red>Мир борда не загружен.</red>"

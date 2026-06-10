@@ -1,5 +1,7 @@
 package bm.b0b0b0.SoulPact.clan.service;
 
+import bm.b0b0b0.SoulPact.api.event.ClanMemberJoinEvent;
+import bm.b0b0b0.SoulPact.api.event.SoulPactEvents;
 import bm.b0b0b0.SoulPact.clan.message.ClanPendingChatPresenter;
 import bm.b0b0b0.SoulPact.clan.model.Clan;
 import bm.b0b0b0.SoulPact.clan.model.ClanInvite;
@@ -505,6 +507,12 @@ public final class ClanMembershipService {
                         ).thenCompose(ignored ->
                                 notifyPlayerAboutRequestDecision(playerId, NOTIFICATION_ACCEPTED, clan)
                         ).thenAccept(ignored -> asyncDatabaseExecutor.runSync(() -> {
+                            SoulPactEvents.fire(new ClanMemberJoinEvent(
+                                    clan.id(),
+                                    clan.tag(),
+                                    playerId,
+                                    ClanPlayerNames.displayName(playerId)
+                            ));
                             if (!notifyReceiver.isOnline()) {
                                 return;
                             }

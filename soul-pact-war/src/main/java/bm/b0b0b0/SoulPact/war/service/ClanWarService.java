@@ -3,6 +3,8 @@ package bm.b0b0b0.SoulPact.war.service;
 import bm.b0b0b0.SoulPact.api.SoulPactApi;
 import bm.b0b0b0.SoulPact.api.clan.ClanPermissionKeys;
 import bm.b0b0b0.SoulPact.api.clan.ClanSnapshot;
+import bm.b0b0b0.SoulPact.api.event.ClanWarStartEvent;
+import bm.b0b0b0.SoulPact.api.event.SoulPactEvents;
 import bm.b0b0b0.SoulPact.api.land.ClanLandProvider;
 import bm.b0b0b0.SoulPact.api.treasury.TreasuryOperationResult;
 import bm.b0b0b0.SoulPact.api.coalition.CoalitionWarBridge;
@@ -273,6 +275,7 @@ public final class ClanWarService {
                                             .thenCompose(tags -> treasuryBridge.unlockTreasuryAfterDecision(declaration.defenderClanId())
                                                     .thenApply(unlocked -> {
                                                         api.scheduler().runSync(() -> {
+                                                            SoulPactEvents.fire(new ClanWarStartEvent(tags[0], tags[1]));
                                                             messages.send(player, "war.response.accepted");
                                                             landCombatService.enableForWar(war);
                                                             flagRevealPresenter.revealStartedWar(war, tags[0], tags[1]);

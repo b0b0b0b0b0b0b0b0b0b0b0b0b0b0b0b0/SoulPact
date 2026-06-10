@@ -1,5 +1,7 @@
 package bm.b0b0b0.SoulPact.clan.service;
 
+import bm.b0b0b0.SoulPact.api.event.ClanCreateEvent;
+import bm.b0b0b0.SoulPact.api.event.SoulPactEvents;
 import bm.b0b0b0.SoulPact.clan.gui.ClanGuiOpenService;
 import bm.b0b0b0.SoulPact.clan.model.Clan;
 import bm.b0b0b0.SoulPact.clan.repository.ClanRepository;
@@ -127,6 +129,13 @@ public final class ClanCreateService {
 
     private void notifyCreated(Player player, Clan clan) {
         asyncDatabaseExecutor.runSync(() -> {
+            SoulPactEvents.fire(new ClanCreateEvent(
+                    clan.id(),
+                    clan.tag(),
+                    clan.name(),
+                    player.getUniqueId(),
+                    player.getName()
+            ));
             if (!player.isOnline()) {
                 return;
             }

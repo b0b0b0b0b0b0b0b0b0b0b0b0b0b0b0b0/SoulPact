@@ -2,6 +2,8 @@ package bm.b0b0b0.SoulPact.quests.service;
 
 import bm.b0b0b0.SoulPact.api.SoulPactApi;
 import bm.b0b0b0.SoulPact.api.clan.ClanSnapshot;
+import bm.b0b0b0.SoulPact.api.event.ClanQuestCompleteEvent;
+import bm.b0b0b0.SoulPact.api.event.SoulPactEvents;
 import bm.b0b0b0.SoulPact.quests.config.QuestsConfig;
 import bm.b0b0b0.SoulPact.quests.message.QuestsMessages;
 import bm.b0b0b0.SoulPact.quests.model.ClanQuestRecord;
@@ -236,6 +238,9 @@ public final class ClanQuestService {
         repository.markCompleted(clanId, definition.id(), definition.targetAmount(), System.currentTimeMillis());
         api.findClanByPlayer(finisherId).thenAccept(clanOptional -> {
             String tag = clanOptional.map(ClanSnapshot::tag).orElse("");
+            api.scheduler().runSync(() -> SoulPactEvents.fire(
+                    new ClanQuestCompleteEvent(clanId, tag, questName(definition))
+            ));
             rewardService.award(clanId, definition, finisherId, tag);
             broadcastToClan(clanId, "quests.broadcast.completed", Map.of(
                     "quest", questName(definition),

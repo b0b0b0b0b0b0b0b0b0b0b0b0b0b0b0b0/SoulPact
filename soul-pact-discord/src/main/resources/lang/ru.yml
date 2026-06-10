@@ -1,0 +1,87 @@
+discord:
+  startup:
+    separator: "=============================="
+    registered: "Discord-мост подключён — события кланов летят в канал"
+    no-webhook: "Discord-мост запущен, но webhook-url пуст — задайте его в config.yml"
+    core-missing: "Ядро SoulPact не найдено — модуль отключён"
+  embed:
+    footer: "{server}"
+    server-start:
+      title: "🟢 Сервер запущен"
+      description:
+        - "**{server}** снова в строю!"
+        - "Система кланов SoulPact активна."
+    server-stop:
+      title: "🔴 Сервер остановлен"
+      description:
+        - "**{server}** уходит на перезагрузку."
+    clan-create:
+      title: "🏰 Создан новый клан"
+      description:
+        - "Клан **[{tag}] {name}**"
+        - "👑 Лидер: **{player}**"
+    clan-delete:
+      title: "💥 Клан расформирован"
+      description:
+        - "Клан **[{tag}] {name}** прекратил существование."
+        - "Решение принял: **{actor}**"
+    tag-change:
+      title: "🏷️ Смена тега клана"
+      description:
+        - "**[{old_tag}]** ➜ **[{new_tag}]**"
+        - "Изменил: **{actor}**"
+    desc-change:
+      title: "📜 Новое описание клана"
+      description:
+        - "Клан **[{tag}]**:"
+        - "> {description}"
+        - "Изменил: **{actor}**"
+    role-change:
+      title: "🎖️ Смена роли в клане"
+      description:
+        - "**{player}** из клана **[{tag}]**"
+        - "Роль: **{old_role}** ➜ **{new_role}**"
+    member-join:
+      title: "✅ Новый участник клана"
+      description:
+        - "**{player}** вступил в клан **[{tag}]**"
+    member-leave:
+      title: "🚪 Игрок покинул клан"
+      description:
+        - "**{player}** вышел из клана **[{tag}]**"
+    member-kick:
+      title: "⛔ Игрок исключён из клана"
+      description:
+        - "**{player}** был исключён из клана **[{tag}]**"
+    leader-change:
+      title: "👑 Передача лидерства"
+      description:
+        - "Клан **[{tag}]**"
+        - "**{old_leader}** передал трон **{new_leader}**"
+    war-start:
+      title: "⚔️ Война кланов началась!"
+      description:
+        - "**[{attacker}]** объявил войну **[{defender}]**"
+        - "Да победит сильнейший!"
+    war-win:
+      title: "🏆 Победа в войне кланов!"
+      description:
+        - "Клан **[{winner}]** одержал победу над **[{loser}]**!"
+    war-end:
+      title: "🕊️ Война кланов завершена"
+      description:
+        - "Война между **[{attacker}]** и **[{defender}]** окончена без победителя."
+    quest-complete:
+      title: "🎯 Квест выполнен"
+      description:
+        - "Клан **[{tag}]** завершил квест **{quest}**!"
+    glad-start:
+      title: "🏟️ Гладиаторский ивент!"
+      description:
+        - "Арена **{arena}** открыта — лобби набирается!"
+        - "Вступайте: `/gladiator join {arena}`"
+    glad-win:
+      title: "🏆 Чемпион арены"
+      description:
+        - "Клан **[{winner}]** победил на арене **{arena}**!"
+        - "Участников: **{participants}**"

@@ -1,5 +1,7 @@
 package bm.b0b0b0.SoulPact.clan.service;
 
+import bm.b0b0b0.SoulPact.api.event.ClanMemberLeaveEvent;
+import bm.b0b0b0.SoulPact.api.event.SoulPactEvents;
 import bm.b0b0b0.SoulPact.clan.model.Clan;
 import bm.b0b0b0.SoulPact.clan.model.ClanMember;
 import bm.b0b0b0.SoulPact.clan.repository.ClanRepository;
@@ -78,6 +80,15 @@ public final class ClanKickService {
                                                 ClanPlaceholderInvalidatorRegistry.invalidatePlayer(targetId);
                                             }
                                             asyncDatabaseExecutor.runSync(() -> {
+                                                if (removed) {
+                                                    SoulPactEvents.fire(new ClanMemberLeaveEvent(
+                                                            clan.id(),
+                                                            clan.tag(),
+                                                            targetId,
+                                                            ClanPlayerNames.displayName(targetId),
+                                                            ClanMemberLeaveEvent.Reason.KICK
+                                                    ));
+                                                }
                                                 if (!actor.isOnline()) {
                                                     return;
                                                 }

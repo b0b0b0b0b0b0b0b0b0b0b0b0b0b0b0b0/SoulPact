@@ -1,0 +1,16 @@
+name: SoulPact-Leaderboard
+version: '${version}'
+main: bm.b0b0b0.SoulPact.leaderboard.SoulPactLeaderboardPlugin
+api-version: '1.21'
+depend: [SoulPact]
+libraries:
+  - net.elytrium:serializer:1.1.1
+commands:
+  clanboard:
+    description: SoulPact leaderboard admin commands
+    aliases: [clb, clanlb]
+    permission: soulpact.leaderboard.admin
+permissions:
+  soulpact.leaderboard.admin:
+    description: Manage SoulPact leaderboards
+    default: op

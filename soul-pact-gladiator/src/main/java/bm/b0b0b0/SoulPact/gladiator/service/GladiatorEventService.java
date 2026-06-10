@@ -1,6 +1,9 @@
 package bm.b0b0b0.SoulPact.gladiator.service;
 
 import bm.b0b0b0.SoulPact.api.SoulPactApi;
+import bm.b0b0b0.SoulPact.api.event.GladiatorEventStartEvent;
+import bm.b0b0b0.SoulPact.api.event.GladiatorEventWinEvent;
+import bm.b0b0b0.SoulPact.api.event.SoulPactEvents;
 import bm.b0b0b0.SoulPact.gladiator.config.GladiatorConfig;
 import bm.b0b0b0.SoulPact.gladiator.model.Arena;
 import bm.b0b0b0.SoulPact.gladiator.model.ArenaPoint;
@@ -56,6 +59,7 @@ public final class GladiatorEventService {
         }
         GladiatorEvent event = new GladiatorEvent(arena, config.lobbyCountdownSeconds());
         events.put(key(arena.name()), event);
+        SoulPactEvents.fire(new GladiatorEventStartEvent(arena.name()));
         presenter.updateLobbyBossBar(event, config.lobbyCountdownSeconds());
         presenter.broadcastAll("gladiator.broadcast.lobby-open", Map.of(
                 "arena", arena.name(),
@@ -301,6 +305,11 @@ public final class GladiatorEventService {
                 .map(Map.Entry::getKey)
                 .toList();
         rewardDispatcher.dispatch(event.arena().name(), winner, winnerParticipants);
+        SoulPactEvents.fire(new GladiatorEventWinEvent(
+                event.arena().name(),
+                winner.tag(),
+                event.participants().size()
+        ));
         presenter.playSound(event.everyone(), config.winSound());
         endEvent(event, "gladiator.broadcast.won", Map.of(
                 "arena", event.arena().name(),

@@ -1,0 +1,87 @@
+discord:
+  startup:
+    separator: "=============================="
+    registered: "Discord bridge connected — clan events flow to the channel"
+    no-webhook: "Discord bridge started, but webhook-url is empty — set it in config.yml"
+    core-missing: "SoulPact core not found — module disabled"
+  embed:
+    footer: "{server}"
+    server-start:
+      title: "🟢 Server started"
+      description:
+        - "**{server}** is back online!"
+        - "SoulPact clan system is active."
+    server-stop:
+      title: "🔴 Server stopped"
+      description:
+        - "**{server}** is going down for a restart."
+    clan-create:
+      title: "🏰 New clan created"
+      description:
+        - "Clan **[{tag}] {name}**"
+        - "👑 Leader: **{player}**"
+    clan-delete:
+      title: "💥 Clan disbanded"
+      description:
+        - "Clan **[{tag}] {name}** is no more."
+        - "Decision by: **{actor}**"
+    tag-change:
+      title: "🏷️ Clan tag changed"
+      description:
+        - "**[{old_tag}]** ➜ **[{new_tag}]**"
+        - "Changed by: **{actor}**"
+    desc-change:
+      title: "📜 New clan description"
+      description:
+        - "Clan **[{tag}]**:"
+        - "> {description}"
+        - "Changed by: **{actor}**"
+    role-change:
+      title: "🎖️ Clan role changed"
+      description:
+        - "**{player}** of clan **[{tag}]**"
+        - "Role: **{old_role}** ➜ **{new_role}**"
+    member-join:
+      title: "✅ New clan member"
+      description:
+        - "**{player}** joined clan **[{tag}]**"
+    member-leave:
+      title: "🚪 Player left the clan"
+      description:
+        - "**{player}** left clan **[{tag}]**"
+    member-kick:
+      title: "⛔ Player kicked from the clan"
+      description:
+        - "**{player}** was kicked from clan **[{tag}]**"
+    leader-change:
+      title: "👑 Leadership transferred"
+      description:
+        - "Clan **[{tag}]**"
+        - "**{old_leader}** passed the throne to **{new_leader}**"
+    war-start:
+      title: "⚔️ Clan war has begun!"
+      description:
+        - "**[{attacker}]** declared war on **[{defender}]**"
+        - "May the strongest prevail!"
+    war-win:
+      title: "🏆 Clan war victory!"
+      description:
+        - "Clan **[{winner}]** defeated **[{loser}]**!"
+    war-end:
+      title: "🕊️ Clan war is over"
+      description:
+        - "The war between **[{attacker}]** and **[{defender}]** ended with no winner."
+    quest-complete:
+      title: "🎯 Quest completed"
+      description:
+        - "Clan **[{tag}]** completed the quest **{quest}**!"
+    glad-start:
+      title: "🏟️ Gladiator event!"
+      description:
+        - "Arena **{arena}** is open — the lobby is filling up!"
+        - "Join: `/gladiator join {arena}`"
+    glad-win:
+      title: "🏆 Arena champion"
+      description:
+        - "Clan **[{winner}]** won at arena **{arena}**!"
+        - "Participants: **{participants}**"
