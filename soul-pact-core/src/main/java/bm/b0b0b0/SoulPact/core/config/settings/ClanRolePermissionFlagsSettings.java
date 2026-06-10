@@ -25,4 +25,19 @@ public final class ClanRolePermissionFlagsSettings {
 
     @Comment(@CommentValue("Брать из кланового сундука"))
     public boolean chestWithdraw = false;
+
+    @Comment(@CommentValue("Управлять базой"))
+    public boolean landManage = false;
+
+    @Comment(@CommentValue("Объявлять войну"))
+    public boolean warDeclare = false;
+
+    @Comment(@CommentValue("Принимать войну и выкуп"))
+    public boolean warRespond = false;
+
+    @Comment(@CommentValue("Участвовать в войне (ломать флаг)"))
+    public boolean warFight = false;
+
+    @Comment(@CommentValue("Управлять коалицией"))
+    public boolean coalitionManage = false;
 }

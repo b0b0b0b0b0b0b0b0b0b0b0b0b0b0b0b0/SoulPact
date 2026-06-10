@@ -47,7 +47,7 @@ public final class LandMenuPopulator {
                         : messages.resolveList(player, "land.gui.item.info-empty.lore", placeholders),
                 placeholders
         ));
-        if (snapshot.leader() && snapshot.base().isPresent()) {
+        if (snapshot.canManage() && snapshot.base().isPresent()) {
             var base = snapshot.base().get();
             populateExpansion(inventory, player, base, BaseExpansionAxis.NORTH, config.expandNorthSlot(), Material.LIGHT_BLUE_CONCRETE);
             populateExpansion(inventory, player, base, BaseExpansionAxis.WEST, config.expandWestSlot(), Material.RED_CONCRETE);

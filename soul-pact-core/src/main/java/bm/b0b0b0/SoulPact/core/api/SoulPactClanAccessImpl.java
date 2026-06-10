@@ -6,6 +6,7 @@ import bm.b0b0b0.SoulPact.api.clan.ClanPermissionKeys;
 import bm.b0b0b0.SoulPact.clan.model.Clan;
 import bm.b0b0b0.SoulPact.clan.model.ClanMember;
 import bm.b0b0b0.SoulPact.clan.repository.ClanRepository;
+import bm.b0b0b0.SoulPact.clan.service.ClanPermissionEvaluator;
 import bm.b0b0b0.SoulPact.clan.service.ClanRolePermissionService;
 import bm.b0b0b0.SoulPact.clan.service.ClanStaffPermissions;
 import java.util.Optional;
@@ -16,13 +17,16 @@ public final class SoulPactClanAccessImpl implements SoulPactClanAccess {
 
     private final ClanRepository clanRepository;
     private final ClanRolePermissionService rolePermissionService;
+    private final ClanPermissionEvaluator permissionEvaluator;
 
     public SoulPactClanAccessImpl(
             ClanRepository clanRepository,
-            ClanRolePermissionService rolePermissionService
+            ClanRolePermissionService rolePermissionService,
+            ClanPermissionEvaluator permissionEvaluator
     ) {
         this.clanRepository = clanRepository;
         this.rolePermissionService = rolePermissionService;
+        this.permissionEvaluator = permissionEvaluator;
     }
 
     @Override
@@ -59,6 +63,11 @@ public final class SoulPactClanAccessImpl implements SoulPactClanAccess {
                 );
             });
         });
+    }
+
+    @Override
+    public boolean hasPermissionSync(long clanId, UUID playerId, String permissionKey) {
+        return permissionEvaluator.hasPermission(clanId, playerId, permissionKey);
     }
 
     private ClanMemberSnapshot toSnapshot(long clanId, ClanMember member) {

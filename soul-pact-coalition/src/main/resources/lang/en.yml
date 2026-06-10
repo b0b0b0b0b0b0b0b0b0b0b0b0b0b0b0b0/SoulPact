@@ -38,6 +38,7 @@ coalition:
   error:
     not-in-clan: "<#F87171>You are not in a clan."
     not-leader: "<#F87171>Only the leader can manage the coalition."
+    no-permission: "<#F87171>Your role cannot manage the coalition."
     target-not-found: "<#F87171>Clan not found."
     self: "<#F87171>You cannot invite your own clan."
     already-allied: "<#F87171>Clans are already allied."

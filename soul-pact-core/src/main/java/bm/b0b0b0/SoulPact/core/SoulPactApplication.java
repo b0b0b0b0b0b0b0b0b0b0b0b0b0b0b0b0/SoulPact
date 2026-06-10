@@ -63,6 +63,7 @@ import bm.b0b0b0.SoulPact.clan.service.ClanMembersDataService;
 import bm.b0b0b0.SoulPact.clan.service.ClanMembersSlotLayout;
 import bm.b0b0b0.SoulPact.clan.service.ClanRequestDetailDataService;
 import bm.b0b0b0.SoulPact.clan.service.ClanRequestHistoryLoreBuilder;
+import bm.b0b0b0.SoulPact.clan.service.ClanPermissionEvaluator;
 import bm.b0b0b0.SoulPact.clan.service.ClanRolePermissionService;
 import bm.b0b0b0.SoulPact.clan.service.ClanRoleSettingsDataService;
 import bm.b0b0b0.SoulPact.clan.service.ClanSettingsDataService;
@@ -121,6 +122,7 @@ import bm.b0b0b0.SoulPact.core.message.MessageService;
 import bm.b0b0b0.SoulPact.core.message.StartupConsolePresenter;
 import bm.b0b0b0.SoulPact.core.module.ExtensionRegistryImpl;
 import bm.b0b0b0.SoulPact.core.module.ClanExtensionMembershipNotifier;
+import bm.b0b0b0.SoulPact.core.placeholder.SoulPactPlaceholderBootstrap;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.plugin.ServicePriority;
@@ -140,6 +142,7 @@ public final class SoulPactApplication {
     private PluginConfig pluginConfig;
     private DatabaseBootstrap databaseBootstrap;
     private SoulPactApiImpl soulPactApi;
+    private SoulPactPlaceholderBootstrap placeholderBootstrap;
 
     public SoulPactApplication(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -150,6 +153,10 @@ public final class SoulPactApplication {
         this.integrationRegistry = new IntegrationRegistry();
         this.integrationBootstrap = new IntegrationBootstrap(integrationRegistry);
         this.clanRuntimeHolder = new ClanRuntimeHolder();
+        this.placeholderBootstrap = new SoulPactPlaceholderBootstrap(
+                plugin,
+                integrationBootstrap.placeholderApiIntegration()
+        );
     }
 
     public void enable() {
@@ -174,6 +181,9 @@ public final class SoulPactApplication {
     }
 
     public void disable() {
+        if (placeholderBootstrap != null) {
+            placeholderBootstrap.unregister();
+        }
         plugin.getServer().getServicesManager().unregisterAll(plugin);
         if (databaseBootstrap != null) {
             databaseBootstrap.shutdown();
@@ -302,6 +312,10 @@ public final class SoulPactApplication {
                 pluginConfig.clan(),
                 messageService,
                 asyncDatabaseExecutor
+        );
+        ClanPermissionEvaluator permissionEvaluator = new ClanPermissionEvaluator(
+                dataSourceProvider,
+                rolePermissionService
         );
         ClanProfileDataService profileDataService = new ClanProfileDataService(
                 clanRepository,
@@ -690,7 +704,7 @@ public final class SoulPactApplication {
                 messageService,
                 extensionRegistry,
                 new SoulPactSchedulerImpl(asyncDatabaseExecutor),
-                new SoulPactClanAccessImpl(clanRepository, rolePermissionService),
+                new SoulPactClanAccessImpl(clanRepository, rolePermissionService, permissionEvaluator),
                 clanGui,
                 new SoulPactClanStandardImpl(clanStandardService),
                 clanLifecycle,
@@ -708,6 +722,13 @@ public final class SoulPactApplication {
                 clanGui,
                 plugin,
                 ServicePriority.Normal
+        );
+        placeholderBootstrap.register(
+                pluginConfig.placeholders(),
+                pluginConfig.locale(),
+                integrationBootstrap.vaultIntegration(),
+                dataSourceProvider,
+                roleThemeService
         );
     }
 }

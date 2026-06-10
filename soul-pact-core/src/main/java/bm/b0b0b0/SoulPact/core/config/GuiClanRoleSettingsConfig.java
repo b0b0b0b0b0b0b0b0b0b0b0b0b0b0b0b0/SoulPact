@@ -1,5 +1,6 @@
 package bm.b0b0b0.SoulPact.core.config;
 
+import bm.b0b0b0.SoulPact.api.clan.ClanPermissionKeys;
 import bm.b0b0b0.SoulPact.core.config.settings.RoleSettingsGuiSettings;
 import org.bukkit.Material;
 
@@ -13,6 +14,11 @@ public final class GuiClanRoleSettingsConfig {
     private final int bankWithdrawSlot;
     private final int chestDepositSlot;
     private final int chestWithdrawSlot;
+    private final int landManageSlot;
+    private final int warDeclareSlot;
+    private final int warRespondSlot;
+    private final int warFightSlot;
+    private final int coalitionManageSlot;
     private final int backSlot;
     private final Material toggleOnMaterial;
     private final Material toggleOffMaterial;
@@ -28,6 +34,11 @@ public final class GuiClanRoleSettingsConfig {
         this.bankWithdrawSlot = settings.slots.bankWithdraw;
         this.chestDepositSlot = settings.slots.chestDeposit;
         this.chestWithdrawSlot = settings.slots.chestWithdraw;
+        this.landManageSlot = settings.slots.landManage;
+        this.warDeclareSlot = settings.slots.warDeclare;
+        this.warRespondSlot = settings.slots.warRespond;
+        this.warFightSlot = settings.slots.warFight;
+        this.coalitionManageSlot = settings.slots.coalitionManage;
         this.backSlot = settings.slots.back;
         this.toggleOnMaterial = parseMaterial(settings.materials.toggleOn, Material.LIME_DYE);
         this.toggleOffMaterial = parseMaterial(settings.materials.toggleOff, Material.GRAY_DYE);
@@ -61,13 +72,18 @@ public final class GuiClanRoleSettingsConfig {
 
     public int slotForPermission(String permission) {
         return switch (permission) {
-            case "kick" -> kickSlot;
-            case "accept" -> acceptSlot;
-            case "recruit_lower" -> recruitLowerSlot;
-            case "bank_deposit" -> bankDepositSlot;
-            case "bank_withdraw" -> bankWithdrawSlot;
-            case "chest_deposit" -> chestDepositSlot;
-            case "chest_withdraw" -> chestWithdrawSlot;
+            case ClanPermissionKeys.KICK -> kickSlot;
+            case ClanPermissionKeys.ACCEPT -> acceptSlot;
+            case ClanPermissionKeys.RECRUIT_LOWER -> recruitLowerSlot;
+            case ClanPermissionKeys.BANK_DEPOSIT -> bankDepositSlot;
+            case ClanPermissionKeys.BANK_WITHDRAW -> bankWithdrawSlot;
+            case ClanPermissionKeys.CHEST_DEPOSIT -> chestDepositSlot;
+            case ClanPermissionKeys.CHEST_WITHDRAW -> chestWithdrawSlot;
+            case ClanPermissionKeys.LAND_MANAGE -> landManageSlot;
+            case ClanPermissionKeys.WAR_DECLARE -> warDeclareSlot;
+            case ClanPermissionKeys.WAR_RESPOND -> warRespondSlot;
+            case ClanPermissionKeys.WAR_FIGHT -> warFightSlot;
+            case ClanPermissionKeys.COALITION_MANAGE -> coalitionManageSlot;
             default -> -1;
         };
     }

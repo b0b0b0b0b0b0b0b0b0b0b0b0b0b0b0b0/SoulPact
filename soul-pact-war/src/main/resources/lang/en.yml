@@ -62,6 +62,7 @@ war:
     accept-no-base: "<#F87171>One of the clans has no base — war cannot start."
     already-pending: "<#F87171>A declaration is already pending."
     not-leader: "<#F87171>Only the leader can respond to declarations."
+    no-permission: "<#F87171>Your role does not have the required permission."
     empty-treasury: "<#F87171>Treasury is empty — ransom unavailable."
     ransom-failed: "<#F87171>Failed to transfer ransom."
     flag-break-blocked: "<#F87171>You cannot break this standard in the current war phase."

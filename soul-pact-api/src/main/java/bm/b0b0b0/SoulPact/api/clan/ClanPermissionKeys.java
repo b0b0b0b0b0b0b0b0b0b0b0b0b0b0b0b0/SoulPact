@@ -10,6 +10,10 @@ public final class ClanPermissionKeys {
     public static final String CHEST_DEPOSIT = "chest_deposit";
     public static final String CHEST_WITHDRAW = "chest_withdraw";
     public static final String LAND_MANAGE = "land_manage";
+    public static final String WAR_DECLARE = "war_declare";
+    public static final String WAR_RESPOND = "war_respond";
+    public static final String WAR_FIGHT = "war_fight";
+    public static final String COALITION_MANAGE = "coalition_manage";
 
     private ClanPermissionKeys() {
     }

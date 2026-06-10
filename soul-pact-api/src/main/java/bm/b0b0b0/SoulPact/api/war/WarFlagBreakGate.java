@@ -25,6 +25,7 @@ public interface WarFlagBreakGate {
             Player breaker,
             long flagOwnerClanId,
             Location flagLocation,
-            Runnable destroyBase
+            Runnable destroyBase,
+            Runnable clearCapturedFlag
     );
 }

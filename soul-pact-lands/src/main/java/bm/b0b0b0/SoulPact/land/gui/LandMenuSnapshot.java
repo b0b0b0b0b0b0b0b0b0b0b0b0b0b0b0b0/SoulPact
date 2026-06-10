@@ -7,6 +7,6 @@ import java.util.Optional;
 public record LandMenuSnapshot(
         ClanSnapshot clan,
         Optional<ClanBaseRecord> base,
-        boolean leader
+        boolean canManage
 ) {
 }

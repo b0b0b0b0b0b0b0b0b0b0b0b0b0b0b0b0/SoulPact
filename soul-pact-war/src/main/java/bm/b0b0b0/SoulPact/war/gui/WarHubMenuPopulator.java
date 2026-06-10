@@ -49,7 +49,7 @@ public final class WarHubMenuPopulator {
                     Map.of()
             ));
         }
-        if (viewData.viewerIsLeader() && viewData.pendingCount() > 0) {
+        if (viewData.viewerCanRespond() && viewData.pendingCount() > 0) {
             inventory.setItem(config.hubPendingSlot(), WarGuiItems.build(
                     messages,
                     player,

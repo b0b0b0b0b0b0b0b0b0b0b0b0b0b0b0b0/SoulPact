@@ -26,6 +26,21 @@ public final class RoleSettingsGuiSlotsSettings {
     @Comment(@CommentValue("Брать из кланового сундука"))
     public int chestWithdraw = 33;
 
+    @Comment(@CommentValue("Управлять базой"))
+    public int landManage = 38;
+
+    @Comment(@CommentValue("Объявлять войну"))
+    public int warDeclare = 40;
+
+    @Comment(@CommentValue("Принимать войну и выкуп"))
+    public int warRespond = 42;
+
+    @Comment(@CommentValue("Участвовать в войне"))
+    public int warFight = 44;
+
+    @Comment(@CommentValue("Управлять коалицией"))
+    public int coalitionManage = 46;
+
     @Comment(@CommentValue("Назад"))
-    public int back = 31;
+    public int back = 49;
 }

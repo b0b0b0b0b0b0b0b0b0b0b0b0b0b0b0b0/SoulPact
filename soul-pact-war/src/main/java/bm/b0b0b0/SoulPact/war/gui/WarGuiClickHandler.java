@@ -76,7 +76,7 @@ public final class WarGuiClickHandler {
             api.clanGui().openProfile(player);
             return;
         }
-        if (slot == menu.pendingSlot() && menu.viewerIsLeader() && menu.pendingCount() > 0) {
+        if (slot == menu.pendingSlot() && menu.viewerCanRespond() && menu.pendingCount() > 0) {
             guiService.openPendingList(player);
         }
     }

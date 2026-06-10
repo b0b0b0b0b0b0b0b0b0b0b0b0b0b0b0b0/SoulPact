@@ -9,6 +9,7 @@ land:
   error:
     not-in-clan: "<#F87171>You are not in a clan."
     not-leader: "<#F87171>Only the clan leader can manage the base."
+    no-permission: "<#F87171>Your role cannot manage the base."
     already-exists: "<#F87171>Your clan already has a base."
     worldguard-missing: "<#F87171>WorldGuard is not installed."
     too-close: "<#F87171>Too close to another region. Buffer required: {buffer} blocks."

@@ -15,6 +15,10 @@ subprojects {
             url = 'https://jitpack.io'
         }
         maven {
+            name = 'placeholderapi'
+            url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
+        }
+        maven {
             name = 'codemc'
             url = 'https://repo.codemc.org/repository/maven-public/'
         }

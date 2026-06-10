@@ -1,6 +1,7 @@
 package bm.b0b0b0.SoulPact.land.gui;
 
 import bm.b0b0b0.SoulPact.api.SoulPactApi;
+import bm.b0b0b0.SoulPact.api.clan.ClanPermissionKeys;
 import bm.b0b0b0.SoulPact.api.clan.ClanSnapshot;
 import bm.b0b0b0.SoulPact.land.config.LandConfig;
 import bm.b0b0b0.SoulPact.land.message.LandMessages;
@@ -53,15 +54,13 @@ public final class LandGuiService {
     }
 
     private void openLoaded(Player player, ClanSnapshot clan) {
-        baseService.findBaseRecord(clan.id()).thenAccept(baseOptional -> api.scheduler().runSync(() -> {
+        baseService.findBaseRecord(clan.id()).thenCombine(
+                api.clanAccess().hasPermission(clan.id(), player.getUniqueId(), ClanPermissionKeys.LAND_MANAGE),
+                (baseOptional, canManage) -> new LandMenuSnapshot(clan, baseOptional, canManage)
+        ).thenAccept(snapshot -> api.scheduler().runSync(() -> {
             if (!player.isOnline()) {
                 return;
             }
-            LandMenuSnapshot snapshot = new LandMenuSnapshot(
-                    clan,
-                    baseOptional,
-                    clan.leaderId().equals(player.getUniqueId())
-            );
             LandMenu menu = new LandMenu(config, messages, populator, player, snapshot);
             player.openInventory(menu.getInventory());
         }));

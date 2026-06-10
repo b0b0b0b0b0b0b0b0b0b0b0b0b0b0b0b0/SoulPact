@@ -1,6 +1,7 @@
 package bm.b0b0b0.SoulPact.land.service;
 
 import bm.b0b0b0.SoulPact.api.SoulPactApi;
+import bm.b0b0b0.SoulPact.api.clan.ClanPermissionKeys;
 import bm.b0b0b0.SoulPact.api.clan.ClanSnapshot;
 import bm.b0b0b0.SoulPact.api.land.ClanBaseSnapshot;
 import bm.b0b0b0.SoulPact.land.config.BorderColorPalette;
@@ -191,8 +192,8 @@ public final class ClanBaseService {
             ClanSnapshot clan,
             Location location
     ) {
-        if (!clan.leaderId().equals(player.getUniqueId())) {
-            return CompletableFuture.completedFuture(Optional.of(BaseSetupFailure.NOT_LEADER));
+        if (!api.clanAccess().hasPermissionSync(clan.id(), player.getUniqueId(), ClanPermissionKeys.LAND_MANAGE)) {
+            return CompletableFuture.completedFuture(Optional.of(BaseSetupFailure.NO_PERMISSION));
         }
         World world = location.getWorld();
         if (world == null) {
@@ -260,6 +261,19 @@ public final class ClanBaseService {
 
     public void destroyBase(ClanBaseRecord base) {
         destroyBase(base, null);
+    }
+
+    public CompletableFuture<Void> destroyBaseByClanId(long clanId) {
+        CompletableFuture<Void> finished = new CompletableFuture<>();
+        api.scheduler().supplyAsync(() -> repository.findByClanId(clanId))
+                .thenAccept(baseOptional -> {
+                    if (baseOptional.isEmpty()) {
+                        finished.complete(null);
+                        return;
+                    }
+                    destroyBase(baseOptional.get(), () -> finished.complete(null));
+                });
+        return finished;
     }
 
     public void destroyBase(ClanBaseRecord base, Runnable onComplete) {
@@ -332,8 +346,7 @@ public final class ClanBaseService {
     }
 
     public void togglePvp(Player player, ClanSnapshot clan, ClanBaseRecord base, Runnable onComplete) {
-        if (!clan.leaderId().equals(player.getUniqueId())) {
-            messages.send(player, "land.error.not-leader");
+        if (!canManageLand(player, clan)) {
             return;
         }
         boolean next = !base.pvpEnabled();
@@ -354,8 +367,7 @@ public final class ClanBaseService {
     }
 
     public void toggleMobSpawn(Player player, ClanSnapshot clan, ClanBaseRecord base, Runnable onComplete) {
-        if (!clan.leaderId().equals(player.getUniqueId())) {
-            messages.send(player, "land.error.not-leader");
+        if (!canManageLand(player, clan)) {
             return;
         }
         boolean next = !base.mobSpawnEnabled();
@@ -376,8 +388,7 @@ public final class ClanBaseService {
     }
 
     public void cycleBorderColor(Player player, ClanSnapshot clan, ClanBaseRecord base, Runnable onComplete) {
-        if (!clan.leaderId().equals(player.getUniqueId())) {
-            messages.send(player, "land.error.not-leader");
+        if (!canManageLand(player, clan)) {
             return;
         }
         Material currentGui = config.borderColors().resolveGui(base.borderMaterial());
@@ -405,8 +416,7 @@ public final class ClanBaseService {
     }
 
     public void expandBase(Player player, ClanSnapshot clan, ClanBaseRecord base, BaseExpansionAxis axis, Runnable onComplete) {
-        if (!clan.leaderId().equals(player.getUniqueId())) {
-            messages.send(player, "land.error.not-leader");
+        if (!canManageLand(player, clan)) {
             return;
         }
         World world = api.plugin().getServer().getWorld(base.world());
@@ -467,6 +477,7 @@ public final class ClanBaseService {
 
     public void notifyFailure(Player player, BaseSetupFailure failure) {
         String key = switch (failure) {
+            case NO_PERMISSION -> "land.error.no-permission";
             case NOT_LEADER -> "land.error.not-leader";
             case ALREADY_EXISTS -> "land.error.already-exists";
             case WORLDGUARD_MISSING -> "land.error.worldguard-missing";
@@ -479,6 +490,14 @@ public final class ClanBaseService {
             return;
         }
         messages.send(player, key);
+    }
+
+    private boolean canManageLand(Player player, ClanSnapshot clan) {
+        if (api.clanAccess().hasPermissionSync(clan.id(), player.getUniqueId(), ClanPermissionKeys.LAND_MANAGE)) {
+            return true;
+        }
+        messages.send(player, "land.error.no-permission");
+        return false;
     }
 
     private void persistNewBase(

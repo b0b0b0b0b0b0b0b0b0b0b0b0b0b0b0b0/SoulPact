@@ -29,11 +29,11 @@ public final class LandClickHandler {
             clanNavigation.openHub(player);
             return;
         }
-        if (slot == config.infoSlot() && menu.snapshot().leader()) {
+        if (slot == config.infoSlot() && menu.snapshot().canManage()) {
             clanNavigation.openBanner(player);
             return;
         }
-        if (!menu.snapshot().leader()) {
+        if (!menu.snapshot().canManage()) {
             return;
         }
         if (menu.snapshot().base().isEmpty()) {

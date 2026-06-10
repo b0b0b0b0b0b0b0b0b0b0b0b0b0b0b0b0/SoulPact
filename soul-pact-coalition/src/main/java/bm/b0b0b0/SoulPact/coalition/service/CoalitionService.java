@@ -1,6 +1,7 @@
 package bm.b0b0b0.SoulPact.coalition.service;
 
 import bm.b0b0b0.SoulPact.api.SoulPactApi;
+import bm.b0b0b0.SoulPact.api.clan.ClanPermissionKeys;
 import bm.b0b0b0.SoulPact.api.clan.ClanSnapshot;
 import bm.b0b0b0.SoulPact.api.coalition.CoalitionAllySnapshot;
 import bm.b0b0b0.SoulPact.api.coalition.CoalitionDisplayExtras;
@@ -139,13 +140,22 @@ public final class CoalitionService {
                 return CompletableFuture.completedFuture(false);
             }
             ClanSnapshot viewerClan = viewerClanOptional.get();
-            if (!viewerClan.leaderId().equals(viewer.getUniqueId()) || viewerClan.id() == targetClanId) {
+            if (viewerClan.id() == targetClanId) {
                 return CompletableFuture.completedFuture(false);
             }
-            if (membershipCache.coalitionsOverlap(viewerClan.id(), targetClanId)) {
-                return CompletableFuture.completedFuture(false);
-            }
-            return api.scheduler().supplyAsync(() -> canInviteToCoalition(viewerClan.id(), targetClanId));
+            return api.clanAccess().hasPermission(
+                    viewerClan.id(),
+                    viewer.getUniqueId(),
+                    ClanPermissionKeys.COALITION_MANAGE
+            ).thenCompose(hasPermission -> {
+                if (!hasPermission) {
+                    return CompletableFuture.completedFuture(false);
+                }
+                if (membershipCache.coalitionsOverlap(viewerClan.id(), targetClanId)) {
+                    return CompletableFuture.completedFuture(false);
+                }
+                return api.scheduler().supplyAsync(() -> canInviteToCoalition(viewerClan.id(), targetClanId));
+            });
         });
     }
 
@@ -395,17 +405,20 @@ public final class CoalitionService {
     }
 
     private CompletableFuture<Optional<ClanSnapshot>> resolveLeaderClan(Player player) {
-        return api.findClanByPlayer(player.getUniqueId()).thenApply(clanOptional -> {
+        return api.findClanByPlayer(player.getUniqueId()).thenCompose(clanOptional -> {
             if (clanOptional.isEmpty()) {
                 api.scheduler().runSync(() -> messages.send(player, "coalition.error.not-in-clan"));
-                return Optional.empty();
+                return CompletableFuture.completedFuture(Optional.empty());
             }
             ClanSnapshot clan = clanOptional.get();
-            if (!clan.leaderId().equals(player.getUniqueId())) {
-                api.scheduler().runSync(() -> messages.send(player, "coalition.error.not-leader"));
-                return Optional.empty();
-            }
-            return Optional.of(clan);
+            return api.clanAccess().hasPermission(clan.id(), player.getUniqueId(), ClanPermissionKeys.COALITION_MANAGE)
+                    .thenApply(hasPermission -> {
+                        if (!hasPermission) {
+                            api.scheduler().runSync(() -> messages.send(player, "coalition.error.no-permission"));
+                            return Optional.<ClanSnapshot>empty();
+                        }
+                        return Optional.of(clan);
+                    });
         });
     }
 }

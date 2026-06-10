@@ -1,6 +1,7 @@
 package bm.b0b0b0.SoulPact.war.service;
 
 import bm.b0b0b0.SoulPact.api.SoulPactApi;
+import bm.b0b0b0.SoulPact.api.clan.ClanPermissionKeys;
 import bm.b0b0b0.SoulPact.api.clan.ClanSnapshot;
 import bm.b0b0b0.SoulPact.api.land.ClanLandProvider;
 import bm.b0b0b0.SoulPact.api.treasury.TreasuryOperationResult;
@@ -136,21 +137,47 @@ public final class ClanWarService {
                 return treasuryFuture.thenApply(treasury -> new ClanWarInfoExtras(treasury, false));
             }
             ClanSnapshot viewerClan = viewerClanOptional.get();
-            if (!viewerClan.leaderId().equals(viewer.getUniqueId()) || viewerClan.id() == targetClanId) {
+            if (viewerClan.id() == targetClanId) {
                 return treasuryFuture.thenApply(treasury -> new ClanWarInfoExtras(treasury, false));
             }
-            return treasuryFuture.thenCompose(treasury ->
-                    resolveDeclareBlockReason(viewerClan.id(), targetClanId).thenApply(blockReason -> {
-                        if (blockReason.isEmpty()) {
-                            return new ClanWarInfoExtras(treasury, true);
-                        }
-                        return new ClanWarInfoExtras(treasury, false, blockReasonId(blockReason.get()));
-                    })
-            );
+            return api.clanAccess().hasPermission(
+                    viewerClan.id(),
+                    viewer.getUniqueId(),
+                    ClanPermissionKeys.WAR_DECLARE
+            ).thenCompose(hasPermission -> {
+                if (!hasPermission) {
+                    return treasuryFuture.thenApply(treasury ->
+                            new ClanWarInfoExtras(treasury, false, "no-permission")
+                    );
+                }
+                return treasuryFuture.thenCompose(treasury ->
+                        resolveDeclareBlockReason(viewerClan.id(), targetClanId).thenApply(blockReason -> {
+                            if (blockReason.isEmpty()) {
+                                return new ClanWarInfoExtras(treasury, true);
+                            }
+                            return new ClanWarInfoExtras(treasury, false, blockReasonId(blockReason.get()));
+                        })
+                );
+            });
         });
     }
 
     public CompletableFuture<Boolean> declareWar(Player player, long attackerClanId, long defenderClanId) {
+        return api.clanAccess().hasPermission(attackerClanId, player.getUniqueId(), ClanPermissionKeys.WAR_DECLARE)
+                .thenCompose(hasPermission -> {
+                    if (!hasPermission) {
+                        api.scheduler().runSync(() -> messages.send(player, "war.error.no-permission"));
+                        return CompletableFuture.completedFuture(false);
+                    }
+                    return declareWarAfterPermissionCheck(player, attackerClanId, defenderClanId);
+                });
+    }
+
+    private CompletableFuture<Boolean> declareWarAfterPermissionCheck(
+            Player player,
+            long attackerClanId,
+            long defenderClanId
+    ) {
         return resolveDeclareBlockReason(attackerClanId, defenderClanId).thenCompose(blockReason -> {
             if (blockReason.isPresent()) {
                 api.scheduler().runSync(() -> messages.send(player, blockReason.get()));
@@ -307,11 +334,18 @@ public final class ClanWarService {
 
     public CompletableFuture<List<WarDeclarationRecord>> listPendingForDefenderLeader(Player player) {
         return api.findClanByPlayer(player.getUniqueId()).thenCompose(clanOptional -> {
-            if (clanOptional.isEmpty() || !clanOptional.get().leaderId().equals(player.getUniqueId())) {
-                api.scheduler().runSync(() -> messages.send(player, "war.error.not-leader"));
+            if (clanOptional.isEmpty()) {
                 return CompletableFuture.completedFuture(List.of());
             }
-            return api.scheduler().supplyAsync(() -> repository.listPendingForDefender(clanOptional.get().id()));
+            ClanSnapshot clan = clanOptional.get();
+            return api.clanAccess().hasPermission(clan.id(), player.getUniqueId(), ClanPermissionKeys.WAR_RESPOND)
+                    .thenCompose(hasPermission -> {
+                        if (!hasPermission) {
+                            api.scheduler().runSync(() -> messages.send(player, "war.error.no-permission"));
+                            return CompletableFuture.completedFuture(List.of());
+                        }
+                        return api.scheduler().supplyAsync(() -> repository.listPendingForDefender(clan.id()));
+                    });
         });
     }
 
@@ -331,7 +365,10 @@ public final class ClanWarService {
         }
         long ownerSide = warSideRoot(war, baseOwnerClanId);
         long breakerSide = warSideRoot(war, breakerClanId);
-        return ownerSide != 0L && breakerSide != 0L && ownerSide != breakerSide;
+        if (ownerSide == 0L || breakerSide == 0L || ownerSide == breakerSide) {
+            return false;
+        }
+        return api.clanAccess().hasPermissionSync(breakerClanId, breakerId, ClanPermissionKeys.WAR_FIGHT);
     }
 
     public void recordCombatKill(Player killer, Player victim) {
@@ -464,13 +501,14 @@ public final class ClanWarService {
             Player breaker,
             long flagOwnerClanId,
             Location flagLocation,
-            Runnable destroyBase
+            Runnable destroyBase,
+            Runnable clearCapturedFlag
     ) {
         if (findWarForParticipant(flagOwnerClanId).isEmpty()) {
             return FlagBreakWarResult.PEACEFUL;
         }
         if (allowsEnemyStandardBreak(breaker.getUniqueId(), flagOwnerClanId)) {
-            onEnemyStandardBreak(breaker, flagOwnerClanId, flagLocation, destroyBase);
+            onEnemyStandardBreak(breaker, flagOwnerClanId, flagLocation, clearCapturedFlag);
             return FlagBreakWarResult.HANDLED;
         }
         Optional<OwnFlagWarBreakAction> ownBreak = resolveOwnFlagBreak(breaker.getUniqueId(), flagOwnerClanId);
@@ -482,10 +520,10 @@ public final class ClanWarService {
         return FlagBreakWarResult.BLOCKED;
     }
 
-    private void onEnemyStandardBreak(Player breaker, long baseOwnerClanId, Location flagLocation, Runnable destroyBase) {
+    private void onEnemyStandardBreak(Player breaker, long baseOwnerClanId, Location flagLocation, Runnable clearCapturedFlag) {
         deliverCapturedStandard(breaker, flagLocation, baseOwnerClanId);
         onEnemyStandardBroken(breaker, baseOwnerClanId);
-        destroyBase.run();
+        clearCapturedFlag.run();
     }
 
     private void deliverCapturedStandard(Player breaker, Location flagLocation, long ownerClanId) {
@@ -570,20 +608,22 @@ public final class ClanWarService {
                 return CompletableFuture.completedFuture(new WarHubViewData(false, 0, Optional.empty()));
             }
             ClanSnapshot clan = clanOptional.get();
-            boolean viewerIsLeader = clan.leaderId().equals(player.getUniqueId());
-            CompletableFuture<Integer> pendingFuture = viewerIsLeader
-                    ? pendingCountForLeader(clan.id())
-                    : CompletableFuture.completedFuture(0);
-            Optional<ActiveWarRecord> warOptional = stateCache.activeWarFor(clan.id());
-            if (warOptional.isEmpty()) {
-                return pendingFuture.thenApply(count -> new WarHubViewData(viewerIsLeader, count, Optional.empty()));
-            }
-            ActiveWarRecord war = warOptional.get();
-            long enemyClanId = war.enemyClanIdFor(clan.id());
-            return pendingFuture.thenCombine(
-                    resolveEnemyTarget(clan.id(), war, enemyClanId),
-                    (count, enemy) -> new WarHubViewData(viewerIsLeader, count, enemy)
-            );
+            return api.clanAccess().hasPermission(clan.id(), player.getUniqueId(), ClanPermissionKeys.WAR_RESPOND)
+                    .thenCompose(viewerCanRespond -> {
+                        CompletableFuture<Integer> pendingFuture = viewerCanRespond
+                                ? pendingCountForLeader(clan.id())
+                                : CompletableFuture.completedFuture(0);
+                        Optional<ActiveWarRecord> warOptional = stateCache.activeWarFor(clan.id());
+                        if (warOptional.isEmpty()) {
+                            return pendingFuture.thenApply(count -> new WarHubViewData(viewerCanRespond, count, Optional.empty()));
+                        }
+                        ActiveWarRecord war = warOptional.get();
+                        long enemyClanId = war.enemyClanIdFor(clan.id());
+                        return pendingFuture.thenCombine(
+                                resolveEnemyTarget(clan.id(), war, enemyClanId),
+                                (count, enemy) -> new WarHubViewData(viewerCanRespond, count, enemy)
+                        );
+                    });
         });
     }
 
@@ -715,13 +755,20 @@ public final class ClanWarService {
 
     private CompletableFuture<Optional<WarDeclarationRecord>> resolveDeclarationForDefenderLeader(Player player, long declarationId) {
         return api.findClanByPlayer(player.getUniqueId()).thenCompose(clanOptional -> {
-            if (clanOptional.isEmpty() || !clanOptional.get().leaderId().equals(player.getUniqueId())) {
-                api.scheduler().runSync(() -> messages.send(player, "war.error.not-leader"));
+            if (clanOptional.isEmpty()) {
                 return CompletableFuture.completedFuture(Optional.empty());
             }
-            return api.scheduler().supplyAsync(() -> repository.listPendingForDefender(clanOptional.get().id()).stream()
-                    .filter(record -> record.id() == declarationId)
-                    .findFirst());
+            ClanSnapshot clan = clanOptional.get();
+            return api.clanAccess().hasPermission(clan.id(), player.getUniqueId(), ClanPermissionKeys.WAR_RESPOND)
+                    .thenCompose(hasPermission -> {
+                        if (!hasPermission) {
+                            api.scheduler().runSync(() -> messages.send(player, "war.error.no-permission"));
+                            return CompletableFuture.completedFuture(Optional.empty());
+                        }
+                        return api.scheduler().supplyAsync(() -> repository.listPendingForDefender(clan.id()).stream()
+                                .filter(record -> record.id() == declarationId)
+                                .findFirst());
+                    });
         });
     }
 

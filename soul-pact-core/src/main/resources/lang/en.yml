@@ -120,6 +120,11 @@ clan:
       bank_withdraw: "Withdraw from treasury"
       chest_deposit: "Deposit to chest"
       chest_withdraw: "Withdraw from chest"
+      land_manage: "Manage base"
+      war_declare: "Declare war"
+      war_respond: "Respond to war"
+      war_fight: "Fight in war"
+      coalition_manage: "Manage coalition"
   banner:
     not-in-clan: "<#F87171>You are not in a clan."
     not-leader: "<#F87171>Only the leader can change the clan banner."
@@ -396,6 +401,61 @@ clan:
                 - "<#D8B4FE>Click — disable"
             disabled:
               name: "<#6B7280>Withdraw from chest"
+              lore:
+                - "<#9CA3AF>Status: <#F87171>disabled"
+                - "<#D8B4FE>Click — enable"
+          land_manage:
+            enabled:
+              name: "<#86EFAC>Manage base"
+              lore:
+                - "<#9CA3AF>Status: <#86EFAC>enabled"
+                - "<#D8B4FE>Click — disable"
+            disabled:
+              name: "<#6B7280>Manage base"
+              lore:
+                - "<#9CA3AF>Status: <#F87171>disabled"
+                - "<#D8B4FE>Click — enable"
+          war_declare:
+            enabled:
+              name: "<#86EFAC>Declare war"
+              lore:
+                - "<#9CA3AF>Status: <#86EFAC>enabled"
+                - "<#D8B4FE>Click — disable"
+            disabled:
+              name: "<#6B7280>Declare war"
+              lore:
+                - "<#9CA3AF>Status: <#F87171>disabled"
+                - "<#D8B4FE>Click — enable"
+          war_respond:
+            enabled:
+              name: "<#86EFAC>Accept war and ransom"
+              lore:
+                - "<#9CA3AF>Status: <#86EFAC>enabled"
+                - "<#D8B4FE>Click — disable"
+            disabled:
+              name: "<#6B7280>Accept war and ransom"
+              lore:
+                - "<#9CA3AF>Status: <#F87171>disabled"
+                - "<#D8B4FE>Click — enable"
+          war_fight:
+            enabled:
+              name: "<#86EFAC>Fight in war"
+              lore:
+                - "<#9CA3AF>Status: <#86EFAC>enabled"
+                - "<#D8B4FE>Click — disable"
+            disabled:
+              name: "<#6B7280>Fight in war"
+              lore:
+                - "<#9CA3AF>Status: <#F87171>disabled"
+                - "<#D8B4FE>Click — enable"
+          coalition_manage:
+            enabled:
+              name: "<#86EFAC>Manage coalition"
+              lore:
+                - "<#9CA3AF>Status: <#86EFAC>enabled"
+                - "<#D8B4FE>Click — disable"
+            disabled:
+              name: "<#6B7280>Manage coalition"
               lore:
                 - "<#9CA3AF>Status: <#F87171>disabled"
                 - "<#D8B4FE>Click — enable"
@@ -718,6 +778,7 @@ clan:
             active-war: "<#F87171>Your clan is already at war."
             target-in-war: "<#F87171>This clan is already at war."
             coalition-ally: "<#F87171>This clan is in your coalition — war is not allowed."
+            no-permission: "<#F87171>Your role cannot declare war."
             cannot-declare: "<#F87171>Cannot declare war on this clan."
           reason:
             generic:
@@ -744,6 +805,9 @@ clan:
             coalition-ally:
               - "<#F87171>Clan is in your coalition"
               - "<#9CA3AF>Allies cannot be attacked"
+            no-permission:
+              - "<#F87171>Cannot declare war"
+              - "<#9CA3AF>Leader can grant this in role settings"
             cannot-declare:
               - "<#F87171>Cannot declare war"
               - "<#9CA3AF>Clan: <white>[{tag}]</white>"

@@ -27,6 +27,11 @@ public final class ClanRolePermissionDefaultsSettings {
         settings.bankWithdraw = true;
         settings.chestDeposit = true;
         settings.chestWithdraw = true;
+        settings.landManage = true;
+        settings.warDeclare = true;
+        settings.warRespond = true;
+        settings.warFight = true;
+        settings.coalitionManage = true;
         return settings;
     }
 
@@ -35,6 +40,7 @@ public final class ClanRolePermissionDefaultsSettings {
         settings.accept = true;
         settings.bankDeposit = true;
         settings.chestDeposit = true;
+        settings.warFight = true;
         return settings;
     }
 

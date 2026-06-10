@@ -15,7 +15,12 @@ public final class ClanRolePermissionMap {
             ClanPermissionKeys.BANK_DEPOSIT,
             ClanPermissionKeys.BANK_WITHDRAW,
             ClanPermissionKeys.CHEST_DEPOSIT,
-            ClanPermissionKeys.CHEST_WITHDRAW
+            ClanPermissionKeys.CHEST_WITHDRAW,
+            ClanPermissionKeys.LAND_MANAGE,
+            ClanPermissionKeys.WAR_DECLARE,
+            ClanPermissionKeys.WAR_RESPOND,
+            ClanPermissionKeys.WAR_FIGHT,
+            ClanPermissionKeys.COALITION_MANAGE
     );
 
     private final Map<String, Map<String, Boolean>> byRole;

@@ -156,7 +156,8 @@ public final class SoulPactWarPlugin extends JavaPlugin {
                 coalitionWithdrawService,
                 killTracker,
                 victoryAnnouncer,
-                clanLookup
+                clanLookup,
+                landBridgeLookup
         );
         WarPendingChatPresenter pendingChatPresenter = new WarPendingChatPresenter(
                 api,

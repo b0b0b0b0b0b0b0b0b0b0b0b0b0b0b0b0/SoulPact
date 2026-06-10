@@ -71,4 +71,9 @@ public final class LandExtension implements ClanLandProvider {
     public void onLeadershipTransferred(long clanId, UUID previousLeaderId, UUID newLeaderId) {
         baseService.transferRegionOwnership(clanId, previousLeaderId, newLeaderId);
     }
+
+    @Override
+    public CompletableFuture<Void> destroyClanBase(long clanId) {
+        return baseService.destroyBaseByClanId(clanId);
+    }
 }

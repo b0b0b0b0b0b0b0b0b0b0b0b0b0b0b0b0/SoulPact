@@ -50,13 +50,7 @@ public final class ClanRolePermissionService {
     }
 
     public CompletableFuture<Boolean> toggle(Player leader, long clanId, String role, String permission) {
-        if (!ClanPermissionKeys.KICK.equals(permission)
-                && !ClanPermissionKeys.ACCEPT.equals(permission)
-                && !ClanPermissionKeys.RECRUIT_LOWER.equals(permission)
-                && !ClanPermissionKeys.BANK_DEPOSIT.equals(permission)
-                && !ClanPermissionKeys.BANK_WITHDRAW.equals(permission)
-                && !ClanPermissionKeys.CHEST_DEPOSIT.equals(permission)
-                && !ClanPermissionKeys.CHEST_WITHDRAW.equals(permission)) {
+        if (!ClanRolePermissionMap.PERMISSION_ORDER.contains(permission)) {
             return CompletableFuture.completedFuture(false);
         }
         return clanRepository.findById(clanId).thenCompose(clanOptional -> {
@@ -99,6 +93,11 @@ public final class ClanRolePermissionService {
             case ClanPermissionKeys.BANK_WITHDRAW -> flags.bankWithdraw;
             case ClanPermissionKeys.CHEST_DEPOSIT -> flags.chestDeposit;
             case ClanPermissionKeys.CHEST_WITHDRAW -> flags.chestWithdraw;
+            case ClanPermissionKeys.LAND_MANAGE -> flags.landManage;
+            case ClanPermissionKeys.WAR_DECLARE -> flags.warDeclare;
+            case ClanPermissionKeys.WAR_RESPOND -> flags.warRespond;
+            case ClanPermissionKeys.WAR_FIGHT -> flags.warFight;
+            case ClanPermissionKeys.COALITION_MANAGE -> flags.coalitionManage;
             default -> false;
         };
     }
@@ -153,6 +152,11 @@ public final class ClanRolePermissionService {
         map.put(ClanPermissionKeys.BANK_WITHDRAW, flags.bankWithdraw);
         map.put(ClanPermissionKeys.CHEST_DEPOSIT, flags.chestDeposit);
         map.put(ClanPermissionKeys.CHEST_WITHDRAW, flags.chestWithdraw);
+        map.put(ClanPermissionKeys.LAND_MANAGE, flags.landManage);
+        map.put(ClanPermissionKeys.WAR_DECLARE, flags.warDeclare);
+        map.put(ClanPermissionKeys.WAR_RESPOND, flags.warRespond);
+        map.put(ClanPermissionKeys.WAR_FIGHT, flags.warFight);
+        map.put(ClanPermissionKeys.COALITION_MANAGE, flags.coalitionManage);
         return map;
     }
 

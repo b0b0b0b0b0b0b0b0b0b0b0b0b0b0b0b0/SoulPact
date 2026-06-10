@@ -23,4 +23,8 @@ public interface ClanLandProvider extends SoulPactGuiExtension {
 
     default void onLeadershipTransferred(long clanId, UUID previousLeaderId, UUID newLeaderId) {
     }
+
+    default CompletableFuture<Void> destroyClanBase(long clanId) {
+        return CompletableFuture.completedFuture(null);
+    }
 }

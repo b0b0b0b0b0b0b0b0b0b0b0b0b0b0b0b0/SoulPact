@@ -23,6 +23,7 @@ public final class PluginConfig {
     private final GuiClanBannerConfig guiClanBannerConfig;
     private final PermissionsConfig permissionsConfig;
     private final EconomyConfig economyConfig;
+    private final PlaceholderConfig placeholderConfig;
 
     public PluginConfig(SoulPactSettings mainSettings, GuiGeneralSettings guiSettings) {
         this.localeConfig = new LocaleConfig(mainSettings.locale);
@@ -43,6 +44,7 @@ public final class PluginConfig {
         this.guiClanBannerConfig = new GuiClanBannerConfig(guiSettings.banner);
         this.permissionsConfig = new PermissionsConfig(mainSettings.permissions);
         this.economyConfig = new EconomyConfig(mainSettings.economy);
+        this.placeholderConfig = new PlaceholderConfig(mainSettings.placeholders);
     }
 
     public LocaleConfig locale() {
@@ -115,5 +117,9 @@ public final class PluginConfig {
 
     public EconomyConfig economy() {
         return economyConfig;
+    }
+
+    public PlaceholderConfig placeholders() {
+        return placeholderConfig;
     }
 }

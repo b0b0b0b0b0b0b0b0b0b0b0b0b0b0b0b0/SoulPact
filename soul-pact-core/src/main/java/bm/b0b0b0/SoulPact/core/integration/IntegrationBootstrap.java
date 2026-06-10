@@ -5,17 +5,19 @@ public final class IntegrationBootstrap {
     private final IntegrationRegistry integrationRegistry;
     private final VaultIntegration vaultIntegration;
     private final SkinRestorerIntegration skinRestorerIntegration;
+    private final PlaceholderApiIntegration placeholderApiIntegration;
 
     public IntegrationBootstrap(IntegrationRegistry integrationRegistry) {
         this.integrationRegistry = integrationRegistry;
         this.vaultIntegration = new VaultIntegration();
         this.skinRestorerIntegration = new SkinRestorerIntegration();
+        this.placeholderApiIntegration = new PlaceholderApiIntegration();
     }
 
     public void registerDefaults() {
         integrationRegistry.register(vaultIntegration);
         integrationRegistry.register(new EssentialsIntegration());
-        integrationRegistry.register(new PlaceholderApiIntegration());
+        integrationRegistry.register(placeholderApiIntegration);
         integrationRegistry.register(skinRestorerIntegration);
     }
 
@@ -29,5 +31,9 @@ public final class IntegrationBootstrap {
 
     public SkinRestorerIntegration skinRestorerIntegration() {
         return skinRestorerIntegration;
+    }
+
+    public PlaceholderApiIntegration placeholderApiIntegration() {
+        return placeholderApiIntegration;
     }
 }

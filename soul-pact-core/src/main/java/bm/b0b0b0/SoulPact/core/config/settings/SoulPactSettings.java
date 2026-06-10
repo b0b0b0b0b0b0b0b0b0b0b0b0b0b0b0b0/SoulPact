@@ -28,6 +28,10 @@ public final class SoulPactSettings extends YamlSerializable {
     public EconomySettings economy = new EconomySettings();
 
     @NewLine
+    @Comment(@CommentValue("PlaceholderAPI (%spact_...%)"))
+    public PlaceholderSettings placeholders = new PlaceholderSettings();
+
+    @NewLine
     @Comment(@CommentValue("Permission nodes"))
     public PermissionSettings permissions = new PermissionSettings();
 }

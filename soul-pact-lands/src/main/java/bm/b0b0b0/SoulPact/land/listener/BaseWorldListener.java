@@ -105,7 +105,8 @@ public final class BaseWorldListener implements Listener {
                     player,
                     flagOwnerClanId,
                     location,
-                    () -> destroyBaseForWar(targetBase)
+                    () -> destroyBaseForWar(targetBase),
+                    () -> clearFlagForWarCapture(targetBase)
             );
             if (warResult != FlagBreakWarResult.PEACEFUL) {
                 return;
@@ -163,6 +164,11 @@ public final class BaseWorldListener implements Listener {
     private void destroyBaseForWar(ClanBaseRecord base) {
         baseService.clearFlagBlocks(base);
         baseService.destroyBase(base);
+    }
+
+    private void clearFlagForWarCapture(ClanBaseRecord base) {
+        baseService.clearFlagBlocks(base);
+        clanStandard.clearDeployed(base.clanId());
     }
 
     private void completeStandardPlacement(

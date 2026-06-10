@@ -10,4 +10,6 @@ public interface SoulPactClanAccess {
     CompletableFuture<Optional<ClanMemberSnapshot>> findMember(long clanId, UUID playerId);
 
     CompletableFuture<Boolean> hasPermission(long clanId, UUID playerId, String permissionKey);
+
+    boolean hasPermissionSync(long clanId, UUID playerId, String permissionKey);
 }

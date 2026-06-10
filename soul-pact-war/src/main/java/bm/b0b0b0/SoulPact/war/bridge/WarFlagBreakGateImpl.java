@@ -24,7 +24,7 @@ public final class WarFlagBreakGateImpl implements WarFlagBreakGate {
 
     @Override
     public void onEnemyStandardBreak(Player breaker, long defenderClanId, Location flagLocation, Runnable defaultDestroy) {
-        warService.handleBrokenFlag(breaker, defenderClanId, flagLocation, defaultDestroy);
+        warService.handleBrokenFlag(breaker, defenderClanId, flagLocation, defaultDestroy, defaultDestroy);
     }
 
     @Override
@@ -48,8 +48,9 @@ public final class WarFlagBreakGateImpl implements WarFlagBreakGate {
             Player breaker,
             long flagOwnerClanId,
             Location flagLocation,
-            Runnable destroyBase
+            Runnable destroyBase,
+            Runnable clearCapturedFlag
     ) {
-        return warService.handleBrokenFlag(breaker, flagOwnerClanId, flagLocation, destroyBase);
+        return warService.handleBrokenFlag(breaker, flagOwnerClanId, flagLocation, destroyBase, clearCapturedFlag);
     }
 }

@@ -11,7 +11,7 @@ public final class WarHubMenu implements InventoryHolder {
 
     private final WarConfig config;
     private final Inventory inventory;
-    private final boolean viewerIsLeader;
+    private final boolean viewerCanRespond;
     private final int pendingCount;
 
     public WarHubMenu(
@@ -22,7 +22,7 @@ public final class WarHubMenu implements InventoryHolder {
             WarHubViewData viewData
     ) {
         this.config = config;
-        this.viewerIsLeader = viewData.viewerIsLeader();
+        this.viewerCanRespond = viewData.viewerCanRespond();
         this.pendingCount = viewData.pendingCount();
         this.inventory = Bukkit.createInventory(
                 this,
@@ -41,8 +41,8 @@ public final class WarHubMenu implements InventoryHolder {
         return config;
     }
 
-    public boolean viewerIsLeader() {
-        return viewerIsLeader;
+    public boolean viewerCanRespond() {
+        return viewerCanRespond;
     }
 
     public int pendingCount() {

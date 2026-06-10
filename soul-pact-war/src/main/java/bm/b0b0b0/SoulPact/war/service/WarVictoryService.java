@@ -25,6 +25,7 @@ public final class WarVictoryService {
     private final WarKillTracker killTracker;
     private final WarVictoryAnnouncer victoryAnnouncer;
     private final WarClanLookup clanLookup;
+    private final WarLandBridgeLookup landBridgeLookup;
 
     public WarVictoryService(
             SoulPactApi api,
@@ -38,7 +39,8 @@ public final class WarVictoryService {
             WarCoalitionWithdrawService coalitionWithdrawService,
             WarKillTracker killTracker,
             WarVictoryAnnouncer victoryAnnouncer,
-            WarClanLookup clanLookup
+            WarClanLookup clanLookup,
+            WarLandBridgeLookup landBridgeLookup
     ) {
         this.api = api;
         this.repository = repository;
@@ -52,6 +54,7 @@ public final class WarVictoryService {
         this.killTracker = killTracker;
         this.victoryAnnouncer = victoryAnnouncer;
         this.clanLookup = clanLookup;
+        this.landBridgeLookup = landBridgeLookup;
     }
 
     public void resolveDueCaptures() {
@@ -139,10 +142,17 @@ public final class WarVictoryService {
             CompletableFuture<Boolean> treasuryFuture = resolveTreasury(outcome);
             treasuryFuture.thenCompose(ignored -> spoilsBridge.transferWarSpoils(loserClanId, winnerClanId))
                     .thenAccept(ignored -> clanLookup.incrementWarsWon(winnerClanId))
+                    .thenCompose(ignored -> destroyLoserBase(loserClanId))
                     .thenCompose(ignored -> api.clanLifecycle().disbandByWarDefeat(loserClanId))
                     .thenAccept(disbanded -> coalitionWarBridgeLookup.resolve()
                             .ifPresent(bridge -> bridge.onWarEnded(outcome, disbanded)));
         });
+    }
+
+    private CompletableFuture<Void> destroyLoserBase(long loserClanId) {
+        return landBridgeLookup.resolve()
+                .map(land -> land.destroyClanBase(loserClanId))
+                .orElseGet(() -> CompletableFuture.completedFuture(null));
     }
 
     private CompletableFuture<Boolean> resolveTreasury(CoalitionWarOutcome outcome) {
