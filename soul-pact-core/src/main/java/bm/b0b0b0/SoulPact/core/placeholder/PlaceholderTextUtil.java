@@ -1,5 +1,7 @@
 package bm.b0b0b0.SoulPact.core.placeholder;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
+import com.destroystokyo.paper.profile.ProfileProperty;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.Instant;
@@ -7,15 +9,15 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Pattern;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.profile.PlayerProfile;
-import org.bukkit.profile.PlayerTextures;
 
 public final class PlaceholderTextUtil {
 
+    private static final String TEXTURES_PROPERTY = "textures";
     private static final Pattern LEGACY_COLOR = Pattern.compile("§[0-9a-fk-orA-FK-OR]");
     private static final Pattern HEX_COLOR = Pattern.compile("<#[0-9A-Fa-f]{6}>");
     private static final Pattern MINI_TAG = Pattern.compile("</?[a-zA-Z#0-9]+>");
@@ -84,27 +86,37 @@ public final class PlaceholderTextUtil {
             return "";
         }
         PlayerProfile profile = player.getPlayerProfile();
-        PlayerTextures textures = profile.getTextures();
-        if (textures.getSkin() == null) {
+        if (!profile.hasProperty(TEXTURES_PROPERTY)) {
             return "";
         }
-        return textures.getSkin().toString();
+        for (ProfileProperty property : profile.getProperties()) {
+            if (TEXTURES_PROPERTY.equals(property.getName())) {
+                return property.getValue();
+            }
+        }
+        return "";
     }
 
-    public static String resolvePlayerName(java.util.UUID playerId) {
+    public static String resolvePlayerName(UUID playerId) {
         if (playerId == null) {
             return "";
         }
         Player online = Bukkit.getPlayer(playerId);
         if (online != null) {
-            return online.getName();
+            return profileName(online.getPlayerProfile(), playerId);
         }
-        var offline = Bukkit.getOfflinePlayer(playerId);
-        String name = offline.getName();
-        return name == null ? playerId.toString().substring(0, 8) : name;
+        OfflinePlayer offline = Bukkit.getOfflinePlayer(playerId);
+        return profileName(offline.getPlayerProfile(), playerId);
     }
 
-    public static String plain(Player player, net.kyori.adventure.text.Component component) {
-        return PlainTextComponentSerializer.plainText().serialize(component);
+    private static String profileName(PlayerProfile profile, UUID fallbackId) {
+        if (profile == null) {
+            return fallbackId.toString().substring(0, 8);
+        }
+        String name = profile.getName();
+        if (name == null || name.isBlank()) {
+            return fallbackId.toString().substring(0, 8);
+        }
+        return name;
     }
 }
