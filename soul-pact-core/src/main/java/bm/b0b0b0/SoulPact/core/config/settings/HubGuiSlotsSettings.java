@@ -20,6 +20,9 @@ public final class HubGuiSlotsSettings {
     @Comment(@CommentValue("Справка (нижний ряд, справа)"))
     public int help = 49;
 
-    @Comment(@CommentValue("Модули: id:slot (chest:10,land:12,bank:14)"))
-    public String modules = "chest:10,land:12,bank:14";
+    @Comment(@CommentValue("Модули: id:slot (chest:10,land:12,bank:14,war:16,coalition:28,quests:30,gladiator:32)"))
+    public String modules = "chest:10,land:12,bank:14,war:16,coalition:28,quests:30,gladiator:32";
+
+    @Comment(@CommentValue("Свободные слоты для модулей без явного id:slot — по порядку регистрации"))
+    public String modulesOverflow = "16,28,30,32,34,37,39,41,43";
 }

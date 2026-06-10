@@ -1,0 +1,111 @@
+land:
+  startup:
+    separator: "=============================="
+    registered: "Clan base module connected"
+    worldguard-connected: "WorldGuard connected"
+    worldguard-missing: "WorldGuard not found — base claiming unavailable"
+    core-missing: "SoulPact is not ready — base module disabled"
+    database-missing: "SoulPact database is not ready — base module disabled"
+  error:
+    not-in-clan: "<#F87171>You are not in a clan."
+    not-leader: "<#F87171>Only the clan leader can manage the base."
+    no-permission: "<#F87171>Your role cannot manage the base."
+    already-exists: "<#F87171>Your clan already has a base."
+    worldguard-missing: "<#F87171>WorldGuard is not installed."
+    too-close: "<#F87171>Too close to another region. Buffer required: {buffer} blocks."
+    border-protected: "<#F87171>Base border is protected."
+    flag-creative-blocked: "<#F87171>Cannot break the standard in creative — switch to survival."
+    flag-war-handled: "<#F87171>This standard is in an active war — use war rules to capture it."
+    failed: "<#F87171>Failed to create base."
+  base:
+    created: "<#86EFAC>Clan base <white>[{tag}]</white> created. Region: <white>{region}</white>"
+    destroyed: "<#F87171>Standard removed — base and region deleted."
+  settings:
+    pvp-enabled: "<#86EFAC>PvP enabled on base."
+    pvp-disabled: "<#86EFAC>PvP disabled on base."
+    mob-enabled: "<#86EFAC>Mob spawning enabled on base."
+    mob-disabled: "<#86EFAC>Mob spawning disabled on base."
+    border-color-changed: "<#86EFAC>Border color: <white>{color}</white>"
+  expansion:
+    success: "<#86EFAC>Base expanded <white>{direction}</white>. Size: <white>{size}</white>. Charged <white>{cost}</white> ({source})"
+    max-reached: "<#F87171>Expansion limit reached: <white>{max}</white> blocks"
+    insufficient-treasury: "<#F87171>Insufficient clan treasury funds."
+    insufficient-leader: "<#F87171>Insufficient funds on your balance."
+    treasury-locked: "<#F87171>Clan treasury is locked."
+    economy-unavailable: "<#F87171>Economy unavailable. Vault and bank module or Vault for leader payment required."
+    direction:
+      north: "north"
+      south: "south"
+      east: "east"
+      west: "west"
+    source:
+      treasury: "treasury"
+      leader: "leader balance"
+  gui:
+    title: "<#581C87><bold>Base</bold> <#374151>[{tag}]"
+    filler:
+      name: " "
+    item:
+      info-empty:
+        name: "<#9CA3AF>No base yet"
+        lore:
+          - "<#9CA3AF>Click — standard and setup"
+          - "<#9CA3AF>Take the standard and place"
+          - "<#9CA3AF>it in the world"
+          - "<#F87171>Breaking the standard removes the base"
+      info-active:
+        name: "<#FCD34D><bold>Base active</bold>"
+        lore:
+          - "<#9CA3AF>Region: <white>{region}"
+          - "<#9CA3AF>World: <white>{world}"
+          - "<#9CA3AF>Standard: <white>{x} {y} {z}"
+          - "<#86EFAC>Click — standard and editing"
+      pvp-on:
+        name: "<#F87171><bold>PvP: on</bold>"
+        lore:
+          - "<#9CA3AF>Click — disable"
+      pvp-off:
+        name: "<#86EFAC><bold>PvP: off</bold>"
+        lore:
+          - "<#9CA3AF>Click — enable"
+      mob-on:
+        name: "<#D8B4FE><bold>Mobs: on</bold>"
+        lore:
+          - "<#9CA3AF>Click — disable"
+      mob-off:
+        name: "<#9CA3AF><bold>Mobs: off</bold>"
+        lore:
+          - "<#9CA3AF>Click — enable"
+      border-color:
+        name: "<#FCD34D><bold>Border color</bold>"
+        lore:
+          - "<#9CA3AF>Current: <white>{color}"
+          - "<#9CA3AF>Click — next color"
+      expand:
+        name: "<#86EFAC><bold>Expand: {direction}</bold>"
+        lore:
+          - "<#9CA3AF>Size: <white>{size}</white> / {max}"
+          - "<#9CA3AF>Cost: <white>{cost}</white>"
+          - "<#9CA3AF>Payment: <white>{source}"
+          - "<#9CA3AF>Click — +{step} blocks"
+      back:
+        name: "<#F87171>Back"
+        lore:
+          - "<#9CA3AF>Back to clan hub"
+    border-colors:
+      red: "Red"
+      orange: "Orange"
+      yellow: "Yellow"
+      lime: "Lime"
+      green: "Green"
+      cyan: "Cyan"
+      light_blue: "Light blue"
+      blue: "Blue"
+      purple: "Purple"
+      magenta: "Magenta"
+      pink: "Pink"
+      white: "White"
+      light_gray: "Light gray"
+      gray: "Gray"
+      black: "Black"
+      brown: "Brown"

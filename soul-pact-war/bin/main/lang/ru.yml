@@ -1,0 +1,137 @@
+war:
+  startup:
+    separator: "=============================="
+    registered: "Модуль войны кланов подключён"
+    core-missing: "SoulPact не найден — модуль войны отключён"
+    database-missing: "База SoulPact не готова — модуль войны отключён"
+  declare:
+    sent: "<#86EFAC>Объявление войны отправлено лидеру клана."
+    received: "<#F87171>Клан <white>[{attacker_tag}] {attacker_name}</white> объявил вам войну!"
+    received-member: "<#F87171>Клан <white>[{attacker_tag}] {attacker_name}</white> объявил вашему клану войну!"
+    button:
+      accept: "<#86EFAC><bold>[Принять войну]</bold>"
+      ransom: "<#EAB308><bold>[Выкуп {ransom_percent}%]</bold>"
+      separator: " <#4B5563>| "
+  response:
+    accepted: "<#86EFAC>Вы приняли войну. Казна разблокирована."
+    ransomed: "<#EAB308>Выкуп <white>{amount}</white> переведён атакующему. Объявление снято."
+  started:
+    enemy-flag: "<#F87171>Война началась! Флаг врага <white>[{enemy_tag}]</white>: <white>{world} {x} {y} {z}</white>"
+  capture:
+    standard-received: "<#86EFAC>Вы захватили знамя <white>[{target_tag}]</white> — оно у вас в инвентаре. Удерживайте захват до победы!"
+    holder-alert: "<#86EFAC>Захват начался! Знамя <white>[{target_tag}]</white> у вашего клана. Удерживайте <white>{seconds}</white> сек. до победы!"
+    defender-alert: "<#F87171><bold>Враг захватил ваш флаг!</bold> Клан <white>[{holder_tag}]</white> удерживает захват. У вас <white>{seconds}</white> сек., чтобы вернуть контроль!"
+  own-flag:
+    defeat: "<#F87171>Вы разрушили своё знамя — поражение. Казна, добыча и клан переходят к <white>[{enemy}]</white>."
+    coalition-withdraw: "<#EAB308>Коалиция выбыла из войны после разрушения своего знамя."
+  coalition-withdraw:
+    self-flag: "<#EAB308>Коалиция выбыла из войны: клан <white>{clan}</white> разрушил своё знамя."
+    flag-captured: "<#EAB308>Коалиция выбыла из войны: знамя клана <white>{clan}</white> захвачено."
+  bossbar:
+    pending-attacker: "Объявление войны — ожидание ответа"
+    pending-defender: "Вам объявили войну — примите или выкуп"
+    active-attacker: "Идёт война — ваш клан атакует"
+    active-defender: "Идёт война — на ваш клан напали"
+    capture-defending: "Враг захватил ваш флаг! {seconds} сек. до поражения"
+    capture-attacking: "Флаг врага захвачен! {seconds} сек. до победы"
+  victory:
+    broadcast:
+      - "<#C084FC><bold>━━━━ Война окончена ━━━━</bold>"
+      - "<#86EFAC>Победители: <white>[{winner_tag}] {winner_name}</white>"
+      - "<#F87171>Проигравшие: <white>[{loser_tag}] {loser_name}</white>"
+      - "<#9CA3AF>Коалиция победителей: <white>{winner_coalition}</white>"
+      - "<#9CA3AF>Коалиция проигравших: <white>{loser_coalition}</white>"
+      - "<#9CA3AF>Убийства врагов по кланам:"
+    loser-alert:
+      - "<#F87171><bold>Ваш клан проиграл войну.</bold>"
+      - "<#9CA3AF>Война с <white>[{winner_tag}] {winner_name}</white>."
+      - "<#9CA3AF>Вся казна клана передана победителям."
+      - "<#9CA3AF>Клан будет расформирован — это поражение."
+      - ""
+      - "<#9CA3AF>Итоги по убийствам:"
+    kill-line: "<#9CA3AF>  [{tag}] {name}: <white>{kills}</white>"
+    kill-empty: "<#6B7280>  Без убийств в этой войне"
+  error:
+    cannot-declare: "<#F87171>Нельзя объявить войну этому клану."
+    lands-required: "<#F87171>Для войны нужен модуль баз (SoulPact-Lands)."
+    attacker-no-base: "<#F87171>У вашего клана нет базы — поставьте флаг."
+    defender-no-base: "<#F87171>У цели нет базы — война невозможна."
+    active-war: "<#F87171>Ваш клан уже в состоянии войны."
+    target-in-war: "<#F87171>Этот клан уже в состоянии войны."
+    coalition-ally: "<#F87171>Клан в вашей коалиции — война невозможна."
+    accept-no-base: "<#F87171>У одного из кланов нет базы — войну нельзя начать."
+    already-pending: "<#F87171>Объявление уже ожидает ответа."
+    not-leader: "<#F87171>Только лидер может отвечать на объявления."
+    no-permission: "<#F87171>У вашей роли нет нужного права."
+    empty-treasury: "<#F87171>Казна пуста — выкуп невозможен."
+    ransom-failed: "<#F87171>Не удалось перевести выкуп."
+    flag-break-blocked: "<#F87171>Вы не можете снять это знамя в текущей фазе войны."
+  gui:
+    declare-confirm:
+      title: "<#581C87><bold>Объявить войну?</bold> <white>[{tag}]"
+      item:
+        confirm:
+          name: "<#86EFAC><bold>Да, объявить</bold>"
+          lore:
+            - "<#9CA3AF>Клан: <white>[{tag}] {name}"
+            - "<#9CA3AF>ID: <white>#{id}"
+            - "<#F87171>Отменить будет нельзя"
+        deny:
+          name: "<#F87171><bold>Нет</bold>"
+          lore:
+            - "<#9CA3AF>Назад к информации о клане"
+    pending-list:
+      title: "<#581C87><bold>Объявления войны</bold> <#374151>({count})"
+      item:
+        empty:
+          name: "<#6B7280>Нет объявлений"
+          lore:
+            - "<#9CA3AF>Никто не объявил вашему клану войну"
+        entry:
+          name: "<#F87171>[{attacker_tag}] {attacker_name}"
+          lore:
+            - "<#9CA3AF>ID объявления: <white>#{id}"
+            - "<#D8B4FE>Нажмите — принять или выкуп"
+        back:
+          name: "<#F87171>Закрыть"
+          lore:
+            - "<#9CA3AF>Закрыть меню"
+    pending-detail:
+      title: "<#581C87><bold>[{tag}] {name}</bold>"
+      item:
+        accept:
+          name: "<#86EFAC><bold>Принять войну</bold>"
+          lore:
+            - "<#9CA3AF>Начать активную войну"
+            - "<#9CA3AF>Казна будет разблокирована"
+        ransom:
+          name: "<#EAB308><bold>Заплатить выкуп</bold>"
+          lore:
+            - "<#9CA3AF>{ransom_percent}% казны: <white>{ransom_amount}"
+            - "<#9CA3AF>Объявление будет снято"
+        back:
+          name: "<#F87171>Назад"
+          lore:
+            - "<#9CA3AF>К списку объявлений"
+    hub:
+      title: "<#581C87><bold>Война</bold>"
+      item:
+        enemy-flag:
+          name: "<#F87171>Флаг врага <white>[{enemy_tag}]</white>"
+          lore:
+            - "<#9CA3AF>Клан: <white>{enemy_name}"
+            - "<#9CA3AF>Мир: <white>{world}"
+            - "<#9CA3AF>Координаты: <white>{x} {y} {z}"
+        no-war:
+          name: "<#6B7280>Нет активной войны"
+          lore:
+            - "<#9CA3AF>Координаты флага противника"
+            - "<#9CA3AF>появятся после начала войны"
+        pending:
+          name: "<#FDE047><bold>Объявления</bold> <#374151>({count})"
+          lore:
+            - "<#D8B4FE>Нажмите — принять или выкуп"
+        back:
+          name: "<#F87171>Назад"
+          lore:
+            - "<#9CA3AF>К профилю клана"

@@ -18,7 +18,7 @@ SoulPact — современный клановый плагин для **Paper
 
 ## Особенности плагина SoulPact
 
-* Модульная система: **SoulPact** (ядро) + **Bank**, **Lands**, **Chest**, **War**, **Coalition** — ставите только нужные аддоны.
+* Модульная система: **SoulPact** (ядро) + **Bank**, **Lands**, **Chest**, **War**, **Coalition**, **Quests**, **Gladiator** — ставите только нужные аддоны.
 * Paper Brigadier-команды `/clan` с подкомандами и подсказками в чате.
 * GUI-хаб клана: профиль, настройки, баннер, список кланов, слоты модулей.
 * Создание, редактирование описания, роспуск клана; выход, кик, приглашения и заявки на вступление.
@@ -32,6 +32,8 @@ SoulPact — современный клановый плагин для **Paper
 * **SoulPact-Chest** — общий сундук с несколькими страницами, покупка ячеек, права deposit/withdraw.
 * **SoulPact-War** — объявление войны, принятие, выкуп, BossBar в бою, учёт киллов, broadcast победы; проигравший клан может быть расформирован.
 * **SoulPact-Coalition** — коалиция до 3 кланов, приглашения, BossBar, общая казна победителя, война на союзника.
+* **SoulPact-Quests** — клановые квесты: ежедневные и разовые, миссии (убийства, добыча, постройка, рыбалка), награды очками, в казну и командами; прогресс в памяти с батч-записью в БД.
+* **SoulPact-Gladiator** — гладиаторские PvP-ивенты: админ запускает арену (или расписание DAILY/WEEKLY), кланы вступают без лимита, последний выживший клан получает награды-команды и кастомный тег арены; BossBar, звуки, регион арены жезлом.
 * PlaceholderAPI: идентификатор `spact`, 60+ плейсхолдеров для scoreboard, TAB, чата и меню.
 * Интеграции: Vault, PlaceholderAPI, SkinsRestorer, WorldGuard, Essentials (soft).
 * SQLite и MySQL, HikariCP, асинхронная работа с БД, версионные SQL-миграции.
@@ -141,6 +143,126 @@ SoulPact — современный клановый плагин для **Paper
 
 `/coa` — Алиас `/clancoalition`.
 
+### SoulPact-Quests
+
+`/clanquest` — Открыть меню квестов клана.
+
+`/clanquest list` — Открыть список квестов (GUI).
+
+`/clanquest status` — Статус активного квеста в чате.
+
+`/clanquest start <id>` — Начать квест (лидер).
+
+`/clanquest abandon` — Отказаться от активного квеста (лидер).
+
+`/cquest` — Алиас `/clanquest`.
+
+`/quests` — Алиас `/clanquest`.
+
+### SoulPact-Gladiator
+
+`/gladiator` — Открыть меню гладиаторских арен (ЛКМ — вступить, ПКМ — наблюдать).
+
+`/gladiator help` — Справка по командам ивента.
+
+`/gladiator join <арена>` — Вступить в ивент (нужен клан, фаза лобби).
+
+`/gladiator leave` — Покинуть ивент.
+
+`/gladiator watch <арена>` — Наблюдать за ивентом.
+
+`/glad` — Алиас `/gladiator`.
+
+`/clanglad help` — Справка администратора.
+
+`/clanglad reload` — Перезагрузить настройки и lang модуля.
+
+`/clanglad wand` — Жезл выделения региона арены (ЛКМ/ПКМ — точки).
+
+`/clanglad arena create <имя>` — Создать арену (применяет выделенный регион).
+
+`/clanglad arena delete <имя>` — Удалить арену.
+
+`/clanglad arena list` — Список арен.
+
+`/clanglad arena point <арена> <SPAWN|WATCH|EXIT|LOBBY>` — Установить точку арены в текущей позиции.
+
+`/clanglad arena toggle <имя>` — Включить/выключить арену.
+
+`/clanglad arena seticon <арена> <материал>` — Иконка арены в GUI.
+
+`/clanglad arena settag <арена> <тег>` — Кастомный тег арены (достаётся победителю).
+
+`/clanglad arena desc <арена> <описание>` — Описание арены.
+
+`/clanglad reward list <арена>` — Список наград арены.
+
+`/clanglad reward clean <арена>` — Очистить награды.
+
+`/clanglad reward add <арена> <команда>` — Добавить награду-команду (`{player}`, `{tag}`, `{arena}`).
+
+`/clanglad start <арена>` — Запустить ивент.
+
+`/clanglad stop <арена>` — Остановить ивент.
+
+`/clanglad view <арена>` — Телепорт к арене (точка WATCH).
+
+`/clanglad scheduler list <арена>` — Список расписаний арены.
+
+`/clanglad scheduler remove <арена> <id>` — Удалить расписание.
+
+`/clanglad scheduler create <арена> <DAILY|WEEKLY> <день 1-7> <час:минута>` — Авто-запуск ивента по расписанию.
+
+`/cglad` — Алиас `/clanglad`.
+
+#### Быстрый старт арены
+
+1. Создать арену и поставить обязательные точки (встаньте в нужное место и выполните команду):
+
+```
+/clanglad arena create colosseum
+/clanglad arena point colosseum LOBBY
+/clanglad arena point colosseum SPAWN
+/clanglad arena point colosseum EXIT
+```
+
+Без точек `SPAWN`, `LOBBY` и `EXIT` ивент не запустится.
+
+2. Опционально — трибуна, тег победителя, описание, иконка и регион:
+
+```
+/clanglad arena point colosseum WATCH
+/clanglad arena settag colosseum <gold>⚔Чемпион
+/clanglad arena desc colosseum Большая арена на спавне
+/clanglad arena seticon colosseum DIAMOND_SWORD
+```
+
+Регион: `/clanglad wand` → ЛКМ по блоку — первый угол, ПКМ — второй, затем `/clanglad arena create <имя>` (регион берётся из выделения при создании). Бойца, вышедшего за границы, возвращает на `SPAWN`.
+
+3. Награды победителям (выполняются консолью на каждого участника клана-победителя):
+
+```
+/clanglad reward add colosseum give {player} diamond 16
+/clanglad reward add colosseum eco give {player} 1000
+```
+
+4. Запуск и проверка (нужно минимум 2 клана):
+
+```
+/clanglad start colosseum
+```
+
+Игроки вступают через `/gladiator join colosseum` или меню `/gladiator` во время отсчёта лобби (60с по умолчанию, ключ `lobby-countdown-seconds` в `plugins/SoulPact-Gladiator/config.yml`). После отсчёта всех телепортирует на `SPAWN`; смерть — выбывание; последний выживший клан получает награды и тег арены. Если кланов меньше двух — ивент отменяется.
+
+5. Авто-запуск по расписанию:
+
+```
+/clanglad scheduler create colosseum DAILY 1 20:00
+/clanglad scheduler create colosseum WEEKLY 6 18:30
+```
+
+`DAILY` — каждый день в указанное время (день игнорируется), `WEEKLY` — по дню недели (1 = понедельник … 7 = воскресенье).
+
 ---
 
 ## Права плагина
@@ -150,6 +272,8 @@ SoulPact — современный клановый плагин для **Paper
 `soulpact.clan.use` — Доступ к командам `/clan` (по умолчанию: все игроки).
 
 `soulpact.admin` — Доступ к `/sclan` и админ-функциям (по умолчанию: OP).
+
+`soulpact.gladiator.admin` — Доступ к `/clanglad` и жезлу арен (по умолчанию: OP; нода настраивается в `plugins/SoulPact-Gladiator/config.yml`).
 
 ---
 
@@ -342,6 +466,40 @@ SoulPact — современный клановый плагин для **Paper
 `%spact_current_lang_head%` — Base64 строки локали (технический плейс).
 
 `%spact_player_head%` — Base64 текстуры головы игрока.
+
+### Квесты (модуль SoulPact-Quests)
+
+`%spact_quest_has_active%` — Есть ли у клана активный квест (`да`/`нет`).
+
+`%spact_quest_active%` — ID активного квеста (пусто, если нет).
+
+`%spact_quest_active_name%` — Название активного квеста из lang.
+
+`%spact_quest_progress%` — Текущий прогресс активного квеста.
+
+`%spact_quest_target%` — Цель активного квеста.
+
+`%spact_quest_percent%` — Прогресс в процентах (0–100).
+
+`%spact_quest_time_left%` — Оставшееся время ежедневного квеста.
+
+### Гладиатор (модуль SoulPact-Gladiator)
+
+`%spact_glad_inwar%` — Участвует ли игрок в бою прямо сейчас (`да`/`нет`).
+
+`%spact_glad_hastag%` — Держит ли клан игрока хотя бы один тег арены (`да`/`нет`).
+
+`%spact_glad_tags%` — Все теги арен, которые держит клан игрока (через пробел).
+
+`%spact_glad_tag:<арена>%` — Кастомный тег арены.
+
+`%spact_glad_holder:<арена>%` — Тег клана, владеющего тегом арены.
+
+`%spact_glad_arena_state:<арена>%` — Состояние арены (Ожидание/Лобби/Идёт бой/Выключена).
+
+`%spact_glad_next_name%` — Арена ближайшего ивента по расписанию.
+
+`%spact_glad_next_time%` — Время до ближайшего ивента по расписанию.
 
 ### Заглушки (ещё не реализовано)
 

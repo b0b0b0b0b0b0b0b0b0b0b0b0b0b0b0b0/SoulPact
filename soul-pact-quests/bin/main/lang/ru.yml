@@ -1,0 +1,90 @@
+quests:
+  startup:
+    separator: "=============================="
+    registered: "Модуль квестов подключён ({count} квестов)"
+    bank-connected: "Казна доступна — награды в банк клана включены"
+    bank-missing: "SoulPact-Bank не найден — награды в казну пропускаются"
+    core-missing: "SoulPact не готов — модуль квестов отключён"
+    database-missing: "База данных SoulPact не готова — модуль квестов отключён"
+  not-in-clan: "<#F87171>Вы не состоите в клане."
+  no-manage-permission: "<#F87171>Управлять квестами может только лидер клана."
+  unknown-quest: "<#F87171>Квест <white>{id}</white> не найден."
+  already-active: "<#F87171>У клана уже есть активный квест."
+  already-completed: "<#F87171>Этот квест уже выполнен кланом."
+  on-cooldown: "<#F87171>Квест <white>{quest}</white> на перезарядке."
+  no-active-quest: "<#F87171>У клана нет активного квеста."
+  failed: "<#F87171>Не удалось выполнить действие с квестом."
+  started: "<#86EFAC>Квест <white>{quest}</white> запущен."
+  abandoned: "<#FCD34D>Активный квест отменён."
+  status: "<#9CA3AF>Квест: <white>{quest}</white> <#9CA3AF>— <white>{progress}</white>/<white>{target}</white> <#9CA3AF>(осталось: <white>{time}</white>)"
+  usage: "<#9CA3AF>Команды: <white>/clanquest list</white>, <white>status</white>, <white>start <id></white>, <white>abandon</white>"
+  usage-start: "<#9CA3AF>Использование: <white>/clanquest start <id></white>"
+  broadcast:
+    started: "<#D8B4FE><white>{player}</white> запустил клановый квест <white>{quest}</white>."
+    abandoned: "<#FCD34D>Клановый квест <white>{quest}</white> отменён."
+    completed: "<#86EFAC>Клан выполнил квест <white>{quest}</white>! <#9CA3AF>(+{points} очков)"
+    expired: "<#F87171>Время кланового квеста <white>{quest}</white> истекло."
+  time:
+    now: "сейчас"
+    days: "д"
+    hours: "ч"
+    minutes: "м"
+    seconds: "с"
+    unlimited: "без лимита"
+  place:
+    "yes": "да"
+    "no": "нет"
+    none: "—"
+  type:
+    daily: "Ежедневный"
+    once: "Разовый"
+  gui:
+    title: "<#581C87><bold>Квесты</bold> <#374151>[{tag}]"
+    section:
+      rewards: "<#9CA3AF>Награды:"
+    item:
+      quest:
+        name: "<#FCD34D><bold>{quest}</bold>"
+        lore:
+          - "<#9CA3AF>{description}"
+          - "<#9CA3AF>Тип: <white>{type}</white>"
+          - "<#9CA3AF>Цель: <white>{progress}</white>/<white>{target}</white>"
+          - ""
+      back:
+        name: "<#F87171>Назад"
+        lore:
+          - "<#9CA3AF>В главное меню"
+    reward:
+      points: "<#9CA3AF>  • <white>{points}</white> очков клана"
+      treasury: "<#9CA3AF>  • <white>{treasury}</white> в казну"
+      extra: "<#9CA3AF>  • дополнительные награды"
+      none: "<#6B7280>  • нет"
+    state:
+      active: "<#86EFAC>Квест активен"
+      expires: "<#9CA3AF>Осталось: <white>{time}</white>"
+      blocked: "<#6B7280>Сначала завершите активный квест"
+      available: "<#9CA3AF>Доступен для запуска лидером"
+      cooldown: "<#FCD34D>Перезарядка: <white>{time}</white>"
+      completed: "<#86EFAC>Выполнен"
+    action:
+      start: "<#D8B4FE>Нажмите — начать квест"
+      abandon: "<#F87171>Нажмите — отменить квест"
+  quest:
+    zombie_hunt:
+      name: "Охота на нежить"
+      description: "Убейте зомби всем кланом"
+    miner:
+      name: "Алмазная лихорадка"
+      description: "Добудьте алмазную руду"
+    builder:
+      name: "Великая стройка"
+      description: "Установите блоки на постройках"
+    fisherman:
+      name: "Рыбный день"
+      description: "Выловите рыбу из водоёмов"
+    first_blood:
+      name: "Первая кровь"
+      description: "Одержите победы над игроками"
+    dragon_slayer:
+      name: "Драконоборцы"
+      description: "Сразите Дракона Края"

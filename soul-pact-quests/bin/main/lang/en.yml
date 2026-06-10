@@ -1,0 +1,90 @@
+quests:
+  startup:
+    separator: "=============================="
+    registered: "Quests module connected ({count} quests)"
+    bank-connected: "Treasury available — clan bank rewards enabled"
+    bank-missing: "SoulPact-Bank not found — treasury rewards are skipped"
+    core-missing: "SoulPact is not ready — quests module disabled"
+    database-missing: "SoulPact database is not ready — quests module disabled"
+  not-in-clan: "<#F87171>You are not in a clan."
+  no-manage-permission: "<#F87171>Only the clan leader can manage quests."
+  unknown-quest: "<#F87171>Quest <white>{id}</white> not found."
+  already-active: "<#F87171>Your clan already has an active quest."
+  already-completed: "<#F87171>This quest is already completed by your clan."
+  on-cooldown: "<#F87171>Quest <white>{quest}</white> is on cooldown."
+  no-active-quest: "<#F87171>Your clan has no active quest."
+  failed: "<#F87171>Quest action failed."
+  started: "<#86EFAC>Quest <white>{quest}</white> started."
+  abandoned: "<#FCD34D>Active quest abandoned."
+  status: "<#9CA3AF>Quest: <white>{quest}</white> <#9CA3AF>— <white>{progress}</white>/<white>{target}</white> <#9CA3AF>(time left: <white>{time}</white>)"
+  usage: "<#9CA3AF>Commands: <white>/clanquest list</white>, <white>status</white>, <white>start <id></white>, <white>abandon</white>"
+  usage-start: "<#9CA3AF>Usage: <white>/clanquest start <id></white>"
+  broadcast:
+    started: "<#D8B4FE><white>{player}</white> started the clan quest <white>{quest}</white>."
+    abandoned: "<#FCD34D>Clan quest <white>{quest}</white> was abandoned."
+    completed: "<#86EFAC>Your clan completed the quest <white>{quest}</white>! <#9CA3AF>(+{points} points)"
+    expired: "<#F87171>Clan quest <white>{quest}</white> has expired."
+  time:
+    now: "now"
+    days: "d"
+    hours: "h"
+    minutes: "m"
+    seconds: "s"
+    unlimited: "unlimited"
+  place:
+    "yes": "yes"
+    "no": "no"
+    none: "—"
+  type:
+    daily: "Daily"
+    once: "One-time"
+  gui:
+    title: "<#581C87><bold>Quests</bold> <#374151>[{tag}]"
+    section:
+      rewards: "<#9CA3AF>Rewards:"
+    item:
+      quest:
+        name: "<#FCD34D><bold>{quest}</bold>"
+        lore:
+          - "<#9CA3AF>{description}"
+          - "<#9CA3AF>Type: <white>{type}</white>"
+          - "<#9CA3AF>Goal: <white>{progress}</white>/<white>{target}</white>"
+          - ""
+      back:
+        name: "<#F87171>Back"
+        lore:
+          - "<#9CA3AF>Back to hub"
+    reward:
+      points: "<#9CA3AF>  • <white>{points}</white> clan points"
+      treasury: "<#9CA3AF>  • <white>{treasury}</white> to treasury"
+      extra: "<#9CA3AF>  • extra rewards"
+      none: "<#6B7280>  • none"
+    state:
+      active: "<#86EFAC>Quest is active"
+      expires: "<#9CA3AF>Time left: <white>{time}</white>"
+      blocked: "<#6B7280>Finish the active quest first"
+      available: "<#9CA3AF>Can be started by the leader"
+      cooldown: "<#FCD34D>Cooldown: <white>{time}</white>"
+      completed: "<#86EFAC>Completed"
+    action:
+      start: "<#D8B4FE>Click — start quest"
+      abandon: "<#F87171>Click — abandon quest"
+  quest:
+    zombie_hunt:
+      name: "Undead Hunt"
+      description: "Kill zombies as a clan"
+    miner:
+      name: "Diamond Rush"
+      description: "Mine diamond ore"
+    builder:
+      name: "Grand Construction"
+      description: "Place blocks on your builds"
+    fisherman:
+      name: "Fishing Day"
+      description: "Catch fish from the waters"
+    first_blood:
+      name: "First Blood"
+      description: "Defeat other players"
+    dragon_slayer:
+      name: "Dragon Slayers"
+      description: "Slay the Ender Dragon"

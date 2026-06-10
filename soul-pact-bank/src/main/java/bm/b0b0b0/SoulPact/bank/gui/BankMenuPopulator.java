@@ -150,6 +150,7 @@ public final class BankMenuPopulator {
                 case ClanTreasuryService.ENTRY_WITHDRAW -> "bank.gui.ledger.line-withdraw";
                 case ClanTreasuryService.ENTRY_TRANSFER_IN -> "bank.gui.ledger.line-transfer-in";
                 case ClanTreasuryService.ENTRY_TRANSFER_OUT -> "bank.gui.ledger.line-transfer-out";
+                case ClanTreasuryService.ENTRY_REWARD -> "bank.gui.ledger.line-reward";
                 default -> "bank.gui.ledger.line-deposit";
             };
             lines.add(messages.resolve(player, key, Map.of(

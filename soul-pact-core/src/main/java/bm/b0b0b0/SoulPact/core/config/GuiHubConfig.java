@@ -33,7 +33,7 @@ public final class GuiHubConfig {
         this.settingsSlot = settings.slots.settings;
         this.createSlot = settings.slots.create;
         this.helpSlot = settings.slots.help;
-        this.moduleSlotMapping = parseModuleSlots(settings.slots.modules);
+        this.moduleSlotMapping = parseModuleSlots(settings.slots.modules, settings.slots.modulesOverflow);
         this.overviewMaterial = parseMaterial(settings.materials.overview, Material.NETHER_STAR);
         this.profileMaterial = parseMaterial(settings.materials.profile, Material.PLAYER_HEAD);
         this.settingsMaterial = parseMaterial(settings.materials.settings, Material.COMPARATOR);
@@ -124,6 +124,10 @@ public final class GuiHubConfig {
         putModuleMaterial(materials, "bank", settings.bank, fallback);
         putModuleMaterial(materials, "land", settings.land, fallback);
         putModuleMaterial(materials, "chest", settings.chest, fallback);
+        putModuleMaterial(materials, "war", settings.war, fallback);
+        putModuleMaterial(materials, "coalition", settings.coalition, fallback);
+        putModuleMaterial(materials, "quests", settings.quests, fallback);
+        putModuleMaterial(materials, "gladiator", settings.gladiator, fallback);
         return Map.copyOf(materials);
     }
 
@@ -136,9 +140,10 @@ public final class GuiHubConfig {
         materials.put(extensionId, parseMaterial(rawValue, fallback));
     }
 
-    private static HubModuleSlotMapping parseModuleSlots(String rawValue) {
+    private static HubModuleSlotMapping parseModuleSlots(String rawValue, String overflowRawValue) {
+        List<Integer> overflowSlots = parseSlotList(overflowRawValue);
         if (rawValue == null || rawValue.isBlank()) {
-            return new HubModuleSlotMapping(Map.of("chest", 10, "land", 12, "bank", 14), List.of());
+            return new HubModuleSlotMapping(Map.of("chest", 10, "land", 12, "bank", 14), List.of(), overflowSlots);
         }
         Map<String, Integer> byExtensionId = new LinkedHashMap<>();
         List<Integer> legacyOrderSlots = new ArrayList<>();
@@ -162,9 +167,27 @@ public final class GuiHubConfig {
             }
         }
         if (byExtensionId.isEmpty() && legacyOrderSlots.isEmpty()) {
-            return new HubModuleSlotMapping(Map.of("chest", 10, "land", 12, "bank", 14), List.of());
+            return new HubModuleSlotMapping(Map.of("chest", 10, "land", 12, "bank", 14), List.of(), overflowSlots);
         }
-        return new HubModuleSlotMapping(byExtensionId, legacyOrderSlots);
+        return new HubModuleSlotMapping(byExtensionId, legacyOrderSlots, overflowSlots);
+    }
+
+    private static List<Integer> parseSlotList(String rawValue) {
+        List<Integer> slots = new ArrayList<>();
+        if (rawValue == null || rawValue.isBlank()) {
+            return slots;
+        }
+        for (String part : rawValue.split(",")) {
+            String trimmed = part.trim();
+            if (trimmed.isEmpty()) {
+                continue;
+            }
+            try {
+                slots.add(Integer.parseInt(trimmed));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return slots;
     }
 
     private static Material parseMaterial(String rawValue, Material fallback) {

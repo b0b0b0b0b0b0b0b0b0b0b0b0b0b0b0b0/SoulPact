@@ -1,0 +1,13 @@
+name: SoulPact-Coalition
+version: '${version}'
+main: bm.b0b0b0.SoulPact.coalition.SoulPactCoalitionPlugin
+api-version: '1.21'
+depend: [SoulPact]
+libraries:
+  - net.elytrium:serializer:1.1.1
+softdepend: [SoulPact-War, SoulPact-Bank]
+commands:
+  clancoalition:
+    description: Clan coalitions
+    usage: /clancoalition
+    aliases: [coalition, coa]

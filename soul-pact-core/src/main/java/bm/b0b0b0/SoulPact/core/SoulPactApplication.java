@@ -728,7 +728,8 @@ public final class SoulPactApplication {
                 pluginConfig.locale(),
                 integrationBootstrap.vaultIntegration(),
                 dataSourceProvider,
-                roleThemeService
+                roleThemeService,
+                extensionRegistry
         );
     }
 }

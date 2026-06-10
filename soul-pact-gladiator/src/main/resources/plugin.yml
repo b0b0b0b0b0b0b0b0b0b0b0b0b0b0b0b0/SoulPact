@@ -1,0 +1,20 @@
+name: SoulPact-Gladiator
+version: '${version}'
+main: bm.b0b0b0.SoulPact.gladiator.SoulPactGladiatorPlugin
+api-version: '1.21'
+depend: [SoulPact]
+libraries:
+  - net.elytrium:serializer:1.1.1
+commands:
+  gladiator:
+    description: Gladiator event
+    usage: /gladiator
+    aliases: [glad]
+  clanglad:
+    description: Gladiator event administration
+    usage: /clanglad
+    aliases: [cglad]
+permissions:
+  soulpact.gladiator.admin:
+    description: Manage gladiator arenas and events
+    default: op

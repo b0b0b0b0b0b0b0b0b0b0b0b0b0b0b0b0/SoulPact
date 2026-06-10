@@ -1,0 +1,13 @@
+name: SoulPact-Quests
+version: '${version}'
+main: bm.b0b0b0.SoulPact.quests.SoulPactQuestsPlugin
+api-version: '1.21'
+depend: [SoulPact]
+softdepend: [SoulPact-Bank]
+libraries:
+  - net.elytrium:serializer:1.1.1
+commands:
+  clanquest:
+    description: Clan quests
+    usage: /clanquest
+    aliases: [cquest, quests]

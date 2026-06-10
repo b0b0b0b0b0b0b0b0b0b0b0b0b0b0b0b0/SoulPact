@@ -27,6 +27,7 @@ public final class ClanTreasuryService implements ClanTreasuryApi {
     public static final String ENTRY_TRANSFER_IN = "TRANSFER_IN";
     public static final String ENTRY_TRANSFER_OUT = "TRANSFER_OUT";
     public static final String ENTRY_CHARGE = "CHARGE";
+    public static final String ENTRY_REWARD = "REWARD";
 
     private final SoulPactApi api;
     private final ClanTreasuryRepository repository;
@@ -94,6 +95,14 @@ public final class ClanTreasuryService implements ClanTreasuryApi {
             }
             return api.scheduler().supplyAsync(() -> executeCharge(clanId, actorId, amount, note));
         });
+    }
+
+    @Override
+    public CompletableFuture<TreasuryOperationResult> credit(long clanId, UUID actorId, double amount, String note) {
+        if (amount <= 0D || !Double.isFinite(amount)) {
+            return CompletableFuture.completedFuture(TreasuryOperationResult.INVALID_AMOUNT);
+        }
+        return api.scheduler().supplyAsync(() -> executeCredit(clanId, actorId, amount, note));
     }
 
     @Override
@@ -276,6 +285,21 @@ public final class ClanTreasuryService implements ClanTreasuryApi {
             return TreasuryOperationResult.INSUFFICIENT_TREASURY_FUNDS;
         }
         return TreasuryOperationResult.SUCCESS;
+    }
+
+    private TreasuryOperationResult executeCredit(long clanId, UUID actorId, double amount, String note) {
+        ClanTreasuryRepository.TreasuryMutationResult mutationResult = repository.applyMutation(
+                new ClanTreasuryRepository.TreasuryMutation(
+                        clanId,
+                        actorId,
+                        ENTRY_REWARD,
+                        amount,
+                        note,
+                        false,
+                        System.currentTimeMillis()
+                )
+        );
+        return mutationResult.success() ? TreasuryOperationResult.SUCCESS : TreasuryOperationResult.FAILED;
     }
 
     private TreasuryOperationResult executeTransferAll(long fromClanId, long toClanId, String note) {

@@ -45,5 +45,5 @@ subprojects {
 tasks.register('plugins') {
     group = 'build'
     description = 'Build plugin JARs into build/plugins'
-    dependsOn ':soul-pact-core:jar', ':soul-pact-bank:jar', ':soul-pact-lands:jar', ':soul-pact-chest:jar', ':soul-pact-war:jar', ':soul-pact-coalition:jar'
+    dependsOn ':soul-pact-core:jar', ':soul-pact-bank:jar', ':soul-pact-lands:jar', ':soul-pact-chest:jar', ':soul-pact-war:jar', ':soul-pact-coalition:jar', ':soul-pact-quests:jar', ':soul-pact-gladiator:jar'
 }

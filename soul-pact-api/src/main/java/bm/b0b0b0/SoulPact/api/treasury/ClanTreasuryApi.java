@@ -18,6 +18,8 @@ public interface ClanTreasuryApi {
 
     CompletableFuture<TreasuryOperationResult> charge(long clanId, java.util.UUID actorId, double amount, String note);
 
+    CompletableFuture<TreasuryOperationResult> credit(long clanId, java.util.UUID actorId, double amount, String note);
+
     CompletableFuture<TreasuryOperationResult> transferAll(long fromClanId, long toClanId, String note);
 
     CompletableFuture<TreasuryOperationResult> seize(long fromClanId, long toClanId, double amount, String note);

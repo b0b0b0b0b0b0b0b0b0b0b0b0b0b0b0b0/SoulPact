@@ -1,0 +1,61 @@
+coalition:
+  startup:
+    separator: "=============================="
+    registered: "Модуль коалиций подключён"
+    core-missing: "SoulPact не найден — модуль коалиций отключён"
+    database-missing: "База SoulPact не готова — модуль коалиций отключён"
+  invite:
+    sent: "<#86EFAC>Приглашение в коалицию отправлено клану <white>[{tag}]</white>."
+    received: "<#D8B4FE>Клан <white>[{inviter_tag}] {inviter_name}</white> приглашает вас в коалицию!"
+    received-member: "<#D8B4FE>Клан <white>[{inviter_tag}] {inviter_name}</white> приглашает ваш клан в коалицию!"
+    accepted: "<#86EFAC>Вы вступили в коалицию."
+    denied: "<#9CA3AF>Приглашение в коалицию отклонено."
+    blocked: "<#F87171>Клан <white>[{inviter_tag}]</white> заблокирован — больше не сможет приглашать."
+    inviter-accepted: "<#86EFAC>Клан <white>[{target_tag}] {target_name}</white> принял ваше приглашение в коалицию!"
+    inviter-accepted-member: "<#86EFAC>Клан <white>[{target_tag}]</white> принял приглашение в коалицию."
+    inviter-denied: "<#9CA3AF>Клан <white>[{target_tag}] {target_name}</white> отклонил приглашение в коалицию."
+    inviter-denied-member: "<#9CA3AF>Клан <white>[{target_tag}]</white> отклонил приглашение в коалицию."
+    inviter-blocked: "<#F87171>Клан <white>[{target_tag}] {target_name}</white> отклонил приглашение и заблокировал повторные."
+    inviter-blocked-member: "<#F87171>Клан <white>[{target_tag}]</white> заблокировал ваши приглашения."
+    button:
+      accept: "<#86EFAC><bold>[Принять]</bold>"
+      deny: "<#F87171><bold>[Отклонить]</bold>"
+      block: "<#6B7280><bold>[Заблокировать]</bold>"
+      separator: " <#4B5563>| "
+  leave:
+    success: "<#9CA3AF>Вы покинули коалицию."
+  war:
+    declared-on-ally: "<#EAB308>Союзнику <white>[{friend_tag}]</white> объявили войну!"
+    started-for-ally: "<#F87171>Коалиционная война началась для клана <white>[{friend_tag}]</white>!"
+    enemy-base-revealed: "<#F87171>Союзник <white>[{friend_tag}]</white> в войне. Флаг врага <white>[{enemy_tag}]</white>: <white>{world} {x} {y} {z}</white>"
+    ally-victory: "<#86EFAC>Союзники победили! <white>[{winner_tag}]</white> одолели <white>[{loser_tag}]</white>."
+    ally-defeat: "<#F87171>Союзник <white>[{loser_tag}]</white> проиграл войну."
+    withdrawn: "<#EAB308>Коалиция выбыла из войны из-за клана <white>[{clan_tag}]</white>."
+  bossbar:
+    declared-on-ally: "Союзнику [{friend_tag}] объявили войну"
+    active-for-ally: "Война коалиции: [{friend_tag}]"
+    capture-for-ally: "Захват флага союзника [{friend_tag}] · {seconds} сек."
+  error:
+    not-in-clan: "<#F87171>Вы не состоите в клане."
+    not-leader: "<#F87171>Только лидер может управлять коалицией."
+    no-permission: "<#F87171>У вашей роли нет права управлять коалицией."
+    target-not-found: "<#F87171>Клан не найден."
+    self: "<#F87171>Нельзя пригласить свой клан."
+    already-allied: "<#F87171>Кланы уже в одной коалиции или связаны союзом."
+    coalition-full: "<#F87171>В коалиции уже максимум 3 клана."
+    already-sent: "<#F87171>Приглашение уже отправлено."
+    blocked-by-target: "<#F87171>Этот клан заблокировал ваши приглашения."
+    invite-not-found: "<#F87171>Приглашение не найдено."
+    not-in-coalition: "<#F87171>Ваш клан не состоит в коалиции."
+    invalid-id: "<#F87171>Неверный номер приглашения."
+  command:
+    usage: "<#9CA3AF>/clancoalition · invite <тег> · accept <id> · deny <id> · block <id> · leave"
+    invite-usage: "<#9CA3AF>/clancoalition invite <тег>"
+    accept-usage: "<#9CA3AF>/clancoalition accept <id>"
+    deny-usage: "<#9CA3AF>/clancoalition deny <id>"
+    block-usage: "<#9CA3AF>/clancoalition block <id>"
+  gui:
+    hub:
+      header: "<#C084FC><bold>Коалиция</bold> <#374151>({count}/3)"
+      member-line: "<#D8B4FE>{index}. <white>[{tag}] {name}</white>"
+      footer: "<#9CA3AF>/clancoalition invite <тег> · leave"

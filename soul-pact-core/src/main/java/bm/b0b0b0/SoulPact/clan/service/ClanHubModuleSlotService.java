@@ -28,6 +28,7 @@ public final class ClanHubModuleSlotService {
         } else {
             assignByRegistrationOrder(mapping, mapped);
         }
+        assignUnmappedToOverflow(mapping, mapped);
         return new ClanHubModuleSlotLayout(Map.copyOf(mapped));
     }
 
@@ -43,6 +44,38 @@ public final class ClanHubModuleSlotService {
             }
             mapped.put(slot, guiExtension);
         }
+    }
+
+    private void assignUnmappedToOverflow(HubModuleSlotMapping mapping, Map<Integer, SoulPactGuiExtension> mapped) {
+        List<Integer> overflowSlots = mapping.overflowSlots();
+        if (overflowSlots.isEmpty()) {
+            return;
+        }
+        int overflowIndex = 0;
+        for (SoulPactExtension extension : extensionRegistry.all()) {
+            if (!(extension instanceof SoulPactGuiExtension guiExtension)) {
+                continue;
+            }
+            if (mapped.containsValue(guiExtension)) {
+                continue;
+            }
+            Integer slot = nextFreeSlot(overflowSlots, overflowIndex, mapped);
+            if (slot == null) {
+                return;
+            }
+            overflowIndex = overflowSlots.indexOf(slot) + 1;
+            mapped.put(slot, guiExtension);
+        }
+    }
+
+    private Integer nextFreeSlot(List<Integer> overflowSlots, int fromIndex, Map<Integer, SoulPactGuiExtension> mapped) {
+        for (int index = fromIndex; index < overflowSlots.size(); index++) {
+            Integer slot = overflowSlots.get(index);
+            if (!mapped.containsKey(slot)) {
+                return slot;
+            }
+        }
+        return null;
     }
 
     private void assignByRegistrationOrder(HubModuleSlotMapping mapping, Map<Integer, SoulPactGuiExtension> mapped) {

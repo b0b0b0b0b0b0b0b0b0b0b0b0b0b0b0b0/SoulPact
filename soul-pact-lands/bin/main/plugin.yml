@@ -1,0 +1,13 @@
+name: SoulPact-Lands
+version: '${version}'
+main: bm.b0b0b0.SoulPact.land.SoulPactLandPlugin
+api-version: '1.21'
+depend: [SoulPact, WorldGuard]
+libraries:
+  - net.elytrium:serializer:1.1.1
+softdepend: [Vault]
+commands:
+  clanland:
+    description: Clan base management
+    usage: /clanland
+    aliases: [cland, land]

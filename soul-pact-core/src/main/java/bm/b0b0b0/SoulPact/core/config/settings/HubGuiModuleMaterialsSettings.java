@@ -13,4 +13,16 @@ public final class HubGuiModuleMaterialsSettings {
 
     @Comment(@CommentValue("Клановый сундук"))
     public String chest = "CHEST";
+
+    @Comment(@CommentValue("Война кланов"))
+    public String war = "IRON_SWORD";
+
+    @Comment(@CommentValue("Коалиция"))
+    public String coalition = "BLUE_BANNER";
+
+    @Comment(@CommentValue("Квесты"))
+    public String quests = "WRITABLE_BOOK";
+
+    @Comment(@CommentValue("Гладиаторские ивенты"))
+    public String gladiator = "DIAMOND_SWORD";
 }

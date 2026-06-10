@@ -1,0 +1,111 @@
+land:
+  startup:
+    separator: "=============================="
+    registered: "Модуль баз кланов подключён"
+    worldguard-connected: "WorldGuard подключён"
+    worldguard-missing: "WorldGuard не найден — захват базы недоступен"
+    core-missing: "SoulPact не готов — модуль баз отключён"
+    database-missing: "База данных SoulPact не готова — модуль баз отключён"
+  error:
+    not-in-clan: "<#F87171>Вы не состоите в клане."
+    not-leader: "<#F87171>Только лидер клана может управлять базой."
+    no-permission: "<#F87171>У вашей роли нет права управлять базой."
+    already-exists: "<#F87171>У клана уже есть база."
+    worldguard-missing: "<#F87171>WorldGuard не установлен."
+    too-close: "<#F87171>Слишком близко к другому региону. Нужен запас {buffer} блоков."
+    border-protected: "<#F87171>Граница базы защищена."
+    flag-creative-blocked: "<#F87171>Знамя нельзя ломать в креативе — переключитесь в выживание."
+    flag-war-handled: "<#F87171>Это знамя в состоянии войны — снятие обрабатывается отдельно."
+    failed: "<#F87171>Не удалось создать базу."
+  base:
+    created: "<#86EFAC>База клана <white>[{tag}]</white> создана. Регион: <white>{region}</white>"
+    destroyed: "<#F87171>Знамя снято — база и регион удалены."
+  settings:
+    pvp-enabled: "<#86EFAC>PvP на базе включён."
+    pvp-disabled: "<#86EFAC>PvP на базе выключен."
+    mob-enabled: "<#86EFAC>Спавн мобов на базе включён."
+    mob-disabled: "<#86EFAC>Спавн мобов на базе выключен."
+    border-color-changed: "<#86EFAC>Цвет границы: <white>{color}</white>"
+  expansion:
+    success: "<#86EFAC>База расширена на <white>{direction}</white>. Размер: <white>{size}</white>. Списано <white>{cost}</white> ({source})"
+    max-reached: "<#F87171>Достигнут предел расширения: <white>{max}</white> блоков"
+    insufficient-treasury: "<#F87171>Недостаточно средств в казне клана."
+    insufficient-leader: "<#F87171>Недостаточно средств на вашем балансе."
+    treasury-locked: "<#F87171>Казна клана заблокирована."
+    economy-unavailable: "<#F87171>Экономика недоступна. Нужен Vault и модуль банка или Vault для оплаты."
+    direction:
+      north: "север"
+      south: "юг"
+      east: "восток"
+      west: "запад"
+    source:
+      treasury: "казна"
+      leader: "баланс лидера"
+  gui:
+    title: "<#581C87><bold>База</bold> <#374151>[{tag}]"
+    filler:
+      name: " "
+    item:
+      info-empty:
+        name: "<#9CA3AF>База не установлена"
+        lore:
+          - "<#9CA3AF>Нажмите — знамя и установка"
+          - "<#9CA3AF>Заберите знамя и поставьте"
+          - "<#9CA3AF>его в мире"
+          - "<#F87171>Снятие знамени удалит базу"
+      info-active:
+        name: "<#FCD34D><bold>База активна</bold>"
+        lore:
+          - "<#9CA3AF>Регион: <white>{region}"
+          - "<#9CA3AF>Мир: <white>{world}"
+          - "<#9CA3AF>Знамя: <white>{x} {y} {z}"
+          - "<#86EFAC>Нажмите — знамя и редактирование"
+      pvp-on:
+        name: "<#F87171><bold>PvP: включён</bold>"
+        lore:
+          - "<#9CA3AF>Нажмите — выключить"
+      pvp-off:
+        name: "<#86EFAC><bold>PvP: выключен</bold>"
+        lore:
+          - "<#9CA3AF>Нажмите — включить"
+      mob-on:
+        name: "<#D8B4FE><bold>Мобы: включены</bold>"
+        lore:
+          - "<#9CA3AF>Нажмите — выключить"
+      mob-off:
+        name: "<#9CA3AF><bold>Мобы: выключены</bold>"
+        lore:
+          - "<#9CA3AF>Нажмите — включить"
+      border-color:
+        name: "<#FCD34D><bold>Цвет границы</bold>"
+        lore:
+          - "<#9CA3AF>Текущий: <white>{color}"
+          - "<#9CA3AF>Нажмите — следующий"
+      expand:
+        name: "<#86EFAC><bold>Расширить: {direction}</bold>"
+        lore:
+          - "<#9CA3AF>Размер: <white>{size}</white> / {max}"
+          - "<#9CA3AF>Цена: <white>{cost}</white>"
+          - "<#9CA3AF>Оплата: <white>{source}"
+          - "<#9CA3AF>Нажмите — +{step} блоков"
+      back:
+        name: "<#F87171>Назад"
+        lore:
+          - "<#9CA3AF>В главное меню клана"
+    border-colors:
+      red: "Красный"
+      orange: "Оранжевый"
+      yellow: "Жёлтый"
+      lime: "Лаймовый"
+      green: "Зелёный"
+      cyan: "Бирюзовый"
+      light_blue: "Голубой"
+      blue: "Синий"
+      purple: "Фиолетовый"
+      magenta: "Пурпурный"
+      pink: "Розовый"
+      white: "Белый"
+      light_gray: "Светло-серый"
+      gray: "Серый"
+      black: "Чёрный"
+      brown: "Коричневый"

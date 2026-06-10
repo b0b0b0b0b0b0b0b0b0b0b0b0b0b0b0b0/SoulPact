@@ -1,0 +1,13 @@
+name: SoulPact-Chest
+version: '${version}'
+main: bm.b0b0b0.SoulPact.chest.SoulPactChestPlugin
+api-version: '1.21'
+depend: [SoulPact]
+libraries:
+  - net.elytrium:serializer:1.1.1
+softdepend: [SoulPact-Bank, Vault]
+commands:
+  clanchest:
+    description: Clan shared chest
+    usage: /clanchest
+    aliases: [cchest, chest]

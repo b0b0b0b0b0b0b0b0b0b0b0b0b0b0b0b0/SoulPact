@@ -1,5 +1,6 @@
 package bm.b0b0b0.SoulPact.core.placeholder;
 
+import bm.b0b0b0.SoulPact.api.extension.ExtensionRegistry;
 import bm.b0b0b0.SoulPact.clan.role.RoleThemeService;
 import bm.b0b0b0.SoulPact.core.config.LocaleConfig;
 import bm.b0b0b0.SoulPact.core.config.PlaceholderConfig;
@@ -29,7 +30,8 @@ public final class SoulPactPlaceholderBootstrap {
             LocaleConfig localeConfig,
             VaultIntegration vaultIntegration,
             DataSourceProvider dataSourceProvider,
-            RoleThemeService roleThemeService
+            RoleThemeService roleThemeService,
+            ExtensionRegistry extensionRegistry
     ) {
         if (!placeholderApiIntegration.available()) {
             return;
@@ -51,7 +53,7 @@ public final class SoulPactPlaceholderBootstrap {
                 localeConfig,
                 vaultIntegration,
                 placeholderService,
-                List.of()
+                List.of(new ExtensionPlaceholderBridge(extensionRegistry))
         );
         placeholderService.bindResolver(resolver);
         expansion = new SoulPactPlaceholderExpansion(plugin, placeholderService);
