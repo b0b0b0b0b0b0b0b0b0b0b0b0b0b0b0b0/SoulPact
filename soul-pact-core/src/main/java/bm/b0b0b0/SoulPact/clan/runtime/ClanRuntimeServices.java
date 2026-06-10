@@ -14,8 +14,10 @@ import bm.b0b0b0.SoulPact.clan.role.RoleThemeService;
 import bm.b0b0b0.SoulPact.clan.service.ClanCreateService;
 import bm.b0b0b0.SoulPact.clan.service.ClanDescriptionService;
 import bm.b0b0b0.SoulPact.clan.service.ClanDisbandService;
+import bm.b0b0b0.SoulPact.clan.service.ClanHomeService;
 import bm.b0b0b0.SoulPact.clan.service.ClanInfoService;
 import bm.b0b0b0.SoulPact.clan.service.ClanLeaveService;
+import bm.b0b0b0.SoulPact.clan.service.ClanMailService;
 import bm.b0b0b0.SoulPact.clan.service.ClanMembershipService;
 
 public final class ClanRuntimeServices {
@@ -36,6 +38,8 @@ public final class ClanRuntimeServices {
     private final ClanLeaveService leaveService;
     private final ClanDisbandService disbandService;
     private final ClanMembershipService membershipService;
+    private final ClanMailService mailService;
+    private final ClanHomeService homeService;
     private final RoleThemeService roleThemeService;
 
     public ClanRuntimeServices(
@@ -55,6 +59,8 @@ public final class ClanRuntimeServices {
             ClanLeaveService leaveService,
             ClanDisbandService disbandService,
             ClanMembershipService membershipService,
+            ClanMailService mailService,
+            ClanHomeService homeService,
             RoleThemeService roleThemeService
     ) {
         this.guiOpenService = guiOpenService;
@@ -73,6 +79,8 @@ public final class ClanRuntimeServices {
         this.leaveService = leaveService;
         this.disbandService = disbandService;
         this.membershipService = membershipService;
+        this.mailService = mailService;
+        this.homeService = homeService;
         this.roleThemeService = roleThemeService;
     }
 
@@ -138,6 +146,14 @@ public final class ClanRuntimeServices {
 
     public ClanMembershipService membershipService() {
         return membershipService;
+    }
+
+    public ClanMailService mailService() {
+        return mailService;
+    }
+
+    public ClanHomeService homeService() {
+        return homeService;
     }
 
     public RoleThemeService roleThemeService() {

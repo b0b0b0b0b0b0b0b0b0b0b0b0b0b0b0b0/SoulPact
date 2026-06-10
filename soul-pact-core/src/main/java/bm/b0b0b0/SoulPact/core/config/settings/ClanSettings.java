@@ -27,6 +27,21 @@ public final class ClanSettings {
     @Comment(@CommentValue("Тема названий ролей: файл lang/roles/{theme}.{locale}.yml (military, anime, …)"))
     public String roleTheme = "military";
 
+    @Comment(@CommentValue("Максимум домов клана"))
+    public int homesMax = 3;
+
+    @Comment(@CommentValue("Максимальная длина имени дома клана"))
+    public int homeNameMaxLength = 16;
+
+    @Comment(@CommentValue("Максимальная длина письма клановой почты"))
+    public int mailMessageMaxLength = 256;
+
+    @Comment(@CommentValue("Максимум писем в ящике клана (старые удаляются автоматически)"))
+    public int mailMaxStored = 50;
+
+    @Comment(@CommentValue("Писем на страницу при чтении почты"))
+    public int mailPageSize = 5;
+
     @Comment(@CommentValue("Права ролей по умолчанию при создании клана"))
     public ClanRolePermissionDefaultsSettings rolePermissionDefaults = new ClanRolePermissionDefaultsSettings();
 

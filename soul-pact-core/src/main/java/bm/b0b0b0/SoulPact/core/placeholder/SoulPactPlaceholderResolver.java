@@ -18,6 +18,7 @@ public final class SoulPactPlaceholderResolver {
     private final LocaleConfig localeConfig;
     private final VaultIntegration vaultIntegration;
     private final SoulPactPlaceholderService placeholderService;
+    private final ClanPlaceholderExtrasService extrasService;
     private final List<SoulPactPlaceholderBridge> moduleBridges;
 
     public SoulPactPlaceholderResolver(
@@ -25,12 +26,14 @@ public final class SoulPactPlaceholderResolver {
             LocaleConfig localeConfig,
             VaultIntegration vaultIntegration,
             SoulPactPlaceholderService placeholderService,
+            ClanPlaceholderExtrasService extrasService,
             List<SoulPactPlaceholderBridge> moduleBridges
     ) {
         this.placeholderConfig = placeholderConfig;
         this.localeConfig = localeConfig;
         this.vaultIntegration = vaultIntegration;
         this.placeholderService = placeholderService;
+        this.extrasService = extrasService;
         this.moduleBridges = List.copyOf(moduleBridges);
     }
 
@@ -49,16 +52,16 @@ public final class SoulPactPlaceholderResolver {
             double balance = playerBalance(player);
             return resolveEconomy(normalized, balance);
         }
+        ClanPlaceholderSnapshot snapshot = placeholderService.load(player);
         if (normalized.startsWith("mail")) {
-            return resolveMail(normalized);
+            return resolveMail(player, snapshot, normalized);
         }
         if (normalized.startsWith("setting")) {
-            return resolveSetting(normalized);
+            return resolveSetting(snapshot, normalized);
         }
         if (normalized.startsWith("home:")) {
-            return placeholderConfig.homeUnavailable();
+            return resolveHome(snapshot, normalized);
         }
-        ClanPlaceholderSnapshot snapshot = placeholderService.load(player);
         return resolveClan(player, snapshot, normalized);
     }
 
@@ -75,24 +78,65 @@ public final class SoulPactPlaceholderResolver {
         };
     }
 
-    private String resolveMail(String params) {
-        if (params.equals("mail_amount") || params.equals("mail_amount_unread")) {
-            return placeholderConfig.mailUnavailable();
+    private String resolveMail(Player player, ClanPlaceholderSnapshot snapshot, String params) {
+        if (!snapshot.hasClan()) {
+            return params.startsWith("mail:") ? "" : "0";
+        }
+        if (params.equals("mail_amount")) {
+            return String.valueOf(extrasService.load(snapshot.clanId()).mailTotal());
+        }
+        if (params.equals("mail_amount_unread")) {
+            return String.valueOf(extrasService.unreadMail(snapshot.clanId(), player.getUniqueId()));
         }
         if (params.startsWith("mail:")) {
-            return "";
+            ClanPlaceholderExtras extras = extrasService.load(snapshot.clanId());
+            return switch (params.substring("mail:".length())) {
+                case "last" -> extras.lastMailMessage();
+                case "last_sender" -> extras.lastMailSender();
+                default -> "";
+            };
         }
-        return placeholderConfig.mailUnavailable();
+        return "0";
     }
 
-    private String resolveSetting(String params) {
+    private String resolveSetting(ClanPlaceholderSnapshot snapshot, String params) {
         if (params.startsWith("setting_state:")) {
-            return placeholderConfig.booleanNo();
+            Boolean value = settingValue(snapshot, params.substring("setting_state:".length()));
+            if (value == null) {
+                return placeholderConfig.booleanNo();
+            }
+            return value ? placeholderConfig.booleanYes() : placeholderConfig.booleanNo();
         }
         if (params.startsWith("setting:")) {
-            return "false";
+            Boolean value = settingValue(snapshot, params.substring("setting:".length()));
+            return value == null ? "false" : booleanText(value);
         }
         return "";
+    }
+
+    private Boolean settingValue(ClanPlaceholderSnapshot snapshot, String key) {
+        if (!snapshot.hasClan()) {
+            return null;
+        }
+        return switch (key) {
+            case "ff", "friendly_fire", "friendlyfire" -> snapshot.friendlyFire();
+            case "open", "join", "join_requests" -> snapshot.joinOpen();
+            case "verified" -> snapshot.verified();
+            default -> null;
+        };
+    }
+
+    private String resolveHome(ClanPlaceholderSnapshot snapshot, String params) {
+        if (!snapshot.hasClan()) {
+            return params.equals("home:count") ? "0" : "";
+        }
+        ClanPlaceholderExtras extras = extrasService.load(snapshot.clanId());
+        String key = params.substring("home:".length());
+        return switch (key) {
+            case "count" -> String.valueOf(extras.homeNames().size());
+            case "list" -> String.join(placeholderConfig.membersSeparator(), extras.homeNames());
+            default -> booleanText(extras.homeNames().stream().anyMatch(name -> name.equalsIgnoreCase(key)));
+        };
     }
 
     private String resolveClan(Player player, ClanPlaceholderSnapshot snapshot, String params) {
@@ -148,8 +192,12 @@ public final class SoulPactPlaceholderResolver {
             case "only_verified_tag_formated" -> snapshot.hasClan() && snapshot.verified()
                     ? computed.verifiedTagFormatted()
                     : "";
-            case "count_banned" -> "0";
-            case "banned" -> "";
+            case "count_banned" -> snapshot.hasClan()
+                    ? String.valueOf(extrasService.load(snapshot.clanId()).bannedCount())
+                    : "0";
+            case "banned" -> snapshot.hasClan()
+                    ? String.join(placeholderConfig.membersSeparator(), extrasService.load(snapshot.clanId()).bannedNames())
+                    : "";
             case "bank_balance" -> snapshot.hasClan() ? String.valueOf(snapshot.bankBalance()) : "0";
             case "bank_balance_formated" -> snapshot.hasClan() ? computed.bankBalanceFormatted() : "0";
             case "level" -> snapshot.hasClan() ? computed.level() : "0";

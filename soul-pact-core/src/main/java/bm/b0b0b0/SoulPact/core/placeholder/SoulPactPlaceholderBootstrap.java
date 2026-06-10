@@ -42,10 +42,15 @@ public final class SoulPactPlaceholderBootstrap {
                 placeholderConfig,
                 roleThemeService
         );
+        ClanPlaceholderExtrasService extrasService = new ClanPlaceholderExtrasService(
+                dataSourceProvider,
+                placeholderConfig.cacheMillis()
+        );
         placeholderService = new SoulPactPlaceholderService(
                 null,
                 dataLoader,
                 snapshotFactory,
+                extrasService,
                 placeholderConfig.cacheMillis()
         );
         SoulPactPlaceholderResolver resolver = new SoulPactPlaceholderResolver(
@@ -53,6 +58,7 @@ public final class SoulPactPlaceholderBootstrap {
                 localeConfig,
                 vaultIntegration,
                 placeholderService,
+                extrasService,
                 List.of(new ExtensionPlaceholderBridge(extensionRegistry))
         );
         placeholderService.bindResolver(resolver);

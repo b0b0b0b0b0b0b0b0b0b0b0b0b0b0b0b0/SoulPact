@@ -74,8 +74,14 @@ import bm.b0b0b0.SoulPact.clan.repository.SqlClanMembershipRepository;
 import bm.b0b0b0.SoulPact.clan.service.ClanInfoViewDataService;
 import bm.b0b0b0.SoulPact.clan.service.ClanMembershipService;
 import bm.b0b0b0.SoulPact.clan.service.ClanTargetResolver;
+import bm.b0b0b0.SoulPact.clan.repository.ClanHomeRepository;
+import bm.b0b0b0.SoulPact.clan.repository.ClanMailRepository;
 import bm.b0b0b0.SoulPact.clan.repository.ClanRepository;
+import bm.b0b0b0.SoulPact.clan.repository.SqlClanHomeRepository;
+import bm.b0b0b0.SoulPact.clan.repository.SqlClanMailRepository;
 import bm.b0b0b0.SoulPact.clan.repository.SqlClanRepository;
+import bm.b0b0b0.SoulPact.clan.service.ClanHomeService;
+import bm.b0b0b0.SoulPact.clan.service.ClanMailService;
 import bm.b0b0b0.SoulPact.clan.runtime.ClanRuntimeHolder;
 import bm.b0b0b0.SoulPact.clan.runtime.ClanRuntimeServices;
 import bm.b0b0b0.SoulPact.clan.message.ClanHelpChatPresenter;
@@ -255,6 +261,8 @@ public final class SoulPactApplication {
 
     private void wireServices() {
         ClanRepository clanRepository = new SqlClanRepository(dataSourceProvider, asyncDatabaseExecutor);
+        ClanMailRepository clanMailRepository = new SqlClanMailRepository(dataSourceProvider, asyncDatabaseExecutor);
+        ClanHomeRepository clanHomeRepository = new SqlClanHomeRepository(dataSourceProvider, asyncDatabaseExecutor);
         ClanBannerRepository clanBannerRepository = new SqlClanBannerRepository(dataSourceProvider, asyncDatabaseExecutor);
         ClanBannerService clanBannerService = new ClanBannerService(clanBannerRepository);
         ClanQueryService clanQueryService = new ClanQueryService(clanRepository);
@@ -678,6 +686,20 @@ public final class SoulPactApplication {
                 guiOpenService,
                 rolePermissionService
         );
+        ClanMailService mailService = new ClanMailService(
+                clanRepository,
+                clanMailRepository,
+                pluginConfig.clan(),
+                messageService,
+                asyncDatabaseExecutor
+        );
+        ClanHomeService homeService = new ClanHomeService(
+                clanRepository,
+                clanHomeRepository,
+                pluginConfig.clan(),
+                messageService,
+                asyncDatabaseExecutor
+        );
         clanRuntimeHolder.install(new ClanRuntimeServices(
                 guiOpenService,
                 hubClickHandler,
@@ -695,6 +717,8 @@ public final class SoulPactApplication {
                 leaveService,
                 disbandService,
                 membershipService,
+                mailService,
+                homeService,
                 roleThemeService
         ));
         SoulPactClanGui clanGui = new SoulPactClanGuiImpl(guiOpenService);

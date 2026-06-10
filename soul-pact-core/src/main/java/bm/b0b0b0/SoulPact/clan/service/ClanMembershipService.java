@@ -250,9 +250,12 @@ public final class ClanMembershipService {
                         membershipRepository.createJoinBlock(request.clanId(), request.playerId(), blockedAt)
                 ).thenCompose(ignored ->
                         notifyPlayerAboutRequestDecision(request.playerId(), NOTIFICATION_BLOCKED, clan)
-                ).thenAccept(ignored -> notify(leader, "clan.request.blocked-leader", Map.of(
-                        "player", ClanPlayerNames.displayName(request.playerId())
-                )));
+                ).thenAccept(ignored -> {
+                    ClanPlaceholderInvalidatorRegistry.invalidateClan(clan.id());
+                    notify(leader, "clan.request.blocked-leader", Map.of(
+                            "player", ClanPlayerNames.displayName(request.playerId())
+                    ));
+                });
             });
         });
     }
@@ -322,7 +325,10 @@ public final class ClanMembershipService {
                             notifyPlayerAboutRequestDecision(request.playerId(), NOTIFICATION_BLOCKED, clan)
                     );
                 }
-                return chain.thenAccept(ignored -> notify(leader, "clan.request.bulk.blocked"));
+                return chain.thenAccept(ignored -> {
+                    ClanPlaceholderInvalidatorRegistry.invalidateClan(clan.id());
+                    notify(leader, "clan.request.bulk.blocked");
+                });
             });
         });
     }

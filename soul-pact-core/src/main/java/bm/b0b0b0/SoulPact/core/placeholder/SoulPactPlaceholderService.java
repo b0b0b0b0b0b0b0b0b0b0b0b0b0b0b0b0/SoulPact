@@ -11,6 +11,7 @@ public final class SoulPactPlaceholderService implements ClanPlaceholderInvalida
     private SoulPactPlaceholderResolver resolver;
     private final ClanPlaceholderDataLoader dataLoader;
     private final ClanPlaceholderSnapshotFactory snapshotFactory;
+    private final ClanPlaceholderExtrasService extrasService;
     private final int cacheMillis;
     private final Map<UUID, CachedPlayerSnapshot> playerCache = new ConcurrentHashMap<>();
     private final Map<Long, CachedClanBundle> clanCache = new ConcurrentHashMap<>();
@@ -19,11 +20,13 @@ public final class SoulPactPlaceholderService implements ClanPlaceholderInvalida
             SoulPactPlaceholderResolver resolver,
             ClanPlaceholderDataLoader dataLoader,
             ClanPlaceholderSnapshotFactory snapshotFactory,
+            ClanPlaceholderExtrasService extrasService,
             int cacheMillis
     ) {
         this.resolver = resolver;
         this.dataLoader = dataLoader;
         this.snapshotFactory = snapshotFactory;
+        this.extrasService = extrasService;
         this.cacheMillis = cacheMillis;
     }
 
@@ -67,6 +70,7 @@ public final class SoulPactPlaceholderService implements ClanPlaceholderInvalida
     @Override
     public void invalidatePlayer(UUID playerId) {
         playerCache.remove(playerId);
+        extrasService.invalidatePlayer(playerId);
     }
 
     @Override
@@ -79,12 +83,14 @@ public final class SoulPactPlaceholderService implements ClanPlaceholderInvalida
                 iterator.remove();
             }
         }
+        extrasService.invalidateClan(clanId);
     }
 
     @Override
     public void invalidateAll() {
         playerCache.clear();
         clanCache.clear();
+        extrasService.invalidateAll();
     }
 
     private ClanPlaceholderClanBundle resolveClanBundle(long clanId, long now) {

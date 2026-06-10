@@ -107,6 +107,56 @@ public final class ClanCommandRegistrar {
                                         context.getSource(),
                                         StringArgumentType.getString(context, "text")
                                 ))))
+                .then(Commands.literal("mail")
+                        .executes(context -> executeMailUsage(context.getSource()))
+                        .then(Commands.literal("send")
+                                .executes(context -> executeMailUsage(context.getSource()))
+                                .then(Commands.argument("text", StringArgumentType.greedyString())
+                                        .executes(context -> executeMailSend(
+                                                context.getSource(),
+                                                StringArgumentType.getString(context, "text")
+                                        ))))
+                        .then(Commands.literal("read")
+                                .executes(context -> executeMailRead(context.getSource(), "1"))
+                                .then(Commands.argument("page", StringArgumentType.word())
+                                        .executes(context -> executeMailRead(
+                                                context.getSource(),
+                                                StringArgumentType.getString(context, "page")
+                                        ))))
+                        .then(Commands.literal("clear")
+                                .executes(context -> executeMailClear(context.getSource()))))
+                .then(Commands.literal("home")
+                        .executes(context -> executeHomeList(context.getSource()))
+                        .then(Commands.literal("create")
+                                .executes(context -> executeHomeUsage(context.getSource()))
+                                .then(Commands.argument("args", StringArgumentType.greedyString())
+                                        .executes(context -> executeHomeCreate(
+                                                context.getSource(),
+                                                StringArgumentType.getString(context, "args")
+                                        ))))
+                        .then(Commands.literal("delete")
+                                .executes(context -> executeHomeUsage(context.getSource()))
+                                .then(Commands.argument("name", StringArgumentType.word())
+                                        .executes(context -> executeHomeDelete(
+                                                context.getSource(),
+                                                StringArgumentType.getString(context, "name")
+                                        ))))
+                        .then(Commands.literal("list")
+                                .executes(context -> executeHomeList(context.getSource())))
+                        .then(Commands.literal("teleport")
+                                .executes(context -> executeHomeUsage(context.getSource()))
+                                .then(Commands.argument("args", StringArgumentType.greedyString())
+                                        .executes(context -> executeHomeTeleport(
+                                                context.getSource(),
+                                                StringArgumentType.getString(context, "args")
+                                        ))))
+                        .then(Commands.literal("tp")
+                                .executes(context -> executeHomeUsage(context.getSource()))
+                                .then(Commands.argument("args", StringArgumentType.greedyString())
+                                        .executes(context -> executeHomeTeleport(
+                                                context.getSource(),
+                                                StringArgumentType.getString(context, "args")
+                                        )))))
                 .build();
         registrar.register(clanRoot, "Clan menu and commands");
     }
@@ -380,6 +430,109 @@ public final class ClanCommandRegistrar {
     private int executeRequestBlock(CommandSourceStack source, String rawId) {
         return executePendingId(source, rawId, (player, id) ->
                 runtimeHolder.services().membershipService().blockRequest(player, id));
+    }
+
+    private int executeMailUsage(CommandSourceStack source) {
+        Player player = readyPlayer(source);
+        if (player != null) {
+            runtimeHolder.services().mailService().sendUsageHint(player);
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int executeMailSend(CommandSourceStack source, String text) {
+        Player player = readyPlayer(source);
+        if (player != null) {
+            runtimeHolder.services().mailService().send(player, text);
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int executeMailRead(CommandSourceStack source, String rawPage) {
+        Player player = readyPlayer(source);
+        if (player != null) {
+            runtimeHolder.services().mailService().read(player, parsePage(rawPage));
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int executeMailClear(CommandSourceStack source) {
+        Player player = readyPlayer(source);
+        if (player != null) {
+            runtimeHolder.services().mailService().clear(player);
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int executeHomeUsage(CommandSourceStack source) {
+        Player player = readyPlayer(source);
+        if (player != null) {
+            runtimeHolder.services().homeService().sendUsageHint(player);
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int executeHomeList(CommandSourceStack source) {
+        Player player = readyPlayer(source);
+        if (player != null) {
+            runtimeHolder.services().homeService().list(player);
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int executeHomeCreate(CommandSourceStack source, String args) {
+        Player player = readyPlayer(source);
+        if (player != null) {
+            String[] parts = splitNameAndPassword(args);
+            runtimeHolder.services().homeService().create(player, parts[0], parts[1]);
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int executeHomeDelete(CommandSourceStack source, String name) {
+        Player player = readyPlayer(source);
+        if (player != null) {
+            runtimeHolder.services().homeService().delete(player, name);
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int executeHomeTeleport(CommandSourceStack source, String args) {
+        Player player = readyPlayer(source);
+        if (player != null) {
+            String[] parts = splitNameAndPassword(args);
+            runtimeHolder.services().homeService().teleport(player, parts[0], parts[1]);
+        }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private Player readyPlayer(CommandSourceStack source) {
+        if (!(source.getExecutor() instanceof Player player)) {
+            messageService.send(source.getSender(), "general.players-only");
+            return null;
+        }
+        if (!dataSourceProvider.isReady() || runtimeHolder.services() == null) {
+            messageService.send(player, "startup.loading");
+            return null;
+        }
+        return player;
+    }
+
+    private static int parsePage(String rawPage) {
+        try {
+            return Integer.parseInt(rawPage.trim());
+        } catch (NumberFormatException exception) {
+            return 1;
+        }
+    }
+
+    private static String[] splitNameAndPassword(String args) {
+        String trimmed = args == null ? "" : args.trim();
+        int spaceIndex = trimmed.indexOf(' ');
+        if (spaceIndex < 0) {
+            return new String[]{trimmed, ""};
+        }
+        return new String[]{trimmed.substring(0, spaceIndex), trimmed.substring(spaceIndex + 1).trim()};
     }
 
     private int executePendingId(CommandSourceStack source, String rawId, PendingAction action) {

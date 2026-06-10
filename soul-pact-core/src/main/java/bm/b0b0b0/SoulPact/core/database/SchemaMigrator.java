@@ -28,6 +28,7 @@ public final class SchemaMigrator {
         runScript("database/002_membership_pending.sql");
         runScript("database/003_membership_extras.sql");
         runScript("database/004_role_permissions.sql");
+        runScript("database/005_mail_homes.sql");
         try (Connection connection = dataSource.getConnection()) {
             ensureColumn(connection, "clans", "join_requests_open", "INTEGER NOT NULL DEFAULT 1");
             ensureColumn(connection, "clans", "banner_data", "TEXT");
