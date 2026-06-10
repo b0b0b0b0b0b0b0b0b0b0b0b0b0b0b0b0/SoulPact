@@ -1018,6 +1018,10 @@ clan:
           display-name: "<#D8B4FE>Leaderboard"
           lore:
             - "<#9CA3AF>Rankings and stats"
+        clanholo:
+          display-name: "<#D8B4FE>Holograms"
+          lore:
+            - "<#9CA3AF>Info and rules on clan base"
         farmcoin:
           display-name: "<#D8B4FE>FarmCoin"
           lore:

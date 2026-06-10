@@ -1017,6 +1017,10 @@ clan:
           display-name: "<#D8B4FE>Рейтинг"
           lore:
             - "<#9CA3AF>Топы и статистика"
+        clanholo:
+          display-name: "<#D8B4FE>Голограммы"
+          lore:
+            - "<#9CA3AF>Инфо и правила на базе"
         farmcoin:
           display-name: "<#D8B4FE>FarmCoin"
           lore:

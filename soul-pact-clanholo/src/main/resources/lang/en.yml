@@ -1,0 +1,73 @@
+clanholo:
+  startup:
+    core-missing: "SoulPact-ClanHolo: SoulPact core or database is not ready."
+    registered: "SoulPact-ClanHolo enabled. Loaded {count} hologram(s)."
+  command:
+    help:
+      - "<#C084FC><bold>Clan holograms</bold>"
+      - "<#9CA3AF>/clanholo create <name> [info|rules] — create on clan base"
+      - "<#9CA3AF>/clanholo add [text] — add a line (nearest hologram)"
+      - "<#9CA3AF>/clanholo remove <line> — remove line"
+      - "<#9CA3AF>/clanholo edit <line> <text> — edit line"
+      - "<#9CA3AF>/clanholo select <name> — select hologram"
+      - "<#9CA3AF>/clanholo delete <name> — delete"
+      - "<#9CA3AF>/clanholo list — list clan holograms"
+      - "<#9CA3AF>/clanholo refresh <name> — refresh info/rules template"
+    admin-help:
+      - "<#C084FC><bold>ClanHolo admin</bold>"
+      - "<#9CA3AF>/clanholo admin create/add/remove/edit/delete/refresh ..."
+      - "<#9CA3AF>/clanholo reload — reload module"
+  usage:
+    create: "<#9CA3AF>Usage: <white>/clanholo create <name> [info|rules]"
+    delete: "<#9CA3AF>Usage: <white>/clanholo delete <name>"
+    remove: "<#9CA3AF>Usage: <white>/clanholo remove <line_number>"
+    edit: "<#9CA3AF>Usage: <white>/clanholo edit <line> <text>"
+    select: "<#9CA3AF>Usage: <white>/clanholo select <name>"
+    refresh: "<#9CA3AF>Usage: <white>/clanholo refresh <name>"
+  create:
+    success: "<#86EFAC>Hologram <white>{name}</white> created."
+  delete:
+    success: "<#86EFAC>Hologram <white>{name}</white> deleted."
+  add:
+    success: "<#86EFAC>Line added to <white>{name}</white>."
+  remove:
+    success: "<#86EFAC>Line removed from <white>{name}</white>."
+  edit:
+    success: "<#86EFAC>Line updated in <white>{name}</white>."
+  select:
+    success: "<#86EFAC>Selected hologram <white>{name}</white>."
+  refresh:
+    success: "<#86EFAC>Template refreshed for <white>{name}</white>."
+  reload:
+    success: "<#86EFAC>ClanHolo reloaded."
+  list:
+    empty: "<#9CA3AF>Your clan has no holograms."
+    header: "<#C084FC><bold>Clan holograms</bold> <#9CA3AF>({count})"
+    entry: "<#9CA3AF>#{id} <white>{name}</white> — {world} ({x}, {y}, {z}), lines: {lines}"
+  error:
+    players-only: "<#F87171>Players only."
+    not-in-clan: "<#F87171>You are not in a clan."
+    no-permission: "<#F87171>Not enough permissions."
+    invalid-name: "<#F87171>Invalid name (letters, digits, _- , max 32)."
+    not-on-base: "<#F87171>Holograms can only be placed on your clan base (SoulPact-Lands + WorldGuard)."
+    worldguard-missing: "<#F87171>WorldGuard not found — clan base check unavailable."
+    limit: "<#F87171>Clan hologram limit: <white>{max}</white>."
+    max-lines: "<#F87171>Maximum lines: <white>{max}</white>."
+    line-too-long: "<#F87171>Line is too long."
+    blocked-word: "<#F87171>Text contains a blocked word or link."
+    empty-line: "<#F87171>Line text cannot be empty."
+    not-found: "<#F87171>Hologram <white>{name}</white> not found."
+    no-selection: "<#F87171>Select a hologram: <white>/clanholo select <name></white> or stand closer."
+    line-not-found: "<#F87171>Line not found."
+    no-template: "<#F87171>This hologram has no info/rules template."
+  templates:
+    info:
+      - "<gold><bold>[{tag}]</bold> <white>{name}"
+      - "<gray>Leader: <white>{leader}"
+      - "<gray>Points: <yellow>{points}"
+      - "<gray>{description}"
+    rules:
+      - "<yellow><bold>Clan rules</bold>"
+      - "<gray>1. Respect allies"
+      - "<gray>2. Do not grief the base"
+      - "<gray>3. Follow the leader"

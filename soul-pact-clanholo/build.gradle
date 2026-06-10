@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    maven {
+        name = 'enginehub'
+        url = 'https://maven.enginehub.org/repo/'
+    }
+}
+
+dependencies {
+    compileOnly('io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT')
+    compileOnly project(':soul-pact-api')
+    compileOnly('com.sk89q.worldguard:worldguard-bukkit:7.0.12')
+    implementation('net.elytrium:serializer:1.1.1')
+}
+
+tasks.named('jar') {
+    archiveBaseName.set('SoulPact-ClanHolo')
+}
+
+processResources {
+    def props = [version: project.version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
+
+apply from: rootProject.file('gradle/plugin-jar.gradle')

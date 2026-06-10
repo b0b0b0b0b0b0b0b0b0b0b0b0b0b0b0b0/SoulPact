@@ -128,6 +128,7 @@ public final class GuiHubConfig {
         putModuleMaterial(materials, "coalition", settings.coalition, fallback);
         putModuleMaterial(materials, "quests", settings.quests, fallback);
         putModuleMaterial(materials, "gladiator", settings.gladiator, fallback);
+        putModuleMaterial(materials, "clanholo", settings.clanholo, fallback);
         return Map.copyOf(materials);
     }
 

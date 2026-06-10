@@ -4,7 +4,7 @@
 
 SoulPact — современный клановый плагин для **Paper 1.21+** и совместимых форков (Purpur и аналоги). Весь интерфейс, чат и меню построены на **Adventure** и **MiniMessage**: hex-цвета, кликабельные подсказки в чате, аккуратные GUI без устаревших `§`-костылей.
 
-Ядро отвечает за создание клана, профиль, роли, права, баннер, заявки и приглашения. Остальное подключается **модулями** — ставите только то, что нужно серверу: казна, база, сундук, войны, коалиции, квесты, гладиаторские ивенты, Discord-мост. Каждый модуль регистрируется через API расширений и появляется в хаб-меню `/clan`.
+Ядро отвечает за создание клана, профиль, роли, права, баннер, заявки и приглашения. Остальное подключается **модулями** — ставите только то, что нужно серверу: казна, база, сундук, войны, коалиции, квесты, гладиаторские ивенты, голограммы на базе, Discord-мост. Каждый модуль регистрируется через API расширений и появляется в хаб-меню `/clan`.
 
 Данные хранятся в **SQLite** или **MySQL** (HikariCP, асинхронные запросы, SQL-миграции). Экономика — через **Vault**. Статистика и TAB — через **PlaceholderAPI** (`%spact_...%`, более 60 плейсхолдеров). Головы в меню — с приоритетом **SkinsRestorer**, без лишних запросов к Mojang.
 
@@ -18,7 +18,7 @@ SoulPact — современный клановый плагин для **Paper
 
 ## Особенности плагина SoulPact
 
-* Модульная система: **SoulPact** (ядро) + **Bank**, **Lands**, **Chest**, **War**, **Coalition**, **Quests**, **Gladiator**, **Discord**, **Leaderboard** — ставите только нужные аддоны.
+* Модульная система: **SoulPact** (ядро) + **Bank**, **Lands**, **Chest**, **War**, **Coalition**, **Quests**, **Gladiator**, **Discord**, **Leaderboard**, **ClanHolo** — ставите только нужные аддоны.
 * Paper Brigadier-команды `/clan` с подкомандами и подсказками в чате.
 * GUI-хаб клана: профиль, настройки, баннер, список кланов, слоты модулей.
 * Создание, редактирование описания, роспуск клана; выход, кик, приглашения и заявки на вступление.
@@ -38,12 +38,13 @@ SoulPact — современный клановый плагин для **Paper
 * **SoulPact-Gladiator** — гладиаторские PvP-ивенты: админ запускает арену (или расписание DAILY/WEEKLY), кланы вступают без лимита, последний выживший клан получает награды-команды и кастомный тег арены; BossBar, звуки, регион арены жезлом.
 * **SoulPact-Discord** — мост в Discord через WebHook: красивые embed-сообщения о создании/роспуске кланов, вступлениях, киках, ролях, лидерстве, войнах, квестах и гладиаторских ивентах; цвета, очередь и rate-limit из коробки.
 * **SoulPact-Leaderboard** — топы кланов в мире: таблички, стойки с головой лидера и бронёй по месту (алмаз/золото/железо), голограммы на нативных TextDisplay без сторонних плагинов; 7 статистик, авто-обновление по таймеру и событиям.
+* **SoulPact-ClanHolo** — голограммы на **базе клана**: инфо о клане и правила, свои строки, лимиты по клану и permission, фильтр слов, авто-строка автора; нативные TextDisplay, без DecentHolograms.
 * PlaceholderAPI: идентификатор `spact`, 60+ плейсхолдеров для scoreboard, TAB, чата и меню.
 * Интеграции: Vault, PlaceholderAPI, SkinsRestorer, WorldGuard, Essentials (soft).
 * SQLite и MySQL, HikariCP, асинхронная работа с БД, версионные SQL-миграции.
 * Локализация ru / en, fallback-язык, все тексты игрокам — в YAML (`lang/`).
 * Конфиги модулей и ядра в YAML; MiniMessage в сообщениях и lore GUI.
-* API расширений (`SoulPactApi`, `ExtensionRegistry`, placeholder bridges) для своих модулей.
+* API расширений (`SoulPactApi`, `ExtensionRegistry`, placeholder bridges) — **свои модули без правок ядра**; см. раздел [Разработка модулей](#разработка-модулей-для-dev).
 
 ---
 
@@ -298,6 +299,47 @@ SoulPact — современный клановый плагин для **Paper
 `/clanboard reload` — Перезагрузить настройки и lang модуля.
 
 `/clb`, `/clanlb` — Алиасы `/clanboard`.
+
+### SoulPact-ClanHolo
+
+Голограммы **только на базе клана** (регион WorldGuard `sp-base-*` от SoulPact-Lands). Рендер — нативные **TextDisplay** (без DecentHolograms/FancyHolograms). Данные — в общей БД SoulPact.
+
+**Зависимости:** SoulPact (ядро), SoulPact-Lands, WorldGuard.
+
+`/clanholo` — Справка по командам (алиасы: `/cholo`, `/dholo`).
+
+`/clanholo create <имя> [info|rules]` — Создать голограмму на текущей позиции на базе. `info` — авто-строки с тегом, лидером, очками, описанием; `rules` — шаблон правил (редактируется в `lang/`).
+
+`/clanholo add [текст]` — Добавить строку в выбранную или ближайшую голограмму (пустой `add` — пустая строка-разделитель).
+
+`/clanholo remove <номер>` — Удалить строку по номеру.
+
+`/clanholo edit <номер> <текст>` — Изменить строку.
+
+`/clanholo select <имя>` — Выбрать голограмму для edit/add.
+
+`/clanholo delete <имя>` — Удалить голограмму.
+
+`/clanholo list` — Список голограмм клана.
+
+`/clanholo refresh <имя>` — Пересобрать шаблон `info`/`rules` из актуальных данных клана.
+
+`/clanholo admin …` — То же без проверки клановых прав (permission `soulpact.clanholo.admin`).
+
+`/clanholo reload` — Перезагрузка config и lang модуля.
+
+**Права:** `soulpact.clanholo.use` (игроки), `soulpact.clanholo.admin`, `soulpact.clanholo.limit.5` / `.limit.10` — повышенный лимит голограмм на клан. Редактирование — клановое право `land_manage` (ключ в config).
+
+**Конфиг** `plugins/SoulPact-ClanHolo/config.yml`: лимит голограмм и строк, длина строки, blocked words (`regex:`), строка автора (`ownerLine: "<gray>Автор: <white>%player%"`), радиус выбора ближайшей голограммы.
+
+**Быстрый старт:**
+
+1. Положить JAR `SoulPact-ClanHolo` + ядро + Lands + WorldGuard.
+2. Создать базу клана (`/clan land` или GUI Lands).
+3. Встать на базе: `/clanholo create board info` или `/clanholo create rules rules`.
+4. Добавить свои строки: `/clanholo add <текст>`. Последняя строка всегда — автор (из config).
+
+При смене описания клана шаблонные голограммы `info` обновляются автоматически; при роспуске клана все его голограммы удаляются.
 
 ---
 
@@ -635,3 +677,169 @@ server-name: "Мой сервер"
 `%spact_setting_state:<ключ>%` — То же, но в формате `да`/`нет` из конфига.
 
 Шаблоны `_formated` настраиваются в `plugins/SoulPact/config.yml`, секция `placeholders`.
+
+---
+
+## Разработка модулей (для dev)
+
+**Да, свои модули делать можно.** SoulPact — платформа: ядро держит кланы и API, фичи — отдельные Paper-плагины (отдельный JAR), которые при старте сами регистрируются в `ExtensionRegistry`. Ядро **не** знает про ваш модуль заранее и **не** содержит `if (questsEnabled)`.
+
+### Архитектура
+
+```
+SoulPact.jar (ядро)
+  └── SoulPactApi — Bukkit ServicesManager
+  └── ExtensionRegistry — кто зарегистрировался, тот и «модуль»
+
+YourPlugin.jar (ваш модуль)
+  └── depend: [SoulPact]
+  └── compileOnly soul-pact-api
+  └── onEnable → api.extensions().register(extension)
+```
+
+Контракты лежат в subproject **`soul-pact-api`** (`bm.b0b0b0.SoulPact.api.*`). В runtime API уже на classpath ядра; свой модуль собираете **без shade** api внутрь.
+
+### Минимальный модуль за 5 шагов
+
+1. **Отдельный Paper-плагин** с `depend: [SoulPact]` в `plugin.yml`.
+2. **Зависимость на API** — в monorepo: `compileOnly project(':soul-pact-api')`; снаружи: JAR api в `libs/` + `compileOnly files('libs/soul-pact-api-1.0.jar')` (собрать: `./gradlew :soul-pact-api:jar`).
+3. **Дождаться ядра и БД** — получить `SoulPactApi` через `ServicesManager`, дождаться `api.isDatabaseReady()` (см. `SoulPactDiscordPlugin`, `SoulPactClanHoloPlugin`).
+4. **Реализовать `SoulPactExtension`** — уникальный `id()`, lifecycle `enable` / `disable` / `reload`.
+5. **Зарегистрировать** на main thread после готовности: `api.extensions().register(extension)`; в `onDisable` — `unregister(id)`.
+
+Пример extension (скелет):
+
+```java
+public final class MyExtension implements SoulPactExtension {
+    @Override public String id() { return "mymod"; }
+    @Override public void enable(SoulPactApi api) { }
+    @Override public void disable() { }
+    @Override public void reload() { }
+}
+```
+
+Bootstrap (упрощённо):
+
+```java
+RegisteredServiceProvider<SoulPactApi> provider =
+    Bukkit.getServicesManager().getRegistration(SoulPactApi.class);
+SoulPactApi api = provider.getProvider();
+if (!api.isDatabaseReady()) { /* retry */ return; }
+api.extensions().register(new MyExtension());
+```
+
+### Что можно «нарастить» на extension
+
+| Интерфейс | Зачем |
+|---|---|
+| `SoulPactExtension` | Базовый модуль, попадает в список `/clan` → «Модули» |
+| `SoulPactGuiExtension` | + кнопка в хаб-меню клана; `openGui(Player)` по клику |
+| `SoulPactPlaceholderBridge` | + плейсхолдеры `%spact_*%` (см. ниже) |
+| `ClanTreasuryProvider`, `ClanLandProvider`, `ClanWarProvider`, … | Специализированные мосты — если модуль заменяет встроенную подсистему (как Bank/Lands/War) |
+
+Эталонные модули в репозитории:
+
+| Модуль | Что смотреть |
+|---|---|
+| `soul-pact-discord` | Минимум: extension без GUI, слушает Bukkit-события ядра |
+| `soul-pact-quests` | GUI + placeholders + своя БД через общий `DataSource` |
+| `soul-pact-clanholo` | WorldGuard softdepend, SQL-миграции, `SoulPactGuiExtension` |
+| `soul-pact-bank` | `ClanTreasuryProvider` — интеграция с профилем/списком кланов |
+
+### SoulPactApi — что доступно модулю
+
+| Метод | Назначение |
+|---|---|
+| `extensions()` | register / unregister / find / all |
+| `scheduler()` | `supplyAsync`, `runAsync`, `runSync` — **БД только async** |
+| `dataSource()` | Общий HikariCP пул (свои таблицы — свои миграции) |
+| `findClanByTag` / `findClanByPlayer` | Async read-only снимок клана |
+| `clanAccess()` | Права участника (`hasPermission`), членство |
+| `clanGui()` | Открыть хаб/профиль/список ядра |
+| `messages()` | Lang ядра (осторожно — ключи ядра, не вашего модуля) |
+
+**Не лезьте** в SQL ядра напрямую, если хватает API. Свои таблицы — префикс + idempotent миграции (`IF NOT EXISTS`), как `soul-pact-clanholo/src/main/resources/database/001_clanholo.sql`.
+
+### События ядра (Bukkit)
+
+Слушайте через `@EventHandler` — события в `bm.b0b0b0.SoulPact.api.event`:
+
+`ClanCreateEvent`, `ClanDisbandEvent`, `ClanMemberJoinEvent`, `ClanMemberLeaveEvent`, `ClanMemberRoleChangeEvent`, `ClanLeaderChangeEvent`, `ClanTagChangeEvent`, `ClanDescriptionChangeEvent`, `ClanWarStartEvent`, `ClanWarEndEvent`, `ClanQuestCompleteEvent`, `GladiatorEventStartEvent`, `GladiatorEventWinEvent`, …
+
+Клановые права (role sync) — константы `ClanPermissionKeys` (`bank_deposit`, `land_manage`, `war_declare`, …).
+
+### PlaceholderAPI
+
+Реализуйте `SoulPactPlaceholderBridge` на extension. Ядро пробрасывает хвост `%spact_<params>%` всем модулям; верните `null`, если params не ваши.
+
+Паттерн (как Quests): префикс `quest_` → `%spact_quest_active%`. Не пересекайтесь с чужими префиксами.
+
+### Кнопка в хаб-меню `/clan`
+
+1. Extension implements **`SoulPactGuiExtension`** + `openGui`.
+2. **Название и lore** — ключи в lang **ядра**: `clan.gui.extensions.modules.<id>.display-name` / `.lore` (`plugins/SoulPact/lang/ru.yml`). Без ключей покажется fallback `{id}`.
+3. **Material иконки** (опционально) — `plugins/SoulPact/gui/general.yml` → `hub.materials.modules.<id>`.
+4. **Слот** — либо явно `hub.slots.modules` (`mymod:34`), либо авто в `modulesOverflow` (дефолтные overflow-слоты уже в config).
+
+Список всех модулей — экран «Модули SoulPact» (`/clan` → extensions); туда попадает **любой** зарегистрированный extension, не только с GUI.
+
+### Gradle / monorepo
+
+Добавить subproject:
+
+```gradle
+// settings.gradle
+include 'soul-pact-mymod'
+
+// soul-pact-mymod/build.gradle
+dependencies {
+    compileOnly('io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT')
+    compileOnly project(':soul-pact-api')
+}
+apply from: rootProject.file('gradle/plugin-jar.gradle')
+```
+
+`plugin.yml`: `libraries` для Maven-зависимостей (Elytrium Serializer и т.д.) — **не shade**, см. правила Paper libraries.
+
+Сборка всех JAR: `./gradlew plugins` → `build/plugins/`.
+
+### plugin.yml (шаблон)
+
+```yaml
+name: SoulPact-MyMod
+main: your.package.MyPlugin
+api-version: '1.21'
+depend: [SoulPact]
+softdepend: [Vault, PlaceholderAPI]
+commands:
+  mymod:
+    permission: soulpact.mymod.use
+```
+
+`name` плагина на сервере = имя JAR без версии; в `depend` указывается **`SoulPact`** (имя ядра из его `plugin.yml`).
+
+### Правила, которые ломают модуль на проде
+
+- JDBC / `getConnection()` на **main thread** — запрещено.
+- Shade `soul-pact-api`, HikariCP, драйвер БД — запрещено.
+- Хардкод текстов и лимитов в Java — только config + `lang/` модуля.
+- GUI без `InventoryHolder` — запрещено (конвенции ядра).
+- Правки **ядра** под ваш модуль (`if module X`) — не нужны; только extension point.
+
+### ID модулей
+
+Уникальный lowercase id (`quests`, `bank`, `clanholo`, …). Зарезервированные имена в monorepo — не занимайте чужие id. Свой: `farm`, `shop`, `dungeons` — что угодно, лишь бы один id на JAR.
+
+### Вне monorepo
+
+Можно собирать отдельный Gradle-проект: Paper API + `soul-pact-api.jar` + ваш код. На сервер: `SoulPact.jar` + ваш JAR. Регистрация та же. Для красивого хаба админ дописывает lang/material в конфиг **ядра** (или вы форкаете monorepo и шлёте PR с ключами).
+
+### Сборка API для IDE
+
+```bash
+./gradlew :soul-pact-api:jar :soul-pact-core:jar plugins
+```
+
+JAR api: `soul-pact-api/build/libs/soul-pact-api-1.0.jar` (или из локального maven cache после publish).
+
+Вопросы по API — смотрите исходники **`soul-pact-api`** и любой модуль `soul-pact-*` как reference implementation.

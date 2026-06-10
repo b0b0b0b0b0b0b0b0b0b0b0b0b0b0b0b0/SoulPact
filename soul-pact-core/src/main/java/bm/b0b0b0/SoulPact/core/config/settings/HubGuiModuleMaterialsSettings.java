@@ -25,4 +25,7 @@ public final class HubGuiModuleMaterialsSettings {
 
     @Comment(@CommentValue("Гладиаторские ивенты"))
     public String gladiator = "DIAMOND_SWORD";
+
+    @Comment(@CommentValue("Голограммы на базе клана"))
+    public String clanholo = "ARMOR_STAND";
 }

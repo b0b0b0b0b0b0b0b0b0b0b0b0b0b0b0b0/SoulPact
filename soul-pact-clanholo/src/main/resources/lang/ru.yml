@@ -1,0 +1,74 @@
+clanholo:
+  startup:
+    core-missing: "SoulPact-ClanHolo: SoulPact core or database is not ready."
+    registered: "SoulPact-ClanHolo enabled. Loaded {count} hologram(s)."
+  command:
+    help:
+      - "<#C084FC><bold>Голограммы клана</bold>"
+      - "<#9CA3AF>/clanholo create <имя> [info|rules] — создать на базе клана"
+      - "<#9CA3AF>/clanholo add [текст] — добавить строку (ближайшая голограмма)"
+      - "<#9CA3AF>/clanholo remove <строка> — удалить строку"
+      - "<#9CA3AF>/clanholo edit <строка> <текст> — изменить строку"
+      - "<#9CA3AF>/clanholo select <имя> — выбрать голограмму"
+      - "<#9CA3AF>/clanholo delete <имя> — удалить"
+      - "<#9CA3AF>/clanholo list — список голограмм клана"
+      - "<#9CA3AF>/clanholo refresh <имя> — обновить шаблон info/rules"
+    admin-help:
+      - "<#C084FC><bold>ClanHolo admin</bold>"
+      - "<#9CA3AF>/clanholo admin create <имя> [info|rules]"
+      - "<#9CA3AF>/clanholo admin add/remove/edit/delete/refresh ..."
+      - "<#9CA3AF>/clanholo reload — перезагрузка модуля"
+  usage:
+    create: "<#9CA3AF>Использование: <white>/clanholo create <имя> [info|rules]"
+    delete: "<#9CA3AF>Использование: <white>/clanholo delete <имя>"
+    remove: "<#9CA3AF>Использование: <white>/clanholo remove <номер_строки>"
+    edit: "<#9CA3AF>Использование: <white>/clanholo edit <номер> <текст>"
+    select: "<#9CA3AF>Использование: <white>/clanholo select <имя>"
+    refresh: "<#9CA3AF>Использование: <white>/clanholo refresh <имя>"
+  create:
+    success: "<#86EFAC>Голограмма <white>{name}</white> создана."
+  delete:
+    success: "<#86EFAC>Голограмма <white>{name}</white> удалена."
+  add:
+    success: "<#86EFAC>Строка добавлена в <white>{name}</white>."
+  remove:
+    success: "<#86EFAC>Строка удалена из <white>{name}</white>."
+  edit:
+    success: "<#86EFAC>Строка изменена в <white>{name}</white>."
+  select:
+    success: "<#86EFAC>Выбрана голограмма <white>{name}</white>."
+  refresh:
+    success: "<#86EFAC>Шаблон голограммы <white>{name}</white> обновлён."
+  reload:
+    success: "<#86EFAC>ClanHolo перезагружен."
+  list:
+    empty: "<#9CA3AF>У клана нет голограмм."
+    header: "<#C084FC><bold>Голограммы клана</bold> <#9CA3AF>({count})"
+    entry: "<#9CA3AF>#{id} <white>{name}</white> — {world} ({x}, {y}, {z}), строк: {lines}"
+  error:
+    players-only: "<#F87171>Только для игроков."
+    not-in-clan: "<#F87171>Вы не состоите в клане."
+    no-permission: "<#F87171>Недостаточно прав."
+    invalid-name: "<#F87171>Недопустимое имя (латиница, цифры, _- , до 32 символов)."
+    not-on-base: "<#F87171>Голограммы можно ставить только на базе клана (SoulPact-Lands + WorldGuard)."
+    worldguard-missing: "<#F87171>WorldGuard не найден — проверка базы клана недоступна."
+    limit: "<#F87171>Лимит голограмм клана: <white>{max}</white>."
+    max-lines: "<#F87171>Максимум строк: <white>{max}</white>."
+    line-too-long: "<#F87171>Строка слишком длинная."
+    blocked-word: "<#F87171>Текст содержит запрещённое слово или ссылку."
+    empty-line: "<#F87171>Текст строки не может быть пустым."
+    not-found: "<#F87171>Голограмма <white>{name}</white> не найдена."
+    no-selection: "<#F87171>Выберите голограмму: <white>/clanholo select <имя></white> или подойдите ближе."
+    line-not-found: "<#F87171>Строка не найдена."
+    no-template: "<#F87171>У этой голограммы нет шаблона info/rules."
+  templates:
+    info:
+      - "<gold><bold>[{tag}]</bold> <white>{name}"
+      - "<gray>Лидер: <white>{leader}"
+      - "<gray>Очки: <yellow>{points}"
+      - "<gray>{description}"
+    rules:
+      - "<yellow><bold>Правила клана</bold>"
+      - "<gray>1. Уважайте союзников"
+      - "<gray>2. Не гриферьте базу"
+      - "<gray>3. Слушайтесь лидера"

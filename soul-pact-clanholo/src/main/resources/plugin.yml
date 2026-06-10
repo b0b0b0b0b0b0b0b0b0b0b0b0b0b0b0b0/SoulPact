@@ -1,0 +1,26 @@
+name: SoulPact-ClanHolo
+version: '${version}'
+main: bm.b0b0b0.SoulPact.clanholo.SoulPactClanHoloPlugin
+api-version: '1.21'
+depend: [SoulPact]
+softdepend: [SoulPact-Lands, WorldGuard]
+libraries:
+  - net.elytrium:serializer:1.1.1
+commands:
+  clanholo:
+    description: Clan base hologram commands
+    aliases: [cholo, dholo]
+    permission: soulpact.clanholo.use
+permissions:
+  soulpact.clanholo.use:
+    description: Manage clan holograms on your clan base
+    default: true
+  soulpact.clanholo.admin:
+    description: Admin clan hologram commands without restrictions
+    default: op
+  soulpact.clanholo.limit.5:
+    description: Up to 5 clan holograms
+    default: false
+  soulpact.clanholo.limit.10:
+    description: Up to 10 clan holograms
+    default: false
