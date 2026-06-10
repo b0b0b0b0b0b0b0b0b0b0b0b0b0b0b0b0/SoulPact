@@ -128,7 +128,7 @@ public final class ClanPlaceholderSnapshotFactory {
         );
         String hasClanFormatted = PlaceholderTextUtil.applyTemplate(
                 placeholderConfig.hasClanFormated(),
-                Map.of("tag", bundle.tag(), "name", bundle.name())
+                Map.of("tag", tagNoColor, "name", PlaceholderTextUtil.stripColors(bundle.name()))
         );
         String creationDate = PlaceholderTextUtil.formatDate(bundle.createdAt());
         int level = PlaceholderTextUtil.clanLevel(
@@ -160,7 +160,7 @@ public final class ClanPlaceholderSnapshotFactory {
                 String.join(placeholderConfig.alliesSeparator(), bundle.allyTags()),
                 PlaceholderTextUtil.applyTemplate(
                         placeholderConfig.verifiedTagFormated(),
-                        Map.of("tag", bundle.tag())
+                        Map.of("tag", tagNoColor)
                 ),
                 PlaceholderTextUtil.formatMoney(bundle.bankBalance()),
                 patentFormatted(memberRole),

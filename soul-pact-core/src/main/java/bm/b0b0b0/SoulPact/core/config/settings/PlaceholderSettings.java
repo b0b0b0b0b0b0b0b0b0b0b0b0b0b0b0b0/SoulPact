@@ -30,7 +30,7 @@ public final class PlaceholderSettings {
     public String tagFormatedNocolor = "[{tag}]";
 
     @Comment(@CommentValue("Формат «в клане»"))
-    public String hasClanFormated = "<#86EFAC>[{tag}]</white> {name}";
+    public String hasClanFormated = "<#86EFAC>[{tag}]</#86EFAC> <white>{name}</white>";
 
     @Comment(@CommentValue("Формат «не в клане»"))
     public String hasClanFormatedNone = "<#6B7280>—";

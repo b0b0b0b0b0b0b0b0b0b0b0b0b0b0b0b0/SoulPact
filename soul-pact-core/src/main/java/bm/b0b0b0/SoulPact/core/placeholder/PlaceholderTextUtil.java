@@ -2,6 +2,7 @@ package bm.b0b0b0.SoulPact.core.placeholder;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
+import bm.b0b0b0.SoulPact.core.message.AdventureTextParser;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.Instant;
@@ -54,6 +55,13 @@ public final class PlaceholderTextUtil {
             result = result.replace("{" + entry.getKey() + "}", entry.getValue());
         }
         return result;
+    }
+
+    public static String toLegacyDisplay(String input) {
+        if (input == null || input.isEmpty()) {
+            return "";
+        }
+        return AdventureTextParser.toLegacyString(input);
     }
 
     public static String formatKdr(int kills, int deaths) {

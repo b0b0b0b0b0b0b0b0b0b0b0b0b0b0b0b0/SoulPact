@@ -6,9 +6,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import net.skinsrestorer.api.SkinsRestorer;
+import net.skinsrestorer.api.property.InputDataResult;
 import net.skinsrestorer.api.property.SkinProperty;
 import net.skinsrestorer.api.storage.PlayerStorage;
+import net.skinsrestorer.api.storage.SkinStorage;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -35,52 +39,119 @@ public final class PlayerHeadSkinApplier {
             skullMeta.setPlayerProfile(copyProfile(cached));
             return;
         }
-        Player online = Bukkit.getPlayer(ownerId);
-        if (online != null) {
-            PlayerProfile profile = copyProfile(online.getPlayerProfile());
-            skullMeta.setPlayerProfile(profile);
-            PROFILE_CACHE.put(ownerId, profile);
+        String resolvedName = resolveOwnerName(ownerId, ownerName);
+        Optional<PlayerProfile> profileOptional = resolveProfile(ownerId, resolvedName);
+        if (profileOptional.isEmpty()) {
             return;
         }
-        if (applySkinRestorer(skullMeta, ownerId)) {
-            PlayerProfile profile = skullMeta.getPlayerProfile();
-            if (profile != null) {
-                PlayerProfile stored = copyProfile(profile);
-                PROFILE_CACHE.put(ownerId, stored);
-            }
-            return;
-        }
-        PlayerProfile profile = Bukkit.createProfile(ownerId);
-        skullMeta.setPlayerProfile(profile);
-        PROFILE_CACHE.put(ownerId, copyProfile(profile));
+        PlayerProfile stored = copyProfile(profileOptional.get());
+        skullMeta.setPlayerProfile(stored);
+        PROFILE_CACHE.put(ownerId, stored);
     }
 
-    private boolean applySkinRestorer(SkullMeta skullMeta, UUID ownerId) {
+    private Optional<PlayerProfile> resolveProfile(UUID ownerId, String ownerName) {
+        Player online = Bukkit.getPlayer(ownerId);
+        if (online != null) {
+            Optional<PlayerProfile> onlineProfile = profileFromExistingTextures(online.getPlayerProfile());
+            if (onlineProfile.isPresent()) {
+                return onlineProfile;
+            }
+        }
+        Optional<SkinProperty> skinRestorerSkin = resolveSkinRestorerSkinLocalOnly(ownerId, ownerName);
+        if (skinRestorerSkin.isPresent()) {
+            return Optional.of(buildProfile(ownerId, ownerName, skinRestorerSkin.get()));
+        }
+        if (online != null) {
+            return profileFromExistingTextures(online.getPlayerProfile());
+        }
+        return Optional.empty();
+    }
+
+    private Optional<SkinProperty> resolveSkinRestorerSkinLocalOnly(UUID ownerId, String ownerName) {
         if (!skinRestorerIntegration.available()) {
-            return false;
+            return Optional.empty();
         }
-        Optional<SkinProperty> skinProperty = resolveSkinProperty(ownerId);
-        if (skinProperty.isEmpty()) {
-            return false;
+        try {
+            SkinsRestorer skinsRestorer = skinRestorerIntegration.skinsRestorer();
+            PlayerStorage playerStorage = skinsRestorer.getPlayerStorage();
+            SkinStorage skinStorage = skinsRestorer.getSkinStorage();
+
+            Optional<SkinProperty> linkedSkin = playerStorage.getSkinOfPlayer(ownerId);
+            if (linkedSkin.isPresent()) {
+                return linkedSkin;
+            }
+
+            Optional<SkinProperty> identifierSkin = playerStorage.getSkinIdOfPlayer(ownerId)
+                    .flatMap(skinStorage::getSkinDataByIdentifier);
+            if (identifierSkin.isPresent()) {
+                return identifierSkin;
+            }
+
+            Optional<SkinProperty> skinByUuidLookup = readSkinDataByInput(skinStorage, ownerId.toString());
+            if (skinByUuidLookup.isPresent()) {
+                return skinByUuidLookup;
+            }
+
+            if (ownerName != null && !ownerName.isBlank()) {
+                Optional<SkinProperty> skinByNameLookup = readSkinDataByInput(skinStorage, ownerName);
+                if (skinByNameLookup.isPresent()) {
+                    return skinByNameLookup;
+                }
+            }
+        } catch (Throwable ignored) {
         }
-        PlayerProfile profile = Bukkit.createProfile(ownerId);
-        SkinProperty property = skinProperty.get();
+        return Optional.empty();
+    }
+
+    private static Optional<SkinProperty> readSkinDataByInput(SkinStorage skinStorage, String input) {
+        Optional<InputDataResult> skinData = skinStorage.findSkinData(input);
+        if (skinData.isEmpty()) {
+            return Optional.empty();
+        }
+        InputDataResult result = skinData.get();
+        if (result.getProperty() != null) {
+            return Optional.of(result.getProperty());
+        }
+        if (result.getIdentifier() == null) {
+            return Optional.empty();
+        }
+        return skinStorage.getSkinDataByIdentifier(result.getIdentifier());
+    }
+
+    private static String resolveOwnerName(UUID ownerId, String ownerName) {
+        if (ownerName != null && !ownerName.isBlank()) {
+            return ownerName;
+        }
+        Player online = Bukkit.getPlayer(ownerId);
+        if (online != null) {
+            String onlineName = online.getPlayerProfile().getName();
+            if (onlineName != null && !onlineName.isBlank()) {
+                return onlineName;
+            }
+        }
+        OfflinePlayer offline = Bukkit.getOfflinePlayer(ownerId);
+        String offlineName = offline.getPlayerProfile().getName();
+        if (offlineName != null && !offlineName.isBlank()) {
+            return offlineName;
+        }
+        return null;
+    }
+
+    private static Optional<PlayerProfile> profileFromExistingTextures(PlayerProfile profile) {
+        if (profile == null || !profile.hasProperty(SkinProperty.TEXTURES_NAME)) {
+            return Optional.empty();
+        }
+        return Optional.of(copyProfile(profile));
+    }
+
+    private static PlayerProfile buildProfile(UUID ownerId, String ownerName, SkinProperty property) {
+        PlayerProfile profile = Bukkit.createProfile(ownerId, ownerName);
         profile.setProperty(new ProfileProperty(
                 SkinProperty.TEXTURES_NAME,
                 property.getValue(),
                 property.getSignature()
         ));
-        skullMeta.setPlayerProfile(profile);
-        return true;
-    }
-
-    private Optional<SkinProperty> resolveSkinProperty(UUID ownerId) {
-        try {
-            PlayerStorage playerStorage = skinRestorerIntegration.skinsRestorer().getPlayerStorage();
-            return playerStorage.getSkinOfPlayer(ownerId);
-        } catch (Throwable ignored) {
-            return Optional.empty();
-        }
+        return profile;
     }
 
     private static PlayerProfile copyProfile(PlayerProfile source) {

@@ -26,6 +26,13 @@ public final class AdventureTextParser {
         return LEGACY.deserialize(input);
     }
 
+    public static String toLegacyString(String input) {
+        if (input == null || input.isEmpty()) {
+            return "";
+        }
+        return LEGACY.serialize(parse(input));
+    }
+
     private static boolean containsMiniMessageTag(String input) {
         int open = input.indexOf('<');
         if (open < 0) {

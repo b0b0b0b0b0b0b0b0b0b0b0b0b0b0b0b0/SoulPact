@@ -48,7 +48,7 @@ public final class ClanHubMenuPopulator {
         inventory.setItem(guiHubConfig.profileSlot(), guiItemBuilder.buildPlayerHead(
                 player,
                 player.getUniqueId(),
-                player.getName(),
+                player.getPlayerProfile().getName(),
                 "clan.gui.hub.item.profile.name",
                 "clan.gui.hub.item.profile.lore",
                 placeholders

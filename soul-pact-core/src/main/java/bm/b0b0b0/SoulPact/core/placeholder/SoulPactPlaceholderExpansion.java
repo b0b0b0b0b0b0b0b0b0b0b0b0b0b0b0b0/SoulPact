@@ -36,6 +36,13 @@ public final class SoulPactPlaceholderExpansion extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(Player player, String params) {
-        return placeholderService.resolve(player, params);
+        String value = placeholderService.resolve(player, params);
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+        if (value.indexOf('<') >= 0) {
+            return PlaceholderTextUtil.toLegacyDisplay(value);
+        }
+        return value;
     }
 }
