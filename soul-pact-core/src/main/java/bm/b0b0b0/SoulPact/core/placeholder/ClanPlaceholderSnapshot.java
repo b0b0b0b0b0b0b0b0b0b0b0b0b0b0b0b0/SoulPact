@@ -31,12 +31,14 @@ public final class ClanPlaceholderSnapshot {
             List.of(),
             List.of(),
             List.of(),
+            List.of(),
             0.0D,
             0,
             0,
             0,
             "",
-            0
+            0,
+            ClanPlaceholderComputed.empty()
     );
 
     private final boolean hasClan;
@@ -64,12 +66,14 @@ public final class ClanPlaceholderSnapshot {
     private final int clanDeaths;
     private final List<String> memberNames;
     private final List<String> onlineMemberNames;
+    private final List<UUID> memberPlayerIds;
     private final List<String> allyTags;
     private final double bankBalance;
     private final int statsLeave;
     private final int statsKick;
     private final int statsJoined;
     private final int roleRank;
+    private final ClanPlaceholderComputed computed;
 
     public ClanPlaceholderSnapshot(
             boolean hasClan,
@@ -96,13 +100,15 @@ public final class ClanPlaceholderSnapshot {
             int onlineCount,
             List<String> memberNames,
             List<String> onlineMemberNames,
+            List<UUID> memberPlayerIds,
             List<String> allyTags,
             double bankBalance,
             int statsJoined,
             int statsLeave,
             int statsKick,
             String bannerData,
-            int roleRank
+            int roleRank,
+            ClanPlaceholderComputed computed
     ) {
         this.hasClan = hasClan;
         this.clanId = clanId;
@@ -129,16 +135,60 @@ public final class ClanPlaceholderSnapshot {
         this.clanDeaths = clanDeaths;
         this.memberNames = List.copyOf(memberNames);
         this.onlineMemberNames = List.copyOf(onlineMemberNames);
+        this.memberPlayerIds = List.copyOf(memberPlayerIds);
         this.allyTags = List.copyOf(allyTags);
         this.bankBalance = bankBalance;
         this.statsJoined = statsJoined;
         this.statsLeave = statsLeave;
         this.statsKick = statsKick;
         this.roleRank = roleRank;
+        this.computed = computed == null ? ClanPlaceholderComputed.empty() : computed;
     }
 
     public static ClanPlaceholderSnapshot empty() {
         return EMPTY;
+    }
+
+    public ClanPlaceholderSnapshot withOnlinePresence(
+            int onlineCount,
+            List<String> onlineMemberNames,
+            String onlineMembersLine
+    ) {
+        return new ClanPlaceholderSnapshot(
+                hasClan,
+                clanId,
+                tag,
+                name,
+                description,
+                leaderId,
+                leaderName,
+                points,
+                warsWon,
+                warsLost,
+                maxSlots,
+                memberCount,
+                verified,
+                friendlyFire,
+                joinOpen,
+                createdAt,
+                memberRole,
+                memberKills,
+                memberDeaths,
+                clanKills,
+                clanDeaths,
+                onlineCount,
+                memberNames,
+                onlineMemberNames,
+                memberPlayerIds,
+                allyTags,
+                bankBalance,
+                statsJoined,
+                statsLeave,
+                statsKick,
+                bannerData,
+                roleRank,
+                computed.withOnlineMembersLine(onlineMembersLine)
+        );
     }
 
     public boolean hasClan() {
@@ -241,6 +291,10 @@ public final class ClanPlaceholderSnapshot {
         return onlineMemberNames;
     }
 
+    public List<UUID> memberPlayerIds() {
+        return memberPlayerIds;
+    }
+
     public List<String> allyTags() {
         return allyTags;
     }
@@ -263,5 +317,9 @@ public final class ClanPlaceholderSnapshot {
 
     public int roleRank() {
         return roleRank;
+    }
+
+    public ClanPlaceholderComputed computed() {
+        return computed;
     }
 }

@@ -35,28 +35,32 @@ public final class SoulPactPlaceholderBootstrap {
             return;
         }
         unregister();
-        ClanPlaceholderSnapshotLoader snapshotLoader = new ClanPlaceholderSnapshotLoader(
-                dataSourceProvider,
-                roleThemeService,
+        ClanPlaceholderDataLoader dataLoader = new ClanPlaceholderDataLoader(dataSourceProvider);
+        ClanPlaceholderSnapshotFactory snapshotFactory = new ClanPlaceholderSnapshotFactory(
+                placeholderConfig,
+                roleThemeService
+        );
+        placeholderService = new SoulPactPlaceholderService(
+                null,
+                dataLoader,
+                snapshotFactory,
                 placeholderConfig.cacheMillis()
         );
         SoulPactPlaceholderResolver resolver = new SoulPactPlaceholderResolver(
                 placeholderConfig,
                 localeConfig,
                 vaultIntegration,
-                snapshotLoader,
+                placeholderService,
                 List.of()
         );
-        placeholderService = new SoulPactPlaceholderService(
-                resolver,
-                snapshotLoader,
-                placeholderConfig.cacheMillis()
-        );
+        placeholderService.bindResolver(resolver);
         expansion = new SoulPactPlaceholderExpansion(plugin, placeholderService);
         expansion.register();
+        ClanPlaceholderInvalidatorRegistry.install(placeholderService);
     }
 
     public void unregister() {
+        ClanPlaceholderInvalidatorRegistry.uninstall();
         if (expansion != null) {
             expansion.unregister();
             expansion = null;

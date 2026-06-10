@@ -8,6 +8,7 @@ import bm.b0b0b0.SoulPact.core.config.ClanConfig;
 import bm.b0b0b0.SoulPact.core.config.EconomyConfig;
 import bm.b0b0b0.SoulPact.core.database.AsyncDatabaseExecutor;
 import bm.b0b0b0.SoulPact.core.message.MessageService;
+import bm.b0b0b0.SoulPact.core.placeholder.ClanPlaceholderInvalidatorRegistry;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -129,6 +130,8 @@ public final class ClanCreateService {
             if (!player.isOnline()) {
                 return;
             }
+            ClanPlaceholderInvalidatorRegistry.invalidatePlayer(player.getUniqueId());
+            ClanPlaceholderInvalidatorRegistry.invalidateClan(clan.id());
             messageService.send(player, "clan.create.success", Map.of(
                     "tag", clan.tag(),
                     "name", clan.name()

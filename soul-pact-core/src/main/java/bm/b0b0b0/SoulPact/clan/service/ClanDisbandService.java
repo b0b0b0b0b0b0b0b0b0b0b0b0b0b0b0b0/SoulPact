@@ -6,6 +6,7 @@ import bm.b0b0b0.SoulPact.clan.repository.ClanRepository;
 import bm.b0b0b0.SoulPact.clan.standard.ClanStandardPresence;
 import bm.b0b0b0.SoulPact.core.database.AsyncDatabaseExecutor;
 import bm.b0b0b0.SoulPact.core.message.MessageService;
+import bm.b0b0b0.SoulPact.core.placeholder.ClanPlaceholderInvalidatorRegistry;
 import java.util.List;
 import java.util.Map;
 import org.bukkit.Bukkit;
@@ -75,6 +76,9 @@ public final class ClanDisbandService {
             return historyFuture.thenCompose(ignored -> clanRepository.deleteClan(clan.id()));
         }).thenApply(deleted -> {
             standardPresence.clear(clan.id());
+            if (deleted) {
+                ClanPlaceholderInvalidatorRegistry.invalidateClan(clan.id());
+            }
             asyncDatabaseExecutor.runSync(() -> finishDisband(clan, initiator, standardLoss, deleted));
             return deleted;
         });

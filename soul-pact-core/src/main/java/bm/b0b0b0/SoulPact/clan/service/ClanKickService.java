@@ -7,6 +7,7 @@ import bm.b0b0b0.SoulPact.clan.role.RoleThemeService;
 import bm.b0b0b0.SoulPact.core.database.AsyncDatabaseExecutor;
 import bm.b0b0b0.SoulPact.core.message.MessageService;
 import bm.b0b0b0.SoulPact.core.module.ClanExtensionMembershipNotifier;
+import bm.b0b0b0.SoulPact.core.placeholder.ClanPlaceholderInvalidatorRegistry;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -73,6 +74,8 @@ public final class ClanKickService {
                                         .thenApply(removed -> {
                                             if (removed) {
                                                 extensionMembershipNotifier.memberLeft(clan.id(), targetId);
+                                                ClanPlaceholderInvalidatorRegistry.invalidateClan(clan.id());
+                                                ClanPlaceholderInvalidatorRegistry.invalidatePlayer(targetId);
                                             }
                                             asyncDatabaseExecutor.runSync(() -> {
                                                 if (!actor.isOnline()) {

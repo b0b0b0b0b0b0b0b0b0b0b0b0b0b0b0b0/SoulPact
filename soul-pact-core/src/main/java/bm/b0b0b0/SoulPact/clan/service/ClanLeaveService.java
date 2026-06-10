@@ -6,6 +6,7 @@ import bm.b0b0b0.SoulPact.clan.repository.ClanRepository;
 import bm.b0b0b0.SoulPact.core.database.AsyncDatabaseExecutor;
 import bm.b0b0b0.SoulPact.core.message.MessageService;
 import bm.b0b0b0.SoulPact.core.module.ClanExtensionMembershipNotifier;
+import bm.b0b0b0.SoulPact.core.placeholder.ClanPlaceholderInvalidatorRegistry;
 import java.util.Map;
 import java.util.Optional;
 import org.bukkit.entity.Player;
@@ -58,6 +59,8 @@ public final class ClanLeaveService {
                         return;
                     }
                     extensionMembershipNotifier.memberLeft(clan.id(), player.getUniqueId());
+                    ClanPlaceholderInvalidatorRegistry.invalidateClan(clan.id());
+                    ClanPlaceholderInvalidatorRegistry.invalidatePlayer(player.getUniqueId());
                     messageService.send(player, "clan.leave.success", Map.of("tag", clan.tag()));
                 });
                 return removed;

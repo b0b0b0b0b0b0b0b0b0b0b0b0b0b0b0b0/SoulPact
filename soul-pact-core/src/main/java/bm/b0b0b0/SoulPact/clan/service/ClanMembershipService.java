@@ -11,6 +11,7 @@ import bm.b0b0b0.SoulPact.clan.repository.ClanRepository;
 import bm.b0b0b0.SoulPact.core.database.AsyncDatabaseExecutor;
 import bm.b0b0b0.SoulPact.core.message.MessageService;
 import bm.b0b0b0.SoulPact.core.module.ClanExtensionMembershipNotifier;
+import bm.b0b0b0.SoulPact.core.placeholder.ClanPlaceholderInvalidatorRegistry;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -492,6 +493,8 @@ public final class ClanMembershipService {
                             return CompletableFuture.completedFuture(null);
                         }
                         extensionMembershipNotifier.memberJoined(clan.id(), playerId);
+                        ClanPlaceholderInvalidatorRegistry.invalidateClan(clan.id());
+                        ClanPlaceholderInvalidatorRegistry.invalidatePlayer(playerId);
                         CompletableFuture<Integer> deleteRequestFuture = requestIdToDelete == null
                                 ? CompletableFuture.completedFuture(0)
                                 : membershipRepository.deleteJoinRequest(requestIdToDelete).thenApply(deleted -> deleted ? 1 : 0);
