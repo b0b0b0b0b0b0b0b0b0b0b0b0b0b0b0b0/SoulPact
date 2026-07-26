@@ -1,5 +1,6 @@
 package bm.b0b0b0.SoulPact.quests.gui;
 
+import bm.b0b0b0.SoulPact.api.message.GuiItemTextStyles;
 import bm.b0b0b0.SoulPact.quests.message.QuestsMessages;
 import bm.b0b0b0.SoulPact.quests.message.QuestsTextParser;
 import java.util.List;
@@ -16,9 +17,9 @@ public final class QuestsGuiItems {
     public static ItemStack named(Material material, String name, List<String> loreLines) {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(QuestsTextParser.parse(name));
+        itemMeta.displayName(GuiItemTextStyles.apply(QuestsTextParser.parse(name)));
         if (loreLines != null && !loreLines.isEmpty()) {
-            itemMeta.lore(loreLines.stream().map(QuestsTextParser::parse).toList());
+            itemMeta.lore(loreLines.stream().map(QuestsTextParser::parse).map(GuiItemTextStyles::apply).toList());
         }
         itemStack.setItemMeta(itemMeta);
         return itemStack;
@@ -42,7 +43,7 @@ public final class QuestsGuiItems {
     public static ItemStack filler(Material material) {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(QuestsTextParser.parse(" "));
+        itemMeta.displayName(GuiItemTextStyles.apply(QuestsTextParser.parse(" ")));
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }

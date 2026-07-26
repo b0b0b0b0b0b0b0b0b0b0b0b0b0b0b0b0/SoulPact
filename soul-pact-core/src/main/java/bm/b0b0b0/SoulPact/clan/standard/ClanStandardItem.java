@@ -31,17 +31,17 @@ public final class ClanStandardItem {
         ItemStack itemStack = bannerDesign.clone();
         ItemMeta itemMeta = itemStack.getItemMeta();
         markContainer(itemMeta.getPersistentDataContainer(), clanId, clanTag, standardUid);
-        itemMeta.displayName(messageService.component(
+        itemMeta.displayName(AdventureTextParser.parseItem(messageService.resolve(
                 player,
                 "clan.standard.item.name",
                 Map.of("tag", clanTag, "id", String.valueOf(clanId))
-        ));
+        )));
         List<String> loreLines = messageService.resolveList(
                 player,
                 "clan.standard.item.lore",
                 Map.of("tag", clanTag, "id", String.valueOf(clanId))
         );
-        itemMeta.lore(loreLines.stream().map(AdventureTextParser::parse).toList());
+        itemMeta.lore(loreLines.stream().map(AdventureTextParser::parseItem).toList());
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }

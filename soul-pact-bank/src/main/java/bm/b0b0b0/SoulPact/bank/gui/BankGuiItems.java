@@ -1,5 +1,6 @@
 package bm.b0b0b0.SoulPact.bank.gui;
 
+import bm.b0b0b0.SoulPact.api.message.GuiItemTextStyles;
 import bm.b0b0b0.SoulPact.bank.message.BankMessages;
 import bm.b0b0b0.SoulPact.bank.message.BankTextParser;
 import java.util.ArrayList;
@@ -35,9 +36,9 @@ public final class BankGuiItems {
     public static ItemStack named(BankMessages messages, Player player, Material material, String name, List<String> loreLines) {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(BankTextParser.parse(name));
+        itemMeta.displayName(GuiItemTextStyles.apply(BankTextParser.parse(name)));
         if (loreLines != null && !loreLines.isEmpty()) {
-            itemMeta.lore(loreLines.stream().map(BankTextParser::parse).toList());
+            itemMeta.lore(loreLines.stream().map(BankTextParser::parse).map(GuiItemTextStyles::apply).toList());
         }
         itemStack.setItemMeta(itemMeta);
         return itemStack;
@@ -46,7 +47,7 @@ public final class BankGuiItems {
     public static ItemStack filler(Material material) {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(BankTextParser.parse(" "));
+        itemMeta.displayName(GuiItemTextStyles.apply(BankTextParser.parse(" ")));
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }

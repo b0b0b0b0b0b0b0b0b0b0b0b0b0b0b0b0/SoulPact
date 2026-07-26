@@ -1,5 +1,6 @@
 package bm.b0b0b0.SoulPact.gladiator.gui;
 
+import bm.b0b0b0.SoulPact.api.message.GuiItemTextStyles;
 import bm.b0b0b0.SoulPact.gladiator.message.GladiatorMessages;
 import bm.b0b0b0.SoulPact.gladiator.message.GladiatorTextParser;
 import java.util.List;
@@ -17,9 +18,9 @@ public final class GladiatorGuiItems {
     public static ItemStack named(Material material, String name, List<String> loreLines) {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(GladiatorTextParser.parse(name));
+        itemMeta.displayName(GuiItemTextStyles.apply(GladiatorTextParser.parse(name)));
         if (loreLines != null && !loreLines.isEmpty()) {
-            itemMeta.lore(loreLines.stream().map(GladiatorTextParser::parse).toList());
+            itemMeta.lore(loreLines.stream().map(GladiatorTextParser::parse).map(GuiItemTextStyles::apply).toList());
         }
         itemStack.setItemMeta(itemMeta);
         return itemStack;
@@ -43,7 +44,7 @@ public final class GladiatorGuiItems {
     public static ItemStack filler(Material material) {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(GladiatorTextParser.parse(" "));
+        itemMeta.displayName(GuiItemTextStyles.apply(GladiatorTextParser.parse(" ")));
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }

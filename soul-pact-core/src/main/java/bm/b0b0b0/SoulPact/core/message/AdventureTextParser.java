@@ -1,5 +1,6 @@
 package bm.b0b0b0.SoulPact.core.message;
 
+import bm.b0b0b0.SoulPact.api.message.GuiItemTextStyles;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -24,6 +25,10 @@ public final class AdventureTextParser {
             return MINI_MESSAGE.deserialize(input);
         }
         return LEGACY.deserialize(input);
+    }
+
+    public static Component parseItem(String input) {
+        return GuiItemTextStyles.apply(parse(input));
     }
 
     public static String toLegacyString(String input) {

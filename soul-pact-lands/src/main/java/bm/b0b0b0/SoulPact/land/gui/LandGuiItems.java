@@ -1,5 +1,6 @@
 package bm.b0b0b0.SoulPact.land.gui;
 
+import bm.b0b0b0.SoulPact.api.message.GuiItemTextStyles;
 import bm.b0b0b0.SoulPact.land.message.LandMessages;
 import bm.b0b0b0.SoulPact.land.message.LandTextParser;
 import java.util.List;
@@ -24,8 +25,8 @@ public final class LandGuiItems {
     ) {
         ItemStack stack = new ItemStack(material);
         ItemMeta meta = stack.getItemMeta();
-        meta.displayName(LandTextParser.parse(messages.resolve(player, nameKey, placeholders)));
-        meta.lore(loreLines.stream().map(LandTextParser::parse).toList());
+        meta.displayName(GuiItemTextStyles.apply(LandTextParser.parse(messages.resolve(player, nameKey, placeholders))));
+        meta.lore(loreLines.stream().map(LandTextParser::parse).map(GuiItemTextStyles::apply).toList());
         stack.setItemMeta(meta);
         return stack;
     }
@@ -51,7 +52,7 @@ public final class LandGuiItems {
     public static ItemStack filler(LandMessages messages, Material material) {
         ItemStack stack = new ItemStack(material);
         ItemMeta meta = stack.getItemMeta();
-        meta.displayName(LandTextParser.parse(messages.resolveDefault("land.gui.filler.name")));
+        meta.displayName(GuiItemTextStyles.apply(LandTextParser.parse(messages.resolveDefault("land.gui.filler.name"))));
         stack.setItemMeta(meta);
         return stack;
     }

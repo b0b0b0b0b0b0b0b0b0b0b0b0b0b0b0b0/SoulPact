@@ -42,6 +42,12 @@ subprojects {
     }
 }
 
+tasks.register('clean', Delete) {
+    group = 'build'
+    description = 'Delete root build/ (including build/plugins)'
+    delete layout.buildDirectory
+}
+
 tasks.register('plugins') {
     group = 'build'
     description = 'Build plugin JARs into build/plugins'

@@ -1,5 +1,6 @@
 package bm.b0b0b0.SoulPact.clan.gui;
 
+import bm.b0b0b0.SoulPact.api.message.GuiItemTextStyles;
 import bm.b0b0b0.SoulPact.core.integration.PlayerHeadSkinApplier;
 import bm.b0b0b0.SoulPact.core.message.AdventureTextParser;
 import bm.b0b0b0.SoulPact.core.message.MessageService;
@@ -44,9 +45,9 @@ public final class GuiItemBuilder {
     ) {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(messageService.component(player, nameKey, placeholders));
+        itemMeta.displayName(GuiItemTextStyles.apply(messageService.component(player, nameKey, placeholders)));
         if (loreLines != null && !loreLines.isEmpty()) {
-            itemMeta.lore(loreLines.stream().map(AdventureTextParser::parse).toList());
+            itemMeta.lore(loreLines.stream().map(AdventureTextParser::parseItem).toList());
         }
         itemStack.setItemMeta(itemMeta);
         return itemStack;
@@ -79,9 +80,9 @@ public final class GuiItemBuilder {
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
         playerHeadSkinApplier.apply(skullMeta, ownerId, ownerName);
-        skullMeta.displayName(messageService.component(player, nameKey, placeholders));
+        skullMeta.displayName(GuiItemTextStyles.apply(messageService.component(player, nameKey, placeholders)));
         if (loreLines != null && !loreLines.isEmpty()) {
-            skullMeta.lore(loreLines.stream().map(AdventureTextParser::parse).toList());
+            skullMeta.lore(loreLines.stream().map(AdventureTextParser::parseItem).toList());
         }
         itemStack.setItemMeta(skullMeta);
         return itemStack;
@@ -105,10 +106,10 @@ public final class GuiItemBuilder {
     ) {
         ItemStack itemStack = source.clone();
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.displayName(messageService.component(player, nameKey, placeholders));
+        itemMeta.displayName(GuiItemTextStyles.apply(messageService.component(player, nameKey, placeholders)));
         List<String> loreLines = messageService.resolveList(player, loreKey, placeholders);
         if (loreLines != null && !loreLines.isEmpty()) {
-            itemMeta.lore(loreLines.stream().map(AdventureTextParser::parse).toList());
+            itemMeta.lore(loreLines.stream().map(AdventureTextParser::parseItem).toList());
         }
         itemStack.setItemMeta(itemMeta);
         return itemStack;

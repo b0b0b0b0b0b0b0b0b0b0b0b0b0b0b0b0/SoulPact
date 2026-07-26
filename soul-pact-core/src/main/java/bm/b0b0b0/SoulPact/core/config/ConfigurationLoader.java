@@ -1,5 +1,6 @@
 package bm.b0b0b0.SoulPact.core.config;
 
+import bm.b0b0b0.SoulPact.api.message.GuiItemTextStyles;
 import bm.b0b0b0.SoulPact.core.config.settings.GuiGeneralSettings;
 import bm.b0b0b0.SoulPact.core.config.settings.SoulPactSettings;
 import java.nio.file.Path;
@@ -20,6 +21,7 @@ public final class ConfigurationLoader {
         SerializedConfigReloader.reload(plugin, mainSettings, Path.of("config.yml"));
         SerializedConfigReloader.reload(plugin, guiSettings, Path.of("gui", "general.yml"));
         this.pluginConfig = new PluginConfig(mainSettings, guiSettings);
+        GuiItemTextStyles.setCurrent(pluginConfig.guiItemTextStyle().style());
         return pluginConfig;
     }
 

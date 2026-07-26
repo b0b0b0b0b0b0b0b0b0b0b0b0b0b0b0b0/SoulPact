@@ -24,11 +24,13 @@ public final class PluginConfig {
     private final PermissionsConfig permissionsConfig;
     private final EconomyConfig economyConfig;
     private final PlaceholderConfig placeholderConfig;
+    private final GuiItemTextStyleConfig guiItemTextStyleConfig;
 
     public PluginConfig(SoulPactSettings mainSettings, GuiGeneralSettings guiSettings) {
         this.localeConfig = new LocaleConfig(mainSettings.locale);
         this.databaseConfig = new DatabaseConfig(mainSettings.database);
         this.clanConfig = new ClanConfig(mainSettings.clan);
+        this.guiItemTextStyleConfig = new GuiItemTextStyleConfig(guiSettings.textStyle);
         this.guiHubConfig = new GuiHubConfig(guiSettings.hub);
         this.guiProfileConfig = new GuiProfileConfig(guiSettings.profile);
         this.guiListConfig = new GuiListConfig(guiSettings.list);
@@ -121,5 +123,9 @@ public final class PluginConfig {
 
     public PlaceholderConfig placeholders() {
         return placeholderConfig;
+    }
+
+    public GuiItemTextStyleConfig guiItemTextStyle() {
+        return guiItemTextStyleConfig;
     }
 }

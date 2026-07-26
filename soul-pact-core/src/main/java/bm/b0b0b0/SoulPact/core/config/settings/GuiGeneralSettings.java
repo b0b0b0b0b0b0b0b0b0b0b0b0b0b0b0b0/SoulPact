@@ -2,6 +2,7 @@ package bm.b0b0b0.SoulPact.core.config.settings;
 
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
+import net.elytrium.serializer.annotations.NewLine;
 import net.elytrium.serializer.language.object.YamlSerializable;
 
 @Comment(@CommentValue("SoulPact — общие настройки GUI (слоты, материалы). Тексты — в lang/"))
@@ -11,6 +12,10 @@ public final class GuiGeneralSettings extends YamlSerializable {
         super(SoulPactSerializerConfig.INSTANCE);
     }
 
+    @Comment(@CommentValue("Стили имён и lore предметов во всех GUI (ядро + модули)"))
+    public GuiTextStyleSettings textStyle = new GuiTextStyleSettings();
+
+    @NewLine
     @Comment(@CommentValue("Главное меню кланов (/clan help)"))
     public HubGuiSettings hub = new HubGuiSettings();
 

@@ -1,5 +1,6 @@
 package bm.b0b0b0.SoulPact.chest.message;
 
+import bm.b0b0b0.SoulPact.api.message.GuiItemTextStyles;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -23,7 +24,7 @@ public final class ChestGuiItems {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (itemMeta != null) {
-            itemMeta.displayName(Component.empty());
+            itemMeta.displayName(GuiItemTextStyles.apply(Component.empty()));
             itemStack.setItemMeta(itemMeta);
         }
         return itemStack;
@@ -42,8 +43,11 @@ public final class ChestGuiItems {
         if (itemMeta == null) {
             return itemStack;
         }
-        itemMeta.displayName(parse(messages.resolve(player, nameKey, placeholders)));
-        itemMeta.lore(messages.resolveList(player, loreKey, placeholders).stream().map(ChestGuiItems::parse).toList());
+        itemMeta.displayName(GuiItemTextStyles.apply(parse(messages.resolve(player, nameKey, placeholders))));
+        itemMeta.lore(messages.resolveList(player, loreKey, placeholders).stream()
+                .map(ChestGuiItems::parse)
+                .map(GuiItemTextStyles::apply)
+                .toList());
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
